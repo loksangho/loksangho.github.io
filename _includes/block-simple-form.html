@@ -1,5 +1,14 @@
 <section id="simple-form" class="block block-simple-form">
   <form action="{{section.form.action}}" method="{{section.form.method}}">
+    {% for field in section.form.fields %}
+    {% assign template = field.type %}
+    {% case template %}
+    {% when 'text' %}
+    <label>{{field.label}}</label><br>
+    <input type="{{field.type}}" name="{{field.name}}">
+    {% endcase %}
+    {% endfor %}
+
     <input type="text" name="name">
     <button type="submit">Send</button>
   </form>
