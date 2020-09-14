@@ -3,6 +3,15 @@ layout: blocks
 title: Contact
 date: 
 page_sections:
+- template: navigation-header-w-button
+  block: header-2
+  navigation:
+  - link: "/"
+    link_text: Home
+  cta:
+    url: "/contact"
+    button_text: Contact
+  logo: ''
 - template: simple-form
   block: simple-form
   form:
