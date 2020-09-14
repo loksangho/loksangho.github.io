@@ -1,4 +1,26 @@
 ---
 label: textarea
 hide_body: true
-fields: []
+fields:
+- name: type
+  type: text
+  config:
+    required: false
+  label: type
+  hidden: true
+  default: textarea
+- name: name
+  type: text
+  config:
+    required: true
+  label: name
+- name: label
+  type: text
+  config:
+    required: false
+  label: label
+- name: description
+  type: text
+  config:
+    required: false
+  label: description
