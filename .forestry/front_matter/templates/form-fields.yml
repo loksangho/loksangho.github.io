@@ -11,6 +11,7 @@ fields:
   - select
   - radio
   - checkbox
+  - email
   config:
     min: 
     max: 
