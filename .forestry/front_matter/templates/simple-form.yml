@@ -2,6 +2,13 @@
 label: Simple Form
 hide_body: true
 fields:
+- name: block
+  type: text
+  config:
+    required: false
+  label: block
+  default: simple-form
+  hidden: true
 - name: title
   type: text
   config:
@@ -33,6 +40,27 @@ fields:
     config: {}
     template: form-fields
     label: fields
+  - name: action
+    type: text
+    config:
+      required: false
+    label: action
+    hidden: true
+  - name: method
+    type: select
+    default: []
+    config:
+      required: false
+      options:
+      - POST
+      - GET
+      source:
+        type: simple
+        section: 
+        file: 
+        path: 
+    label: method
+    hidden: true
   label: form
 pages:
 - contact.md
