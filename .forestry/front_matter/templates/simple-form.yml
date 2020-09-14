@@ -62,5 +62,3 @@ fields:
     template: form-fields
     label: fields
   label: form
-pages:
-- contact.md
