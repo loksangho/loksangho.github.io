@@ -23,6 +23,14 @@ page_sections:
       name: Message
       label: Message
       description: ''
+    - template: select
+      type: select
+      name: TestSelect
+      label: TestSelect
+      options:
+      - Two
+      - One
+      description: ''
   title: Message Me
 
 ---
