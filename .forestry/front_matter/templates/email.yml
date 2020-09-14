@@ -1,4 +1,40 @@
 ---
 label: email
 hide_body: true
-fields: []
+fields:
+- name: type
+  type: text
+  config:
+    required: false
+  label: Type
+  hidden: true
+  default: email
+- name: name
+  type: text
+  config:
+    required: true
+  label: Name
+- name: label
+  type: text
+  config:
+    required: false
+  label: Label
+- name: description
+  type: text
+  config:
+    required: false
+  label: Description
+- name: required
+  type: select
+  default: 'False'
+  config:
+    required: true
+    options:
+    - 'True'
+    - 'False'
+    source:
+      type: simple
+      section: 
+      file: 
+      path: 
+  label: Required
