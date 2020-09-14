@@ -13,7 +13,7 @@ page_sections:
   cta:
     url: "/contact"
     button_text: Contact
-  logo: ''
+  logo: "/uploads/2020/09/14/favicon-1.png"
 - template: simple-form
   block: simple-form
   form:
