@@ -38,14 +38,14 @@ fields:
   - name: action
     type: text
     config:
-      required: false
+      required: true
     label: action
     hidden: true
   - name: method
     type: select
     default: []
     config:
-      required: false
+      required: true
       options:
       - POST
       - GET
