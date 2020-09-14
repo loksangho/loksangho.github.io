@@ -18,6 +18,11 @@ page_sections:
       name: Name
       label: Name
       description: ''
+    - template: textarea
+      type: textarea
+      name: Message
+      label: Message
+      description: ''
   title: Message Me
 
 ---
