@@ -1,1 +1,15 @@
-
+<section id="simple-form" class="block block-simple-form">
+  <form action="{{section."
+  
+  <div class="container">
+    <div class="columns">
+      <div class="column media">
+          <img src="{{ section.media.image | relative_url }}" alt="{{ section.media.alt_text }}">
+      </div>
+      <div class="column text">
+          <h2><span class="light">{{ section.headline }}</span></h2>
+          <p>{{ section.content }}</p>
+      </div>  
+    </div>
+  </div>
+</section>
