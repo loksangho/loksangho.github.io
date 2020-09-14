@@ -19,6 +19,12 @@ page_sections:
       label: Name
       description: ''
       required: 'True'
+    - template: email
+      type: email
+      required: 'True'
+      name: Email
+      label: Email
+      description: ''
     - template: textarea
       type: textarea
       name: Message
