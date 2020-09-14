@@ -35,11 +35,6 @@ fields:
     config:
       required: false
     label: submit_text
-  - name: fields
-    type: include
-    config: {}
-    template: form-fields
-    label: fields
   - name: action
     type: text
     config:
@@ -61,6 +56,11 @@ fields:
         path: 
     label: method
     hidden: true
+  - name: fields
+    type: include
+    config: {}
+    template: form-fields
+    label: fields
   label: form
 pages:
 - contact.md
