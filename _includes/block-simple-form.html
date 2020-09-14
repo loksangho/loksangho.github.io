@@ -6,9 +6,6 @@
     {% when 'text' %}
     <label>{{field.label}}</label><br>
     <input type="{{field.type}}" name="{{field.name}}"><br>
-    {% when 'email' %}
-    <label>{{field.label}}</label><br>
-    <input type="{{field.type}}" name="{{field.name}}"><br>
     {% when 'textarea' %}
     <label>{{field.label}}</label><br>
     <input type="{{field.type}}" name="{{field.name}}"><br>
@@ -29,7 +26,7 @@
     <label for="{{field.name}}">{{field.label}}</label><br>
     {% endcase %}
     {% endfor %}
-    
+    <div class="g-recaptcha" data-sitekey="6Lc9RMwZAAAAAHCvJxeDOLBHzfcIyoAWnQhGcTRd"></div>
     <button type="submit">{{section.form.submit_text}}</button>
   </form>
 </section>
