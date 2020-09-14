@@ -1,4 +1,26 @@
 ---
 label: text
 hide_body: true
-fields: []
+fields:
+- name: type
+  type: text
+  config:
+    required: false
+  hidden: true
+  label: type
+  default: text
+- name: name
+  type: text
+  config:
+    required: true
+  label: name
+- name: label
+  type: text
+  config:
+    required: false
+  label: label
+- name: description
+  type: text
+  config:
+    required: false
+  label: description
