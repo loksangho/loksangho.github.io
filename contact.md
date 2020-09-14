@@ -19,6 +19,5 @@ page_sections:
       label: Name
       description: ''
   title: Message Me
-published: false
 
 ---
