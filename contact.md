@@ -9,6 +9,16 @@ form:
     name: Name
     label: Name
     description: ''
+  - template: text
+    type: text
+    name: Email
+    label: Email
+    description: ''
+  - template: text
+    type: text
+    name: Message
+    label: Message
+    description: ''
 title: Contact
 published: false
 
