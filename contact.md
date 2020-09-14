@@ -20,6 +20,9 @@ form:
     label: Message
     description: ''
 title: Contact
+menu:
+  main:
+    weight: 2
 published: false
 
 ---
