@@ -24,3 +24,17 @@ fields:
   config:
     required: false
   label: description
+- name: required
+  type: select
+  default: 'False'
+  config:
+    required: true
+    options:
+    - 'True'
+    - 'False'
+    source:
+      type: simple
+      section: 
+      file: 
+      path: 
+  label: Required
