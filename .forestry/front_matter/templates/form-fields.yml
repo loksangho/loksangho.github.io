@@ -1,4 +1,16 @@
 ---
 label: Form Fields
 hide_body: true
-fields: []
+fields:
+- name: fields
+  type: blocks
+  label: fields
+  template_types:
+  - text
+  - textarea
+  - select
+  - radio
+  - checkbox
+  config:
+    min: 
+    max: 
