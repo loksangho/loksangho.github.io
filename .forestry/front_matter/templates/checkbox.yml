@@ -1,4 +1,31 @@
 ---
 label: checkbox
 hide_body: true
-fields: []
+fields:
+- name: type
+  type: text
+  config:
+    required: false
+  label: type
+  default: checkbox
+  hidden: true
+- name: name
+  type: text
+  config:
+    required: true
+  label: name
+- name: label
+  type: text
+  config:
+    required: false
+  label: label
+- name: description
+  type: text
+  config:
+    required: false
+  label: description
+- name: checkbox_text
+  type: text
+  config:
+    required: false
+  label: checkbox_text
