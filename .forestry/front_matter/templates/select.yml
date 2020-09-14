@@ -30,4 +30,6 @@ fields:
     use_select: false
     min: 
     max: 
+    source:
+      type: simple
   label: options
