@@ -18,19 +18,13 @@ page_sections:
       name: Name
       label: Name
       description: ''
+      required: 'True'
     - template: textarea
       type: textarea
       name: Message
       label: Message
       description: ''
-    - template: select
-      type: select
-      name: TestSelect
-      label: TestSelect
-      options:
-      - Two
-      - One
-      description: ''
+      required: 'True'
   title: Message Me
 
 ---
