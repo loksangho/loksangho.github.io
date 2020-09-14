@@ -6,6 +6,9 @@
     {% when 'text' %}
     <label>{{field.label}}</label><br>
     <input type="{{field.type}}" name="{{field.name}}"><br>
+    {% when 'email' %}
+    <label>{{field.label}}</label><br>
+    <input type="{{field.type}}" name="{{field.name}}"><br>
     {% when 'textarea' %}
     <label>{{field.label}}</label><br>
     <input type="{{field.type}}" name="{{field.name}}"><br>
