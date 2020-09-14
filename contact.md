@@ -23,6 +23,5 @@ title: Contact
 menu:
   main:
     weight: 2
-published: false
 
 ---
