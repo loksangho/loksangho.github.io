@@ -8,6 +8,8 @@ page_sections:
   navigation:
   - link: "/"
     link_text: Home
+  - link: "/about-me"
+    link_text: About Me
   cta:
     url: "/contact"
     button_text: Contact
