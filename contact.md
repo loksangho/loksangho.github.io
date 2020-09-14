@@ -7,9 +7,10 @@ page_sections:
   block: simple-form
   form:
     type: simple
-    method: []
+    method: POST
     recipient: sangstar@gmail.com
-    submit_text: Message
+    submit_text: Message Me
+    action: https://smartforms.dev/submit/5f5f20a5b81854118fd3d6ad
     fields:
     - template: text
       block: text
@@ -17,7 +18,6 @@ page_sections:
       name: Name
       label: Name
       description: ''
-    action: ''
   title: Message Me
 published: false
 
