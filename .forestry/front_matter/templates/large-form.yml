@@ -1,4 +1,49 @@
 ---
 label: Large Form
 hide_body: true
-fields: []
+fields:
+- name: title
+  type: text
+  config:
+    required: false
+  label: title
+- name: form
+  type: field_group
+  config: {}
+  fields:
+  - name: recipient
+    type: text
+    config:
+      required: false
+    label: recipient
+  - name: submit_text
+    type: text
+    config:
+      required: false
+    label: submit_text
+  - name: type
+    type: text
+    config:
+      required: false
+    label: type
+    hidden: true
+    default: long
+  - name: sections
+    type: field_group_list
+    fields:
+    - name: title
+      type: text
+      config:
+        required: false
+      label: title
+    - name: fields
+      type: include
+      config: {}
+      template: form-fields
+      label: fields
+    config:
+      min: 
+      max: 
+      labelField: 
+    label: sections
+  label: form
