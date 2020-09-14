@@ -40,7 +40,7 @@ fields:
     config:
       required: true
     label: action
-    hidden: true
+    hidden: false
   - name: method
     type: select
     default: []
@@ -55,7 +55,7 @@ fields:
         file: 
         path: 
     label: method
-    hidden: true
+    hidden: false
   - name: fields
     type: include
     config: {}
