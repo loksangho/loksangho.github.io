@@ -31,5 +31,6 @@ fields:
   - signup-bar
   - simple-footer
   - 4-column-footer
+  - simple-form
 pages:
 - index.md
