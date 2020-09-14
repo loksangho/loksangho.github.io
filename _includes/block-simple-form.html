@@ -6,6 +6,24 @@
     {% when 'text' %}
     <label>{{field.label}}</label><br>
     <input type="{{field.type}}" name="{{field.name}}">
+    {% when 'textarea' %}
+    <label>{{field.label}}</label><br>
+    <input type="{{field.type}}" name="{{field.name}}">
+    {% when 'select' %}
+    <label for="{{field.name}}">{{field.label}}</label>
+    <select name="{{field.name}}" id="{{field.name}}">
+    {% for option in field.options %}
+      <option value="{{option}}">{{option}}</option>
+    {% endfor %}
+    </select>
+    {% when 'radio' %}
+    {% for option in field.options %}
+    <input type="{{field.type}}" id="{{option}}" name="{{field.name}}" value="{{option}}">
+    <label for="{{option}}">{{option}}</label><br>
+    {% endfor %}
+    {% when 'checkbox' %}
+    <input type="{{field.type}}" id="{{field.name}}" name="{{field.name}}" value="{{field.name}}">
+    <label for="{{field.name}}">{{field.label}}</label><br>
     {% endcase %}
     {% endfor %}
   </form>
