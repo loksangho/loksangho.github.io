@@ -2,6 +2,14 @@
 label: text
 hide_body: true
 fields:
+- name: block
+  type: blocks
+  label: block
+  template_types: []
+  config:
+    min: 
+    max: 
+  hidden: true
 - name: type
   type: text
   config:
