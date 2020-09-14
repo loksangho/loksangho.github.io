@@ -2,13 +2,6 @@
 label: text
 hide_body: true
 fields:
-- name: block
-  type: text
-  config:
-    required: false
-  label: block
-  default: text
-  hidden: true
 - name: type
   type: text
   config:
