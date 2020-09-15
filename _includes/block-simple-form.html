@@ -12,7 +12,7 @@
     <input type="{{field.type}}" name="{{field.name}}"><br>
     {% when 'textarea' %}
     <label for="{{field.name}}">{{field.label}}</label>
-    <textarea id="{{field.name}}" name="{{field.name}}" rows="4" cols="50">
+    <textarea id="{{field.name}}" name="{{field.name}}" rows="{{field.rows}}" cols="{{field.cols}}">
     </textarea>
     {% when 'select' %}
     <label for="{{field.name}}">{{field.label}}</label><br>
