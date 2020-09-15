@@ -38,3 +38,24 @@ fields:
       file: 
       path: 
   label: Required
+- name: rows
+  type: number
+  label: Rows
+  description: ''
+  default: 4
+  required: true
+  config:
+    min: 
+    max: 
+    step: 
+    required: false
+- name: cols
+  type: number
+  label: Cols
+  description: ''
+  default: 50
+  required: true
+  config:
+    min: 
+    max: 
+    step: 
