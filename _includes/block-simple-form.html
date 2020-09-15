@@ -11,8 +11,9 @@
     <label>{{field.label}}</label><br>
     <input type="{{field.type}}" name="{{field.name}}"><br>
     {% when 'textarea' %}
-    <label>{{field.label}}</label><br>
-    <input type="{{field.type}}" name="{{field.name}}"><br>
+    <label for="{{field.name}}">{{field.label}}</label>
+    <textarea id="{{field.name}}" name="{{field.name}}" rows="4" cols="50">
+    </textarea>
     {% when 'select' %}
     <label for="{{field.name}}">{{field.label}}</label><br>
     <select name="{{field.name}}" id="{{field.name}}">
