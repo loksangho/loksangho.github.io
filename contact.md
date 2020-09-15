@@ -42,6 +42,8 @@ page_sections:
       label: Message
       description: ''
       required: 'True'
+      rows: '4'
+      cols: '50'
   title: Message Me
 
 ---
