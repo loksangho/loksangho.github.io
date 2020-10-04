@@ -238,7 +238,7 @@ input.inverted::placeholder {
 }
 
 .block-header-2 .nav-item.active a {
-    color: #ffcb3c
+    color: #3cbad1
 }
 
 .block-header-2 .nav-item a {
@@ -251,7 +251,7 @@ input.inverted::placeholder {
 }
 
 .block-header-2 .nav-item.active a:hover {
-    color: #ffcb3c
+    color: #3cbad1
 }
 
 .block-header-2 .nav-item:last-of-type {
