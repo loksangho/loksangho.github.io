@@ -217,8 +217,8 @@ input.inverted::placeholder {
 }
 
 .block-header-2--logo img {
-    max-height: 24px;
-    max-height: 1.5rem
+    max-height: 50px;
+    max-height: 3rem
 }
 
 .block-header-2--nav {
