@@ -117,7 +117,7 @@ p {
     padding: .5rem 1rem
 }
 
-input {
+input, textarea {
     border: none;
     border-bottom: 1px solid #000;
     font-size: 16px;
