@@ -4,7 +4,7 @@ author: Lok Sang Ho
 email: loksangho@icloud.com
 description: This is my portfolio
 baseurl: "/"
-url: ''
+url: www.loksangho.com
 defaults:
 - scope:
     path: ''
