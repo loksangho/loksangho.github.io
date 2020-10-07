@@ -8,6 +8,7 @@ fields:
     required: false
   hidden: true
   label: block
+  default: list-of-portfolio-items
 - name: thumbnail_width
   type: number
   description: ''
