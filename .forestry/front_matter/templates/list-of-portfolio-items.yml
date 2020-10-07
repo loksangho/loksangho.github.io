@@ -29,3 +29,8 @@ fields:
     max: 
     step: 
     required: true
+- name: items
+  type: include
+  config: {}
+  template: thumbnail
+  label: Items
