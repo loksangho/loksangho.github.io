@@ -1,4 +1,9 @@
 ---
 label: thumbnail
 hide_body: true
-fields: []
+fields:
+- name: image_url
+  type: file
+  config:
+    maxSize: 64
+  label: Image_URL
