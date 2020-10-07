@@ -1,6 +1,6 @@
 ---
 label: post-item
-hide_body: false
+hide_body: true
 fields:
 - name: thumbnail
   type: file
