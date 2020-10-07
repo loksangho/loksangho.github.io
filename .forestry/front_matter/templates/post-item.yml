@@ -18,3 +18,5 @@ fields:
   config:
     required: true
   label: Title
+pages:
+- _posts/abraham-lincoln-bust.md
