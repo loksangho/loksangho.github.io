@@ -7,3 +7,8 @@ fields:
   config:
     maxSize: 64
   label: Image_URL
+- name: link_url
+  type: text
+  config:
+    required: true
+  label: Link_URL
