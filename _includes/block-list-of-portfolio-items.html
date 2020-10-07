@@ -3,9 +3,9 @@
     <ul class="portfolio_list">
         {% for post in site.posts %}
             <li>
-            <div class="thumbnail">
+            <div style="width:{{section.thumbnail_width}}px; height:{{section.thumbnail_height}}px; overflow: hidden" class="thumbnail">
                 <a href="{{post.path}}">
-              <img style="width:{{section.thumbnail_width}}px; height:{{section.thumbnail_height}}px; overflow:hidden;" src="{{ post.thumbnail}}" />
+              <img src="{{ post.thumbnail}}" />
                     </a>
             </div>
           </li>
