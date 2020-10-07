@@ -17,5 +17,3 @@ fields:
     wysiwyg: true
     schema:
       format: html-blocks
-pages:
-- _posts/draft-post.md

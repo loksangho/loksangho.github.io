@@ -1,4 +1,20 @@
 ---
 label: post-item
 hide_body: false
-fields: []
+fields:
+- name: block
+  type: text
+  config:
+    required: true
+  label: block
+  hidden: true
+- name: thumbnail
+  type: file
+  config:
+    maxSize: 64
+  label: Thumbnail
+- name: title
+  type: text
+  config:
+    required: true
+  label: Title
