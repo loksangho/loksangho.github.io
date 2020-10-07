@@ -1,4 +1,31 @@
 ---
 label: list-of-portfolio-items
 hide_body: false
-fields: []
+fields:
+- name: block
+  type: text
+  config:
+    required: true
+  hidden: true
+  label: block
+- name: thumbnail_width
+  type: number
+  description: ''
+  default: 100
+  required: true
+  config:
+    min: 
+    max: 
+    step: 
+  label: Thumbnail Width
+- name: thumbnail_height
+  type: number
+  label: Thumbnail Height
+  description: ''
+  default: 100
+  required: true
+  config:
+    min: 
+    max: 
+    step: 
+    required: true
