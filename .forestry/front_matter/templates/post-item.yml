@@ -2,13 +2,6 @@
 label: post-item
 hide_body: false
 fields:
-- name: block
-  type: text
-  config:
-    required: false
-  label: block
-  hidden: true
-  default: post-item
 - name: thumbnail
   type: file
   config:
