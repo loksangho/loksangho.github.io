@@ -8,6 +8,7 @@ fields:
     required: false
   label: block
   hidden: true
+  default: post-item
 - name: thumbnail
   type: file
   config:
