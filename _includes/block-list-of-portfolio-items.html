@@ -1,7 +1,7 @@
 <section id="list-of-portfolio-items" class="block block-list-of-portfolio-items">
     
     <ul class="portfolio_list">
-        {% for post in site.posts | where:"is_featured", "true" %}
+        {% for post in site.posts %}
             <li>
             <div class="thumbnail">
                 <a href="{{post.path}}">
