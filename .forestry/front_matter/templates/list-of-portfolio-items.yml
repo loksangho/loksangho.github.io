@@ -5,7 +5,7 @@ fields:
 - name: block
   type: text
   config:
-    required: true
+    required: false
   hidden: true
   label: block
 - name: thumbnail_width
