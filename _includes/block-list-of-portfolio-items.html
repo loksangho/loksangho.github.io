@@ -1,0 +1,15 @@
+<section id="list-of-portfolio-items" class="block block-list-of-portfolio-items">
+    
+    <ul class="portfolio_list">
+        {% for post in site.posts | where:"is_featured", "true" %}
+            <li>
+            <div class="thumbnail">
+                <a href="{{post.path}}">
+              <img style="width:{{thumbnail_width}}; height:{{thumbnail_height}}; overflow: hidden" src="{{ post.thumbnail}}" />
+                    </a>
+            </div>
+          </li>
+        {% endif %}
+          
+        </ul>
+</section>
