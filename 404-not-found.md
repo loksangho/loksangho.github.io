@@ -1,7 +1,7 @@
 ---
 layout: blocks
 title: 404 Not Found
-date: 
+date: 2020-10-08 00:00:00 +1100
 page_sections:
 - template: navigation-header-w-button
   block: header-2
