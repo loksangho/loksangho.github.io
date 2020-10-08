@@ -13,7 +13,7 @@ page_sections:
 - template: detail-content
   block: text-1
   title: About Me
-  content: ''
+  content: "<p>This is me.</p>"
   thumbnail: ''
 - template: simple-footer
   block: footer-1
