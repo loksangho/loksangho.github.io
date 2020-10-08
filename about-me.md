@@ -7,7 +7,7 @@ page_sections:
   block: header-2
   logo: "/uploads/2020/10/05/icon_with_text.png"
   cta:
-    url: "/contact"
+    url: "/contact.html"
     button_text: Contact
   navigation:
   - link: "/"
