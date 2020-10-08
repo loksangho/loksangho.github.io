@@ -19,7 +19,16 @@ page_sections:
 - template: detail-content
   block: text-1
   title: About Me
-  content: "<p>This is me.</p>"
+  content: "<p>Hello, I’m Lok Sang Ho, a 3D artist studying at Billy Blue College
+    of Design.</p><p>I am nearing completion of my Bachelor degree in Digital Media
+    (3D Design and Animation). I have developed skills in modelling, rigging, animation,
+    and compositing throughout my degree, using software such as Maya, Substance Painter,
+    Nuke, Premiere Pro and After Effects.</p><p>I am currently completing a live brief
+    with Mirvac as part of my final year major project work, and have recently completed
+    a challenging group project to produce an animated short, giving me valuable experience
+    in environment and character design.</p><p>I am hardworking, organised, reliable
+    and hungry for knowledge, aspiring to work with a team of animators to make some
+    wonderful things together.</p>"
   thumbnail: ''
 - template: simple-footer
   block: footer-1
