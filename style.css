@@ -866,3 +866,7 @@ ul.portfolio_list {
     text-align: left;
   }
 }
+
+.block-header-2 .nav-item {
+    text-decoration:none;   
+}
