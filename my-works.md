@@ -18,8 +18,8 @@ page_sections:
     link_text: About Me
 - template: list-of-portfolio-items
   block: list-of-portfolio-items
-  thumbnail_width: 100
-  thumbnail_height: 100
+  thumbnail_width: 200
+  thumbnail_height: 200
 - template: simple-footer
   block: footer-1
   content: Lok Sang Ho
