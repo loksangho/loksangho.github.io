@@ -10,8 +10,17 @@ page_sections:
     url: "/contact"
     button_text: Contact
   navigation:
+  - link: "/my-works"
+    link_text: My Works
   - link: "/"
     link_text: Home
+- template: list-of-portfolio-items
+  block: list-of-portfolio-items
+  thumbnail_width: 100
+  thumbnail_height: 100
+- template: simple-footer
+  block: footer-1
+  content: Lok Sang Ho
 published: false
 
 ---
