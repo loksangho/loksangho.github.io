@@ -3,7 +3,7 @@
     <ul class="portfolio_list">
         {% for post in site.posts | where:"is_featured", "true" %}
             <li>
-            {% for page_section in post.section.page_sections %}
+            {% for page_section in post.page_sections %}
                 
             {% if page_section.type == "post-item" %}
             <div style="width:{{page_section.thumbnail_width}}px; height:{{page_section.thumbnail_height}}px; overflow: hidden" class="thumbnail">
