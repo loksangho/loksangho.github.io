@@ -867,6 +867,10 @@ ul.portfolio_list {
   }
 }
 
+.block-header-2--nav .icon {
+  display: none;
+}
+
 .block-header-2 a.nav-item.active {
     color: #3cbad1
 }
