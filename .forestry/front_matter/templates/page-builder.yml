@@ -36,5 +36,6 @@ fields:
   - post-item
 pages:
 - _posts/2020-10-08-abraham-lincoln-bust.md
+- about-me.md
 - contact.md
 - index.md
