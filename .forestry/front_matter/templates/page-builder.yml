@@ -35,6 +35,5 @@ fields:
   - list-of-portfolio-items
   - post-item
 pages:
-- _posts/2020-10-08-siren.md
 - contact.md
 - index.md
