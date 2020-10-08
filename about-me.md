@@ -14,7 +14,7 @@ page_sections:
     link_text: Home
   - link: "/my-works.html"
     link_text: My Works
-  - link: "/about-me"
+  - link: "/about-me.html"
     link_text: About Me
 - template: detail-content
   block: text-1
