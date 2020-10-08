@@ -28,5 +28,3 @@ fields:
     schema:
       format: html-blocks
   label: Content
-pages:
-- _posts/2020-10-08-krispy-kreme-store.md
