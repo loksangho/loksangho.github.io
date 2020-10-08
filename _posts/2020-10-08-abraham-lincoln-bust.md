@@ -1,7 +1,7 @@
 ---
 layout: blocks
 title: Abraham Lincoln Bust
-date: 2020-10-08 00:00:00 +1100
+date: 2020-10-08T00:00:00.000+11:00
 page_sections:
 - template: navigation-header-w-button
   block: header-2
@@ -18,6 +18,6 @@ page_sections:
   content: "<p>This is a test</p>"
 - template: simple-footer
   block: footer-1
-  content: ''
+  content: Lok Sang Ho
 
 ---
