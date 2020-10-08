@@ -47,6 +47,6 @@ page_sections:
   title: Message Me
 - template: simple-footer
   block: footer-1
-  content: ''
+  content: Hello world! ❤︎
 
 ---
