@@ -33,6 +33,7 @@ fields:
   - 4-column-footer
   - simple-form
   - list-of-portfolio-items
+  - post-item
 pages:
 - contact.md
 - index.md
