@@ -34,5 +34,6 @@ fields:
   - simple-form
   - list-of-portfolio-items
 pages:
+- _posts/siren.md
 - contact.md
 - index.md
