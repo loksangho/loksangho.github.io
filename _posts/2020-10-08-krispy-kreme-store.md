@@ -27,8 +27,5 @@ below_content:
   content: ''
 
 ---
-{{section.above_content}}
 
 Hello. This is some content
-
-{{section.below_content}}
