@@ -5,7 +5,7 @@ fields:
 - name: type
   type: text
   config:
-    required: true
+    required: false
   label: Type
   default: post-item
   hidden: true
