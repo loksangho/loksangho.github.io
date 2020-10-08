@@ -14,3 +14,4 @@ fields:
     wysiwyg: true
     schema:
       format: html
+  default: Lok Sang Ho
