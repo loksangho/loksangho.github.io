@@ -21,11 +21,18 @@ fields:
     schema:
       format: html-blocks
   label: Content
-- name: layout
+- name: above_content
   type: blocks
-  label: Layout
+  label: Above Content
   template_types:
   - navigation-header-w-button
+  config:
+    min: 
+    max: 
+- name: below_content
+  type: blocks
+  label: Below Content
+  template_types:
   - simple-footer
   config:
     min: 
