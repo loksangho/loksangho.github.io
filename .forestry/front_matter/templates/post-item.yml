@@ -21,3 +21,5 @@ fields:
     schema:
       format: html-blocks
   label: Content
+pages:
+- _posts/krispy-kreme-store.md
