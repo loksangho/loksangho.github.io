@@ -45,5 +45,8 @@ page_sections:
       rows: '4'
       cols: '50'
   title: Message Me
+- template: simple-footer
+  block: footer-1
+  content: ''
 
 ---
