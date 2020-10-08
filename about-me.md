@@ -10,6 +10,11 @@ page_sections:
     url: "/contact"
     button_text: Contact
   navigation: []
+- template: detail-content
+  block: text-1
+  title: About Me
+  content: ''
+  thumbnail: ''
 published: false
 
 ---
