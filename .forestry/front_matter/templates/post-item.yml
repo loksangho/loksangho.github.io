@@ -2,6 +2,13 @@
 label: post-item
 hide_body: false
 fields:
+- name: block
+  type: text
+  config:
+    required: false
+  label: block
+  default: post-item
+  hidden: true
 - name: type
   type: text
   config:
