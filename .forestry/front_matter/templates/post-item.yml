@@ -19,7 +19,7 @@ fields:
     required: true
     wysiwyg: true
     schema:
-      format: html
+      format: markdown
   label: Content
 pages:
 - _posts/2020-10-07-abraham-lincoln-bust.md
