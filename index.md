@@ -14,7 +14,7 @@ page_sections:
   - link: "/about-me.html"
     link_text: About Me
   cta:
-    url: "/contact"
+    url: "/contact.html"
     button_text: Contact
 - template: hero-banner-w-image
   block: hero-2
