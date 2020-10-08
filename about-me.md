@@ -15,6 +15,9 @@ page_sections:
   title: About Me
   content: ''
   thumbnail: ''
+- template: simple-footer
+  block: footer-1
+  content: Lok Sang Ho
 published: false
 
 ---
