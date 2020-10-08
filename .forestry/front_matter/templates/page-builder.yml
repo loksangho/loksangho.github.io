@@ -35,6 +35,7 @@ fields:
   - list-of-portfolio-items
   - post-item
 pages:
+- 404-not-found.md
 - _posts/2020-10-08-abraham-lincoln-bust.md
 - about-me.md
 - contact.md
