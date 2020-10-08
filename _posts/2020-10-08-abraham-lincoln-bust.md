@@ -9,7 +9,11 @@ page_sections:
   cta:
     url: "/contact"
     button_text: Contact
-  navigation: []
+  navigation:
+  - link: "/"
+    link_text: Home
+  - link: "/my-works.html"
+    link_text: My Works
 - template: post-item
   block: post-item
   type: post-item
