@@ -1,5 +1,5 @@
 <header class="block block-header-2">
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <div class="block-header-2--logo">
     <a href="{{ site.url | relative_url }}">
       <img src="{{ section.logo | relative_url }}" alt="{{ site.title }}">
@@ -13,5 +13,8 @@
         {% endfor %}
     </ul>
     <a class="button primary small block-header-2--cta" href="{{ section.cta.url }}">{{ section.cta.button_text }}</a>
+    <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+      <i class="fa fa-bars"></i>
+    </a>
   </nav>
 </header>
