@@ -6,6 +6,8 @@ page_sections:
 - template: navigation-header-w-button
   block: header-2
   navigation:
+  - link: my-works
+    link_text: My Works
   - link: "/"
     link_text: Home
   - link: "/about-me"
