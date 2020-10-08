@@ -10,6 +10,7 @@ fields:
 - type: file
   name: logo
   label: Logo
+  default: "/uploads/2020/10/05/icon_with_text.png"
 - type: field_group_list
   name: navigation
   label: Navigation
