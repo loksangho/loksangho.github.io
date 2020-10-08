@@ -6,13 +6,13 @@
     {% case template %}
     {% when 'text' %}
     <label>{{field.label}}</label><br>
-    <input type="{{field.type}}" name="{{field.name}}" {% if field.required %}required{% endif %}><br>
+    <input type="{{field.type}}" name="{{field.name}}" {% if field.required == true %}required{% endif %}><br>
     {% when 'email' %}
     <label>{{field.label}}</label><br>
-    <input type="{{field.type}}" name="{{field.name}}" {% if field.required %}required{% endif %}><br>
+    <input type="{{field.type}}" name="{{field.name}}" {% if field.required == true %}required{% endif %}><br>
     {% when 'textarea' %}
     <label for="{{field.name}}">{{field.label}}</label><br>
-    <textarea id="{{field.name}}" name="{{field.name}}" rows={{field.rows}} cols={{field.cols}} {% if field.required %}required{% endif %}>
+    <textarea id="{{field.name}}" name="{{field.name}}" rows={{field.rows}} cols={{field.cols}} {% if field.required == true %}required{% endif %}>
     </textarea>
     {% when 'select' %}
     <label for="{{field.name}}">{{field.label}}</label><br>
