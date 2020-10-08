@@ -16,5 +16,8 @@ page_sections:
   thumbnail: "/uploads/2020/10/07/abe_thumbnail.jpg"
   title: Abraham Lincoln Bust
   content: "<p>This is a test</p>"
+- template: simple-footer
+  block: footer-1
+  content: ''
 
 ---
