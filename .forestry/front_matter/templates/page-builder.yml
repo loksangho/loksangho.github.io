@@ -35,5 +35,6 @@ fields:
   - list-of-portfolio-items
   - post-item
 pages:
+- _posts/abraham-lincoln-bust.md
 - contact.md
 - index.md
