@@ -871,6 +871,7 @@ ul.portfolio_list {
   }
   a.nav-item {
       padding: 14px 16px;
+      text-align: center;
    }
 }
 
