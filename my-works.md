@@ -10,12 +10,12 @@ page_sections:
     url: "/contact"
     button_text: Contact
   navigation:
-  - link: "/about-me"
-    link_text: About Me
   - link: "/"
     link_text: Home
   - link: "/my-works"
     link_text: My Works
+  - link: "/about-me"
+    link_text: About Me
 - template: list-of-portfolio-items
   block: list-of-portfolio-items
   thumbnail_width: 100
