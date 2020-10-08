@@ -8,8 +8,10 @@ fields:
   name: block
   default: text-1
 - type: text
-  name: headline
-  label: Headline
+  name: title
+  label: Title
+  config:
+    required: true
 - type: textarea
   name: content
   label: Content
