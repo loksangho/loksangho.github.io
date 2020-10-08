@@ -16,7 +16,7 @@ layout:
 above_content:
 - template: navigation-header-w-button
   block: header-2
-  logo: ''
+  logo: "/uploads/2020/10/05/icon_with_text.png"
   navigation: []
   cta:
     url: ''
