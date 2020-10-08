@@ -7,7 +7,7 @@
                 
             {% if page_section.type == "post-item" %}
             <div style="width:{{section.thumbnail_width}}px; height:{{section.thumbnail_height}}px; overflow: hidden" class="thumbnail">
-                <a href="{{page_section.path}}">
+                <a href="{{post.url}}">
               <img  src="{{ page_section.thumbnail}}" />
                     </a>
             </div>
