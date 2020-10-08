@@ -870,3 +870,20 @@ ul.portfolio_list {
 .block-header-2 .nav-item {
     text-decoration:none;   
 }
+
+.block-header-2 .nav-item a {
+    text-decoration: none;
+    color: #2b2b2b
+}
+
+.block-header-2 a.nav-item:hover {
+    color: #666
+}
+
+.block-header-2 a.nav-item.active:hover {
+    color: #3cbad1
+}
+
+.block-header-2 a.nav-item:last-of-type {
+    margin: 0
+}
