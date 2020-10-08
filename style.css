@@ -843,8 +843,8 @@ ul.portfolio_list {
 }
 
 
-/* When the screen is less than 600 pixels wide, hide all links, except for the first one ("Home"). Show the link that contains should open and close the topnav (.icon) */
-@media screen and (max-width: 600px) {
+/* When the screen is less than 700 pixels wide, hide all links, except for the first one ("Home"). Show the link that contains should open and close the topnav (.icon) */
+@media screen and (max-width: 700px) {
   .block-header-2--nav a:not(:first-child) {display: none;}
   .block-header-2--nav a.icon {
     float: right;
@@ -853,7 +853,7 @@ ul.portfolio_list {
 }
 
 /* The "responsive" class is added to the topnav with JavaScript when the user clicks on the icon. This class makes the topnav look good on small screens (display the links vertically instead of horizontally) */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 700px) {
   .block-header-2--nav.responsive {position: relative;}
   .block-header-2--nav.responsive a.icon {
     position: absolute;
@@ -869,6 +869,9 @@ ul.portfolio_list {
     display: block;
     float: right;
   }
+  a.nav-item {
+      padding: 14px 16px;
+   }
 }
 
 .block-header-2--nav .icon {
