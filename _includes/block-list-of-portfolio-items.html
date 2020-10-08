@@ -6,7 +6,7 @@
             {% for page_section in post.page_sections %}
                 
             {% if page_section.type == "post-item" %}
-            <div style="width:{{section.thumbnail_width}}px; height:{{section.thumbnail_height}}px; overflow: hidden" class="thumbnail">
+            <div style="width:{{section.thumbnail_width}}px; height:{{section.thumbnail_height}}px; object-fit:cover;" class="thumbnail">
                 <a href="{{post.url}}">
               <img  src="{{ page_section.thumbnail}}" />
                     </a>
