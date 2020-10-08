@@ -14,6 +14,9 @@ page_sections:
   block: text-1
   title: 404 Not Found
   content: ''
+- template: simple-footer
+  block: footer-1
+  content: Lok Sang Ho
 published: false
 
 ---
