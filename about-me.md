@@ -1,7 +1,7 @@
 ---
 layout: blocks
 title: About Me
-date: 2020-10-08 00:00:00 +1100
+date: 2020-10-08T00:00:00.000+11:00
 page_sections:
 - template: navigation-header-w-button
   block: header-2
@@ -12,7 +12,7 @@ page_sections:
   navigation:
   - link: "/"
     link_text: Home
-  - link: "/my-works"
+  - link: "/my-works.html"
     link_text: My Works
   - link: "/about-me"
     link_text: About Me
