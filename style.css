@@ -837,3 +837,7 @@ body {
     background: #ffedbc;
     color: #333
 }
+
+ul.portfolio_list {
+    list-style-type:none;
+}
