@@ -30,6 +30,8 @@ fields:
   - type: text
     name: url
     label: URL
+    default: "/contact.html"
   - type: text
     name: button_text
     label: Button Text
+    default: Contact
