@@ -21,5 +21,14 @@ fields:
     schema:
       format: html-blocks
   label: Content
+- name: layout
+  type: blocks
+  label: Layout
+  template_types:
+  - navigation-header-w-button
+  - simple-footer
+  config:
+    min: 
+    max: 
 pages:
 - _posts/2020-10-08-krispy-kreme-store.md
