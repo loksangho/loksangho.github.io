@@ -865,6 +865,10 @@ ul.portfolio_list {
     display: block;
     text-align: left;
   }
+  .block-header-2--nav {
+    display: block;
+    float: right;
+  }
 }
 
 .block-header-2--nav .icon {
