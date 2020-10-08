@@ -5,7 +5,7 @@ content: "<p>This is a store</p>"
 layout:
 - template: navigation-header-w-button
   block: header-2
-  logo: ''
+  logo: "/uploads/2020/10/08/icon_with_text.png"
   navigation: []
   cta:
     url: ''
