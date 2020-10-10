@@ -78,7 +78,7 @@ page_sections:
   thumbnail_height: 100
 - template: simple-footer
   block: footer-1
-  content: Hello world! ❤︎
+  content: <img src="/uploads/2020/10/10/linkedin.svg">
 
 ---
 foo bar
