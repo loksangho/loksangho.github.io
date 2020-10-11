@@ -19,7 +19,7 @@ page_sections:
 - template: detail-content
   block: text-1
   title: About Me
-  content: <p><img src="/uploads/2020/10/11/60a2493_smaller.jpg"></p><p><a href="https://www.artstation.com/lokho"
+  content: <p><img src="/uploads/2020/10/11/60a2493_very_small.png"></p><p><a href="https://www.artstation.com/lokho"
     title="Artstation"><img src="/uploads/2020/10/10/artstationartboard-1-4x.png"></a>
     <a href="https://www.instagram.com/loksangho/" title="Instagram"><img src="/uploads/2020/10/10/instagramartboard-1-4x.png"></a>
     <a href="https://www.linkedin.com/in/loksangho/" title="LinkedIn"><img src="/uploads/2020/10/10/linkedinartboard-1-4x.png"></a>
