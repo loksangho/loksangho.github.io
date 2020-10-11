@@ -33,7 +33,8 @@ page_sections:
     project work, and have recently completed a challenging group project to produce
     an animated short, giving me valuable experience in environment and character
     design.</p><p>I am hardworking, organised, reliable and hungry for knowledge,
-    aspiring to work with a team of animators to make some wonderful things together.</p>
+    aspiring to work with a team of animators to make some wonderful things together.</p><p>A
+    resumé may be supplied upon request.</p>
   thumbnail: ''
 - template: simple-footer
   block: footer-1
