@@ -19,9 +19,15 @@ page_sections:
 - template: detail-content
   block: text-1
   title: About Me
-  content: <p><img src="/uploads/2020/10/10/_60a2493_smaller.jpg"></p><p>Hello, I’m
-    Lok Sang Ho, a 3D artist studying at Billy Blue College of Design.</p><p>I am
-    nearing completion of my Bachelor degree in Digital Media (3D Design and Animation).
+  content: <p><img src="/uploads/2020/10/10/_60a2493_smaller.jpg"></p><p><a href="https://www.artstation.com/lokho"
+    title="Artstation" target="_blank"><img src="/uploads/2020/10/10/artstationartboard-1-4x.png"></a>
+    <a href="https://www.instagram.com/loksangho/" title="Instagram" target="_blank"><img
+    src="/uploads/2020/10/10/instagramartboard-1-4x.png"></a> <a href="https://www.linkedin.com/in/loksangho/"
+    title="LinkedIn" target="_blank"><img src="/uploads/2020/10/10/linkedinartboard-1-4x.png"></a>
+    <a href="https://www.youtube.com/channel/UC1DHShERDsCziO9iertdIRg" title="Youtube"
+    target="_blank"><img src="/uploads/2020/10/10/youtubeartboard-1-4x.png"></a></p><p>Hello,
+    I’m Lok Sang Ho, a 3D artist studying at Billy Blue College of Design.</p><p>I
+    am nearing completion of my Bachelor degree in Digital Media (3D Design and Animation).
     I have developed skills in modelling, rigging, animation, and compositing throughout
     my degree, using software such as Maya, Substance Painter, Nuke, Premiere Pro
     and After Effects.</p><p>I am currently completing a live brief with Mirvac as
@@ -29,13 +35,7 @@ page_sections:
     group project to produce an animated short, giving me valuable experience in environment
     and character design.</p><p>I am hardworking, organised, reliable and hungry for
     knowledge, aspiring to work with a team of animators to make some wonderful things
-    together.</p><p><a href="https://www.artstation.com/lokho" title="Artstation"
-    target="_blank"><img src="/uploads/2020/10/10/artstationartboard-1-4x.png"></a>
-    <a href="https://www.instagram.com/loksangho/" title="Instagram" target="_blank"><img
-    src="/uploads/2020/10/10/instagramartboard-1-4x.png"></a> <a href="https://www.linkedin.com/in/loksangho/"
-    title="LinkedIn" target="_blank"><img src="/uploads/2020/10/10/linkedinartboard-1-4x.png"></a>
-    <a href="https://www.youtube.com/channel/UC1DHShERDsCziO9iertdIRg" title="Youtube"
-    target="_blank"><img src="/uploads/2020/10/10/youtubeartboard-1-4x.png"></a></p>
+    together.</p>
   thumbnail: ''
 - template: simple-footer
   block: footer-1
