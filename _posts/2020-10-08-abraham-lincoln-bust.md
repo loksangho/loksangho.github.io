@@ -43,5 +43,8 @@ page_sections:
     <a href="https://www.linkedin.com/in/loksangho/" title="LinkedIn"><img src="/uploads/2020/10/10/linkedinartboard-1-2x.png"></a>
     <a href="https://www.youtube.com/channel/UC1DHShERDsCziO9iertdIRg" title="Youtube"><img
     src="/uploads/2020/10/10/youtubeartboard-1-2x.png" title="Youtube"></a>
+- template: embed-youtube
+  block: embed-youtube
+  url: https://www.youtube.com/embed/u1hLySmUMSw
 
 ---
