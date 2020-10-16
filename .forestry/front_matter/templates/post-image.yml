@@ -1,4 +1,16 @@
 ---
 label: post-image
 hide_body: true
-fields: []
+fields:
+- name: block
+  type: text
+  config:
+    required: false
+  label: block
+  default: post-image
+  hidden: true
+- name: image
+  type: file
+  config:
+    maxSize: 64
+  label: image
