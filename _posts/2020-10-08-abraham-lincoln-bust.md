@@ -21,18 +21,13 @@ page_sections:
   type: post-item
   thumbnail: "/uploads/2020/10/07/abe_thumbnail.jpg"
   title: Abraham Lincoln Bust
-  content: <p>I was inspired by the distinctive shape of Abraham Lincoln while searching
+  content: "<p>I was inspired by the distinctive shape of Abraham Lincoln while searching
     for a good head to model, a very interesting and challenging subject to model
     while retaining human features. The process involved the creation of individual
     quads to shape the nose, eye and mouth, followed by adding topology that corresponds
     to the various aspects of the face. The hair was created using XGen, and the surfacing
     using Surface Painter. Since it was my first time experimenting with XGen, it
-    was quite a learning curve. It was also my first time using Renderman.</p><p><img
-    src="/uploads/2020/10/16/abe_render-renderman-with-displacement.jpg"></p><p><img
-    src="/uploads/2020/10/16/abe_expressions.jpg"></p><p>&lt;iframe width="560" height="315"
-    src="<a href="https://www.youtube.com/embed/u1hLySmUMSw" title="https://www.youtube.com/embed/u1hLySmUMSw">https://www.youtube.com/embed/u1hLySmUMSw</a>"
-    frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media;
-    gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;</p>
+    was quite a learning curve. It was also my first time using Renderman.</p>"
 - template: full-width-media-element
   block: media-1
   image: "/uploads/2020/10/16/abe_render-renderman-with-displacement.jpg"
