@@ -32,6 +32,10 @@ page_sections:
   block: media-1
   image: "/uploads/2020/10/16/abe_render-renderman-with-displacement.jpg"
   caption: ''
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/16/abe_expressions.jpg"
+  caption: ''
 - template: simple-footer
   block: footer-1
   content: <a href="https://www.artstation.com/lokho" title="Artstation"><img src="/uploads/2020/10/10/artstationartboard-1-2x.png"></a>
