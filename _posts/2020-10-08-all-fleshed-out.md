@@ -19,7 +19,7 @@ page_sections:
 - template: post-item
   block: post-item
   type: post-item
-  thumbnail: "/uploads/2020/10/07/abe_thumbnail.jpg"
+  thumbnail: "/uploads/2020/10/16/all_fleshed_out_thumbnail.jpg"
   title: Abraham Lincoln Bust
   content: "<h1>Short Film: All Fleshed Out</h1><p>Horror films tend to stick into
     my mind when I occasionally watch them, so zombies became an inspiration for this
