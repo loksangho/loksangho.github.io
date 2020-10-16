@@ -36,6 +36,9 @@ page_sections:
   block: media-1
   image: "/uploads/2020/10/16/abe_expressions.jpg"
   caption: ''
+- template: embed-youtube
+  block: embed-youtube
+  url: https://www.youtube.com/embed/u1hLySmUMSw
 - template: simple-footer
   block: footer-1
   content: <a href="https://www.artstation.com/lokho" title="Artstation"><img src="/uploads/2020/10/10/artstationartboard-1-2x.png"></a>
@@ -43,8 +46,5 @@ page_sections:
     <a href="https://www.linkedin.com/in/loksangho/" title="LinkedIn"><img src="/uploads/2020/10/10/linkedinartboard-1-2x.png"></a>
     <a href="https://www.youtube.com/channel/UC1DHShERDsCziO9iertdIRg" title="Youtube"><img
     src="/uploads/2020/10/10/youtubeartboard-1-2x.png" title="Youtube"></a>
-- template: embed-youtube
-  block: embed-youtube
-  url: https://www.youtube.com/embed/u1hLySmUMSw
 
 ---
