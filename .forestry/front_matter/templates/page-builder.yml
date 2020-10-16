@@ -34,6 +34,7 @@ fields:
   - simple-form
   - list-of-portfolio-items
   - post-item
+  - embed-youtube
 pages:
 - 404.md
 - _posts/2020-10-08-abraham-lincoln-bust.md
