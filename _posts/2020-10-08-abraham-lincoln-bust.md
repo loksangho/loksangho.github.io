@@ -21,7 +21,13 @@ page_sections:
   type: post-item
   thumbnail: "/uploads/2020/10/07/abe_thumbnail.jpg"
   title: Abraham Lincoln Bust
-  content: "<p>This is a test</p>"
+  content: "<p>I was inspired by the distinctive shape of Abraham Lincoln while searching
+    for a good head to model, a very interesting and challenging subject to model
+    while retaining human features. The process involved the creation of individual
+    quads to shape the nose, eye and mouth, followed by adding topology that corresponds
+    to the various aspects of the face. The hair was created using XGen, and the surfacing
+    using Surface Painter. Since it was my first time experimenting with XGen, it
+    was quite a learning curve. It was also my first time using Renderman.</p><p></p>"
 - template: simple-footer
   block: footer-1
   content: <a href="https://www.artstation.com/lokho" title="Artstation"><img src="/uploads/2020/10/10/artstationartboard-1-2x.png"></a>
