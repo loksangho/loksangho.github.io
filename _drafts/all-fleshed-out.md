@@ -1,6 +1,6 @@
 ---
 layout: blocks
-title: All Fleshed Out
+title: 'Short Film: All Fleshed Out'
 date: 2020-10-08T00:00:00.000+11:00
 page_sections:
 - template: navigation-header-w-button
@@ -21,14 +21,15 @@ page_sections:
   type: post-item
   thumbnail: "/uploads/2020/10/07/abe_thumbnail.jpg"
   title: Abraham Lincoln Bust
-  content: "<h1>Abraham Lincoln Bust</h1><p>I was inspired by the distinctive shape
-    of Abraham Lincoln while searching for a good head to model, a very interesting
-    and challenging subject to model while retaining human features. The process involved
-    the creation of individual quads to shape the nose, eye and mouth, followed by
-    adding topology that corresponds to the various aspects of the face. The hair
-    was created using XGen, and the surfacing using Surface Painter. Since it was
-    my first time experimenting with XGen, it was quite a learning curve. It was also
-    my first time using Renderman.</p>"
+  content: "<h1>Short Film: All Fleshed Out</h1><p>Horror films tend to stick into
+    my mind when I occasionally watch them, so zombies became an inspiration for this
+    short film. To create the film, pre-production required writing the script, preparing
+    shot lists, getting model release forms signed and organising all the people and
+    equipment to film on shoot day. This project required some on-the-job learning,
+    as it was a first time using some equipment like a camera gimbal borrowed before
+    the day of the shoot. When it came time to shoot the film, it was over by lunchtime,
+    having started at around 10am. The editing also took much longer, the challenge
+    being making the footage into a cohesive and interesting piece of work.</p>"
 - template: full-width-media-element
   block: media-1
   image: "/uploads/2020/10/16/abe_render-renderman-with-displacement.jpg"
