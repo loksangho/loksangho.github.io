@@ -29,7 +29,10 @@ page_sections:
     using Surface Painter. Since it was my first time experimenting with XGen, it
     was quite a learning curve. It was also my first time using Renderman.</p><p><img
     src="/uploads/2020/10/16/abe_render-renderman-with-displacement.jpg"></p><p><img
-    src="/uploads/2020/10/16/abe_expressions.jpg"></p><p></p>
+    src="/uploads/2020/10/16/abe_expressions.jpg"></p><p>&lt;iframe width="560" height="315"
+    src="<a href="https://www.youtube.com/embed/u1hLySmUMSw" title="https://www.youtube.com/embed/u1hLySmUMSw">https://www.youtube.com/embed/u1hLySmUMSw</a>"
+    frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media;
+    gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;</p>
 - template: simple-footer
   block: footer-1
   content: <a href="https://www.artstation.com/lokho" title="Artstation"><img src="/uploads/2020/10/10/artstationartboard-1-2x.png"></a>
