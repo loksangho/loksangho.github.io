@@ -1,4 +1,16 @@
 ---
 label: embed-vimeo
 hide_body: true
-fields: []
+fields:
+- name: block
+  type: text
+  config:
+    required: false
+  label: block
+  hidden: true
+  default: embed-vimeo
+- name: url
+  type: text
+  config:
+    required: false
+  label: url
