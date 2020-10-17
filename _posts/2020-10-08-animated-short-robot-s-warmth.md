@@ -30,6 +30,18 @@ page_sections:
     compositing and rendering. I found animation the most challenging. Rendering also
     was a challenging part of this production as I wanted to minimise the incurred
     costs of using the render farm.</p>"
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/env5.png"
+  caption: ''
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/env6.png"
+  caption: ''
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/env7.png"
+  caption: ''
 - template: embed-youtube
   block: embed-youtube
   url: https://www.youtube.com/embed/hn6vd0kWB7k
