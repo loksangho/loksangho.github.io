@@ -19,16 +19,16 @@ page_sections:
 - template: post-item
   block: post-item
   type: post-item
-  thumbnail: "/uploads/2020/10/17/thumbnail_captain_w.png"
-  title: The Adventures of Captain W
-  content: "<h1>The Adventures of Captain W</h1><p>For this project I focused on rigging
-    and animation using the Unreal Engine. The inspiration for this work came from
-    the need to use existing assets from my other projects and from the Unreal Marketplace,
-    the challenge was to learn the new way of doing things using a different paradigm
-    of creating. This involved using iPad as a virtual production tool, and having
-    a workflow of importing Mixamo characters, retargeting to appropriate rigs, and
-    animating the rigs. This project involved resource-intensive computing and so
-    I had to be creative about how to manage the workflow.</p>"
+  thumbnail: "/uploads/2020/10/17/thumbnail_gun.png"
+  title: 'Animation and Model: Gun Fight'
+  content: "<h1>Animation and Model: Gun Fight</h1><p>As an application to a Masters
+    degree, I was asked to create some 3D models and animation to demonstrate my modelling
+    and animation skills. I was inspired by an animation that used a pink gun, and
+    so I made my own pistol with a baby blue colour. The character rig was sourced
+    online and used it to create an animation with the character holding the gun.
+    Since I consider myself fairly new to animation, the task of animating the character
+    was challenging. Getting the basic movement was a steep learning curve, let alone
+    adding the additional principles of animation.</p>"
 - template: embed-youtube
   block: embed-youtube
   url: https://www.youtube.com/embed/vYx6tFKz-2E
