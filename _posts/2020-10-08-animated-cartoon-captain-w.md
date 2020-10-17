@@ -1,7 +1,7 @@
 ---
 layout: blocks
 title: 'Animated Cartoon: Captain W'
-date: 2020-10-08T00:00:00.000+11:00
+date: 2020-07-01 00:00:00 +1000
 page_sections:
 - template: navigation-header-w-button
   block: header-2
