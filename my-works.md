@@ -18,8 +18,8 @@ page_sections:
     link_text: About Me
 - template: list-of-portfolio-items
   block: list-of-portfolio-items
-  thumbnail_width: 200
-  thumbnail_height: 200
+  thumbnail_width: 400
+  thumbnail_height: 400
 - template: simple-footer
   block: footer-1
   content: <a href="https://www.artstation.com/lokho" title="Artstation"><img src="/uploads/2020/10/10/artstationartboard-1-2x.png"></a>
