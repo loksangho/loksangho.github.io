@@ -23,13 +23,13 @@ page_sections:
   title: 'Animated Short: Robot''s Warmth'
   content: "<h1>Animated Short: Robot's Warmth</h1><p>Title: Robot’s Warmth<br>Software:
     Maya, Substance Painter, Substance Designer, Shotgun<br>Year created: 2020<br>Category:
-    Animated Short<br>Brief: Create an animated short</p><p>My friend showed me a
-    Youtube video which inspired me to create this animated short. Since we were in
-    COVID-19 lockdown I wanted to use my time effectively. The process involved storyboarding,
-    character modelling and rigging, animatic and previz, asset modelling, animation,
-    compositing and rendering. I found animation the most challenging. Rendering also
-    was a challenging part of this production as I wanted to minimise the incurred
-    costs of using the render farm.</p>"
+    Animated Short<br>Brief: Create an animated short</p><p>I worked in a group of
+    8 people to create this animated short. The chosen idea (Robot’s Warmth) was based
+    on the idea of another student, I was responsible for Character Modelling and
+    Rigging, Environment Design, and Animation. This was challenging as it was the
+    first animated short that I worked on as a group, and it involved coordination
+    and discussion. I received a high grade for this subject and I was happy with
+    the outcome of the project.</p>"
 - template: full-width-media-element
   block: media-1
   image: "/uploads/2020/10/17/env5.png"
