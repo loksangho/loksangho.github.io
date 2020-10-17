@@ -19,17 +19,16 @@ page_sections:
 - template: post-item
   block: post-item
   type: post-item
-  thumbnail: "/uploads/2020/10/16/all_fleshed_out_thumbnail.jpg"
-  title: 'Short Film: All Fleshed Out'
-  content: "<h1>Short Film: All Fleshed Out</h1><p>Horror films tend to stick into
-    my mind when I occasionally watch them, so zombies became an inspiration for this
-    short film. To create the film, pre-production required writing the script, preparing
-    shot lists, getting model release forms signed and organising all the people and
-    equipment to film on shoot day. This project required some on-the-job learning,
-    as it was a first time using some equipment like a camera gimbal borrowed before
-    the day of the shoot. When it came time to shoot the film, it was over by lunchtime,
-    having started at around 10am. The editing also took much longer, the challenge
-    being making the footage into a cohesive and interesting piece of work.</p>"
+  thumbnail: "/uploads/2020/10/17/siren_thumbnail.jpg"
+  title: 'Model, Rig, Animation: Siren'
+  content: "<h1>Model, Rig, Animation: Siren</h1><p>Title: Siren<br> Software: Maya<br>
+    Year created: 2020<br> Category: Character Modelling, Rigging and Animation<br>
+    Brief: (Multiple) To model a creature, rig it and animate it</p><p>In the span
+    of two subjects, I created a 3D model of a siren, rigged it and animated it. This
+    involved studying the anatomy of a humanoid and fitting good topology over the
+    3D model. Rigging was done using a number of techniques including spline IK and
+    constraints. The animation was challenging, I created a number of actions for
+    the character as well as a monologue.</p>"
 - template: embed-youtube
   block: embed-youtube
   url: https://www.youtube.com/embed/YdFg6uC3NU4
