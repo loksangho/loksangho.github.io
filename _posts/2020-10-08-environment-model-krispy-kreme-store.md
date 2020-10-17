@@ -21,14 +21,16 @@ page_sections:
   type: post-item
   thumbnail: "/uploads/2020/10/17/thumbnail_krispy_kreme.jpg"
   title: 'Environment Model: Krispy Kreme Store'
-  content: "<h1>Environment Model: Krispy Kreme Store</h1><p>I was drawn by the interesting
-    and iconic colours of the Krispy Kreme brand and the clean and fun the design
-    of the store. I re-created the store in 3D and added both the donut rain and the
-    circular window (neither of which existed in actuality). The challenge was to
-    model all the 3D assets in a short timeframe, as well as manage the computer memory
-    of Maya, since the wall tiles took a while to load. Rendering was challenging,
-    originally I had wanted to render an animation but render time limits were too
-    short so I opted for rendering individual stills instead.</p>"
+  content: "<h1>Environment Model: Krispy Kreme Store</h1><p>Title: Krispy Kreme<br>Software:
+    Maya, Photoshop<br>Year created: 2019<br>Category: 3D Modelling<br>Brief: Create
+    an environment in 3D</p><p>I was drawn by the interesting and iconic colours of
+    the Krispy Kreme brand and the clean and fun the design of the store. I re-created
+    the store in 3D and added both the donut rain and the circular window (neither
+    of which existed in actuality). The challenge was to model all the 3D assets in
+    a short timeframe, as well as manage the computer memory of Maya, since the wall
+    tiles took a while to load. Rendering was challenging, originally I had wanted
+    to render an animation but render time limits were too short so I opted for rendering
+    individual stills instead.</p>"
 - template: full-width-media-element
   block: media-1
   image: "/uploads/2020/10/17/pic1.jpg"
