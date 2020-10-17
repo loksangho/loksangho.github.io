@@ -21,8 +21,10 @@ page_sections:
   type: post-item
   thumbnail: "/uploads/2020/10/17/thumbnail_gun.png"
   title: 'Animation and Model: Gun Fight'
-  content: "<h1>Animation and Model: Gun Fight</h1><p>As an application to a Masters
-    degree, I was asked to create some 3D models and animation to demonstrate my modelling
+  content: "<h1>Animation and Model: Gun Fight</h1><p>Title: Gun Animation<br>Software:
+    Maya<br>Year created: 2020<br>Category: 3D Animation and Model<br>Brief: Demonstrate
+    skills in modelling and animation</p><p>As an application to a Masters degree,
+    I was asked to create some 3D models and animation to demonstrate my modelling
     and animation skills. I was inspired by an animation that used a pink gun, and
     so I made my own pistol with a baby blue colour. The character rig was sourced
     online and used it to create an animation with the character holding the gun.
