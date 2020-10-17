@@ -20,16 +20,17 @@ page_sections:
   block: post-item
   type: post-item
   thumbnail: "/uploads/2020/10/16/all_fleshed_out_thumbnail.jpg"
-  title: Abraham Lincoln Bust
-  content: "<h1>Short Film: All Fleshed Out</h1><p>Horror films tend to stick into
-    my mind when I occasionally watch them, so zombies became an inspiration for this
-    short film. To create the film, pre-production required writing the script, preparing
-    shot lists, getting model release forms signed and organising all the people and
-    equipment to film on shoot day. This project required some on-the-job learning,
-    as it was a first time using some equipment like a camera gimbal borrowed before
-    the day of the shoot. When it came time to shoot the film, it was over by lunchtime,
-    having started at around 10am. The editing also took much longer, the challenge
-    being making the footage into a cohesive and interesting piece of work.</p>"
+  title: 'Short VFX Sequence: Scary House'
+  content: "<h1>Short VFX Sequence: Scary House</h1><p>Title: Scary House<br>Software:
+    After Effects, Premiere Pro<br>Year created: 2020<br>Category: Short VFX Film<br>Brief:
+    Create an short film using compositing techniques</p><p>The brief given was to
+    create a scary house film sequence, though we were free to choose how we wanted
+    to implement this. The inspiration came from horror films watched in the past,
+    the challenge was to film footage that could be used for automatic tracking. I
+    took footage from my camera in a way that allowed easier tracking using Mocha.
+    Then, I imported the footage into After Effects and created a matte painting to
+    place at the beginning of the video to create an establishing shot. At the end
+    I also colour graded the video.</p>"
 - template: embed-youtube
   block: embed-youtube
   url: https://www.youtube.com/embed/YdFg6uC3NU4
