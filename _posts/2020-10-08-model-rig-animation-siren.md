@@ -40,6 +40,9 @@ page_sections:
 - template: embed-youtube
   block: embed-youtube
   url: https://www.youtube.com/embed/1OI_KyT7_vY
+- template: embed-youtube
+  block: embed-youtube
+  url: https://www.youtube.com/embed/5gvVzk0HAx4
 - template: simple-footer
   block: footer-1
   content: <a href="https://www.artstation.com/lokho" title="Artstation"><img src="/uploads/2020/10/10/artstationartboard-1-2x.png"></a>
