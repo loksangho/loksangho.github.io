@@ -29,6 +29,54 @@ page_sections:
     of Maya, since the wall tiles took a while to load. Rendering was challenging,
     originally I had wanted to render an animation but render time limits were too
     short so I opted for rendering individual stills instead.</p>"
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/pic1.jpg"
+  caption: ''
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/pic2.jpg"
+  caption: ''
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/pic3.jpg"
+  caption: ''
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/pic4.jpg"
+  caption: ''
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/pic5.jpg"
+  caption: ''
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/pic6.jpg"
+  caption: ''
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/pic7.jpg"
+  caption: ''
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/pic8.jpg"
+  caption: ''
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/pic9.jpg"
+  caption: ''
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/pic10.jpg"
+  caption: ''
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/pic11.jpg"
+  caption: ''
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/pic12.jpg"
+  caption: ''
 - template: simple-footer
   block: footer-1
   content: <a href="https://www.artstation.com/lokho" title="Artstation"><img src="/uploads/2020/10/10/artstationartboard-1-2x.png"></a>
