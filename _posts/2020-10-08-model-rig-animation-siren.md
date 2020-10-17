@@ -21,14 +21,14 @@ page_sections:
   type: post-item
   thumbnail: "/uploads/2020/10/17/siren_thumbnail.jpg"
   title: 'Model, Rig, Animation: Siren'
-  content: "<h1>Model, Rig, Animation: Siren</h1><p>Title: Siren<br> Software: Maya<br>
-    Year created: 2020<br> Category: Character Modelling, Rigging and Animation<br>
-    Brief: (Multiple) To model a creature, rig it and animate it</p><p>In the span
-    of two subjects, I created a 3D model of a siren, rigged it and animated it. This
-    involved studying the anatomy of a humanoid and fitting good topology over the
-    3D model. Rigging was done using a number of techniques including spline IK and
-    constraints. The animation was challenging, I created a number of actions for
-    the character as well as a monologue.</p>"
+  content: "<h1>Model, Rig, Animation: Siren</h1><p><strong>Title:</strong> Siren<br><strong>Software:</strong>
+    Maya<br><strong>Year created:</strong> 2020<br><strong>Category:</strong> Character
+    Modelling, Rigging and Animation<br><strong>Brief:</strong> (Multiple) To model
+    a creature, rig it and animate it</p><p>In the span of two subjects, I created
+    a 3D model of a siren, rigged it and animated it. This involved studying the anatomy
+    of a humanoid and fitting good topology over the 3D model. Rigging was done using
+    a number of techniques including spline IK and constraints. The animation was
+    challenging, I created a number of actions for the character as well as a monologue.</p>"
 - template: full-width-media-element
   block: media-1
   image: "/uploads/2020/10/17/siren_pose_scene_front_view.jpg"
