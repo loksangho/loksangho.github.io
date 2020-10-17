@@ -29,9 +29,17 @@ page_sections:
     3D model. Rigging was done using a number of techniques including spline IK and
     constraints. The animation was challenging, I created a number of actions for
     the character as well as a monologue.</p>"
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/siren_pose_scene_front_view.jpg"
+  caption: ''
+- template: full-width-media-element
+  block: media-1
+  image: "/uploads/2020/10/17/siren_pose_scene_back_view.jpg"
+  caption: ''
 - template: embed-youtube
   block: embed-youtube
-  url: https://www.youtube.com/embed/YdFg6uC3NU4
+  url: https://www.youtube.com/embed/1OI_KyT7_vY
 - template: simple-footer
   block: footer-1
   content: <a href="https://www.artstation.com/lokho" title="Artstation"><img src="/uploads/2020/10/10/artstationartboard-1-2x.png"></a>
