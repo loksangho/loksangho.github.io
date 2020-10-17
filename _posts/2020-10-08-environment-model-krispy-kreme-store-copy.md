@@ -29,10 +29,9 @@ page_sections:
     asset modelling, animation, compositing and rendering. I found animation the most
     challenging. Rendering also was a challenging part of this production as I wanted
     to minimise the incurred costs of using the render farm.</p>"
-- template: full-width-media-element
-  block: media-1
-  image: "/uploads/2020/10/17/pic11.jpg"
-  caption: ''
+- template: embed-youtube
+  block: embed-youtube
+  url: https://www.youtube.com/embed/4XIw1aUtzkI
 - template: simple-footer
   block: footer-1
   content: <a href="https://www.artstation.com/lokho" title="Artstation"><img src="/uploads/2020/10/10/artstationartboard-1-2x.png"></a>
