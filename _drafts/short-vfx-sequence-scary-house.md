@@ -19,7 +19,7 @@ page_sections:
 - template: post-item
   block: post-item
   type: post-item
-  thumbnail: "/uploads/2020/10/16/all_fleshed_out_thumbnail.jpg"
+  thumbnail: "/uploads/2020/10/17/thumbnail_scary_house.jpg"
   title: 'Short VFX Sequence: Scary House'
   content: "<h1>Short VFX Sequence: Scary House</h1><p>Title: Scary House<br>Software:
     After Effects, Premiere Pro<br>Year created: 2020<br>Category: Short VFX Film<br>Brief:
