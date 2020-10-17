@@ -19,16 +19,17 @@ page_sections:
 - template: post-item
   block: post-item
   type: post-item
-  thumbnail: "/uploads/2020/10/17/thumbnail_meta.jpg"
-  title: 'Animated Short: Meta'
-  content: "<h1>Animated Short: Meta</h1><p>Title: Meta<br>Software: Maya<br>Year
-    created: 2020<br>Category: Animated Short<br>Brief: Personal Project</p><p>My
-    friend showed me a Youtube video which inspired me to create this animated short.
-    Since we were in COVID-19 lockdown I wanted to use my time effectively. The process
-    involved storyboarding, character modelling and rigging, animatic and previz,
-    asset modelling, animation, compositing and rendering. I found animation the most
-    challenging. Rendering also was a challenging part of this production as I wanted
-    to minimise the incurred costs of using the render farm.</p>"
+  thumbnail: "/uploads/2020/10/17/thumbnail_robots_warmth.jpg"
+  title: 'Animated Short: Robot''s Warmth'
+  content: "<h1>Animated Short: Robot's Warmth</h1><p>Title: Robot’s Warmth<br>Software:
+    Maya, Substance Painter, Substance Designer, Shotgun<br>Year created: 2020<br>Category:
+    Animated Short<br>Brief: Create an animated short</p><p>My friend showed me a
+    Youtube video which inspired me to create this animated short. Since we were in
+    COVID-19 lockdown I wanted to use my time effectively. The process involved storyboarding,
+    character modelling and rigging, animatic and previz, asset modelling, animation,
+    compositing and rendering. I found animation the most challenging. Rendering also
+    was a challenging part of this production as I wanted to minimise the incurred
+    costs of using the render farm.</p>"
 - template: embed-youtube
   block: embed-youtube
   url: https://www.youtube.com/embed/4XIw1aUtzkI
