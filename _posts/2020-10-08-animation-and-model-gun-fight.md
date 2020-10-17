@@ -31,7 +31,7 @@ page_sections:
     adding the additional principles of animation.</p>"
 - template: embed-youtube
   block: embed-youtube
-  url: https://www.youtube.com/embed/vYx6tFKz-2E
+  url: https://www.youtube.com/embed/rW7bhidvnpw
 - template: simple-footer
   block: footer-1
   content: <a href="https://www.artstation.com/lokho" title="Artstation"><img src="/uploads/2020/10/10/artstationartboard-1-2x.png"></a>
