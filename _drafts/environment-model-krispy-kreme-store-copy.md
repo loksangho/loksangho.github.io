@@ -19,63 +19,19 @@ page_sections:
 - template: post-item
   block: post-item
   type: post-item
-  thumbnail: "/uploads/2020/10/17/thumbnail_krispy_kreme.jpg"
-  title: 'Environment Model: Krispy Kreme Store'
-  content: "<h1>Environment Model: Krispy Kreme Store</h1><p>I was drawn by the interesting
-    and iconic colours of the Krispy Kreme brand and the clean and fun the design
-    of the store. I re-created the store in 3D and added both the donut rain and the
-    circular window (neither of which existed in actuality). The challenge was to
-    model all the 3D assets in a short timeframe, as well as manage the computer memory
-    of Maya, since the wall tiles took a while to load. Rendering was challenging,
-    originally I had wanted to render an animation but render time limits were too
-    short so I opted for rendering individual stills instead.</p>"
-- template: full-width-media-element
-  block: media-1
-  image: "/uploads/2020/10/17/pic1.jpg"
-  caption: ''
-- template: full-width-media-element
-  block: media-1
-  image: "/uploads/2020/10/17/pic2.jpg"
-  caption: ''
-- template: full-width-media-element
-  block: media-1
-  image: "/uploads/2020/10/17/pic3.jpg"
-  caption: ''
-- template: full-width-media-element
-  block: media-1
-  image: "/uploads/2020/10/17/pic4.jpg"
-  caption: ''
-- template: full-width-media-element
-  block: media-1
-  image: "/uploads/2020/10/17/pic5.jpg"
-  caption: ''
-- template: full-width-media-element
-  block: media-1
-  image: "/uploads/2020/10/17/pic6.jpg"
-  caption: ''
-- template: full-width-media-element
-  block: media-1
-  image: "/uploads/2020/10/17/pic7.jpg"
-  caption: ''
-- template: full-width-media-element
-  block: media-1
-  image: "/uploads/2020/10/17/pic8.jpg"
-  caption: ''
-- template: full-width-media-element
-  block: media-1
-  image: "/uploads/2020/10/17/pic9.jpg"
-  caption: ''
-- template: full-width-media-element
-  block: media-1
-  image: "/uploads/2020/10/17/pic10.jpg"
-  caption: ''
+  thumbnail: "/uploads/2020/10/17/thumbnail_meta.jpg"
+  title: 'Animated Short: Meta'
+  content: "<h1>Animated Short: Meta</h1><p>Title: Meta<br>Software: Maya<br>Year
+    created: 2020<br>Category: Animated Short<br>Brief: Personal Project</p><p>My
+    friend showed me a Youtube video which inspired me to create this animated short.
+    Since we were in COVID-19 lockdown I wanted to use my time effectively. The process
+    involved storyboarding, character modelling and rigging, animatic and previz,
+    asset modelling, animation, compositing and rendering. I found animation the most
+    challenging. Rendering also was a challenging part of this production as I wanted
+    to minimise the incurred costs of using the render farm.</p>"
 - template: full-width-media-element
   block: media-1
   image: "/uploads/2020/10/17/pic11.jpg"
-  caption: ''
-- template: full-width-media-element
-  block: media-1
-  image: "/uploads/2020/10/17/pic12.jpg"
   caption: ''
 - template: simple-footer
   block: footer-1
