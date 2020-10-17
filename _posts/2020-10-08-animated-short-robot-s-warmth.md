@@ -21,13 +21,14 @@ page_sections:
   type: post-item
   thumbnail: "/uploads/2020/10/17/thumbnail_robots_warmth.jpg"
   title: 'Animated Short: Robot''s Warmth'
-  content: "<h1>Animated Short: Robot's Warmth</h1><p>Title: Robot’s Warmth<br>Software:
-    Maya, Substance Painter, Substance Designer, Shotgun<br>Year created: 2020<br>Category:
-    Animated Short<br>Brief: Create an animated short</p><p>I worked in a group of
-    8 people to create this animated short. The chosen idea (Robot’s Warmth) was based
-    on the idea of another student, I was responsible for Character Modelling and
-    Rigging, Environment Design, and Animation. This was challenging as it was the
-    first animated short that I worked on as a group, and it involved coordination
+  content: "<h1>Animated Short: Robot's Warmth</h1><p><strong>Title:</strong> Robot’s
+    Warmth<br><strong>Software:</strong> Maya, Substance Painter, Substance Designer,
+    Shotgun<br><strong>Year created:</strong> 2020<br><strong>Category:</strong> Animated
+    Short<br><strong>Brief:</strong> Create an animated short</p><p>I worked in a
+    group of 8 people to create this animated short. The chosen idea (Robot’s Warmth)
+    was based on the idea of another student, I was responsible for Character Modelling
+    and Rigging, Environment Design, and Animation. This was challenging as it was
+    the first animated short that I worked on as a group, and it involved coordination
     and discussion. I received a high grade for this subject and I was happy with
     the outcome of the project.</p>"
 - template: full-width-media-element
