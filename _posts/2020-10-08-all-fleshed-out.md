@@ -20,7 +20,7 @@ page_sections:
   block: post-item
   type: post-item
   thumbnail: "/uploads/2020/10/16/all_fleshed_out_thumbnail.jpg"
-  title: Abraham Lincoln Bust
+  title: 'Short Film: All Fleshed Out'
   content: "<h1>Short Film: All Fleshed Out</h1><p>Horror films tend to stick into
     my mind when I occasionally watch them, so zombies became an inspiration for this
     short film. To create the film, pre-production required writing the script, preparing
