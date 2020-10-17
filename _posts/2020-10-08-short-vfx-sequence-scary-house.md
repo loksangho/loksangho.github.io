@@ -21,8 +21,9 @@ page_sections:
   type: post-item
   thumbnail: "/uploads/2020/10/17/thumbnail_scary_house.jpg"
   title: 'Short VFX Sequence: Scary House'
-  content: "<h1>Short VFX Sequence: Scary House</h1><p>Title: Scary House<br>Software:
-    After Effects, Premiere Pro<br>Year created: 2020<br>Category: Short VFX Film<br>Brief:
+  content: "<h1>Short VFX Sequence: Scary House</h1><p><strong>Title:</strong> Scary
+    House<br><strong>Software: </strong>After Effects, Premiere Pro<br><strong>Year
+    created:</strong> 2020<br><strong>Category:</strong> Short VFX Film<br><strong>Brief:</strong>
     Create an short film using compositing techniques</p><p>The brief given was to
     create a scary house film sequence, though we were free to choose how we wanted
     to implement this. The inspiration came from horror films watched in the past,
