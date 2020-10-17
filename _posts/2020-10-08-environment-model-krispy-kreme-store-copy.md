@@ -21,14 +21,15 @@ page_sections:
   type: post-item
   thumbnail: "/uploads/2020/10/17/thumbnail_meta.jpg"
   title: 'Animated Short: Meta'
-  content: "<h1>Animated Short: Meta</h1><p>Title: Meta<br>Software: Maya<br>Year
-    created: 2020<br>Category: Animated Short<br>Brief: Personal Project</p><p>My
-    friend showed me a Youtube video which inspired me to create this animated short.
-    Since we were in COVID-19 lockdown I wanted to use my time effectively. The process
-    involved storyboarding, character modelling and rigging, animatic and previz,
-    asset modelling, animation, compositing and rendering. I found animation the most
-    challenging. Rendering also was a challenging part of this production as I wanted
-    to minimise the incurred costs of using the render farm.</p>"
+  content: "<h1>Animated Short: Meta</h1><p><strong>Title:</strong> Meta<br><strong>Software:</strong>
+    Maya<br><strong>Year created:</strong> 2020<br><strong>Category:</strong> Animated
+    Short<br><strong>Brief:</strong> Personal Project</p><p>My friend showed me a
+    Youtube video which inspired me to create this animated short. Since we were in
+    COVID-19 lockdown I wanted to use my time effectively. The process involved storyboarding,
+    character modelling and rigging, animatic and previz, asset modelling, animation,
+    compositing and rendering. I found animation the most challenging. Rendering also
+    was a challenging part of this production as I wanted to minimise the incurred
+    costs of using the render farm.</p>"
 - template: embed-youtube
   block: embed-youtube
   url: https://www.youtube.com/embed/4XIw1aUtzkI
