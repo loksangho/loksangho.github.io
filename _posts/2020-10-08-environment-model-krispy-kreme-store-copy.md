@@ -1,6 +1,6 @@
 ---
 layout: blocks
-title: 'Environment Model: Krispy Kreme Store-(copy)'
+title: 'Animated Short: Meta'
 date: 2020-10-08T00:00:00.000+11:00
 page_sections:
 - template: navigation-header-w-button
