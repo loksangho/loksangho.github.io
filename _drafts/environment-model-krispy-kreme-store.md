@@ -19,16 +19,16 @@ page_sections:
 - template: post-item
   block: post-item
   type: post-item
-  thumbnail: "/uploads/2020/10/17/thumbnail_gun.png"
-  title: 'Animation and Model: Gun Fight'
-  content: "<h1>Animation and Model: Gun Fight</h1><p>As an application to a Masters
-    degree, I was asked to create some 3D models and animation to demonstrate my modelling
-    and animation skills. I was inspired by an animation that used a pink gun, and
-    so I made my own pistol with a baby blue colour. The character rig was sourced
-    online and used it to create an animation with the character holding the gun.
-    Since I consider myself fairly new to animation, the task of animating the character
-    was challenging. Getting the basic movement was a steep learning curve, let alone
-    adding the additional principles of animation.</p>"
+  thumbnail: "/uploads/2020/10/17/thumbnail_krispy_kreme.jpg"
+  title: 'Environment Model: Krispy Kreme Store'
+  content: "<h1>Environment Model: Krispy Kreme Store</h1><p>I was drawn by the interesting
+    and iconic colours of the Krispy Kreme brand and the clean and fun the design
+    of the store. I re-created the store in 3D and added both the donut rain and the
+    circular window (neither of which existed in actuality). The challenge was to
+    model all the 3D assets in a short timeframe, as well as manage the computer memory
+    of Maya, since the wall tiles took a while to load. Rendering was challenging,
+    originally I had wanted to render an animation but render time limits were too
+    short so I opted for rendering individual stills instead.</p>"
 - template: embed-youtube
   block: embed-youtube
   url: https://www.youtube.com/embed/rW7bhidvnpw
