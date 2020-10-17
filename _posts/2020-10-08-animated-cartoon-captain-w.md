@@ -19,7 +19,7 @@ page_sections:
 - template: post-item
   block: post-item
   type: post-item
-  thumbnail: "/uploads/2020/10/16/all_fleshed_out_thumbnail.jpg"
+  thumbnail: "/uploads/2020/10/17/thumbnail_captain_w.png"
   title: The Adventures of Captain W
   content: "<h1>The Adventures of Captain W</h1><p>For this project I focused on rigging
     and animation using the Unreal Engine. The inspiration for this work came from
@@ -31,7 +31,7 @@ page_sections:
     I had to be creative about how to manage the workflow.</p>"
 - template: embed-youtube
   block: embed-youtube
-  url: https://www.youtube.com/embed/YdFg6uC3NU4
+  url: https://www.youtube.com/embed/vYx6tFKz-2E
 - template: simple-footer
   block: footer-1
   content: <a href="https://www.artstation.com/lokho" title="Artstation"><img src="/uploads/2020/10/10/artstationartboard-1-2x.png"></a>
