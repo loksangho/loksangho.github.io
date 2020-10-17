@@ -21,8 +21,9 @@ page_sections:
   type: post-item
   thumbnail: "/uploads/2020/10/17/thumbnail_krispy_kreme.jpg"
   title: 'Environment Model: Krispy Kreme Store'
-  content: "<h1>Environment Model: Krispy Kreme Store</h1><p>Title: Krispy Kreme<br>Software:
-    Maya, Photoshop<br>Year created: 2019<br>Category: 3D Modelling<br>Brief: Create
+  content: "<h1>Environment Model: Krispy Kreme Store</h1><p><strong>Title:</strong>
+    Krispy Kreme<br><strong>Software:</strong> Maya, Photoshop<br><strong>Year created:</strong>
+    2019<br><strong>Category:</strong> 3D Modelling<br><strong>Brief:</strong> Create
     an environment in 3D</p><p>I was drawn by the interesting and iconic colours of
     the Krispy Kreme brand and the clean and fun the design of the store. I re-created
     the store in 3D and added both the donut rain and the circular window (neither
