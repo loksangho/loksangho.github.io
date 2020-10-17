@@ -21,15 +21,17 @@ page_sections:
   type: post-item
   thumbnail: "/uploads/2020/10/16/all_fleshed_out_thumbnail.jpg"
   title: 'Short Film: All Fleshed Out'
-  content: "<h1>Short Film: All Fleshed Out</h1><p>Horror films tend to stick into
-    my mind when I occasionally watch them, so zombies became an inspiration for this
-    short film. To create the film, pre-production required writing the script, preparing
-    shot lists, getting model release forms signed and organising all the people and
-    equipment to film on shoot day. This project required some on-the-job learning,
-    as it was a first time using some equipment like a camera gimbal borrowed before
-    the day of the shoot. When it came time to shoot the film, it was over by lunchtime,
-    having started at around 10am. The editing also took much longer, the challenge
-    being making the footage into a cohesive and interesting piece of work.</p>"
+  content: "<h1>Short Film: All Fleshed Out</h1><p>Title: All Fleshed Out<br>Software:
+    Premiere Pro<br>Year created: 2019<br>Category: Live Action<br>Brief: Create a
+    short film</p><p>Horror films tend to stick into my mind when I occasionally watch
+    them, so zombies became an inspiration for this short film. To create the film,
+    pre-production required writing the script, preparing shot lists, getting model
+    release forms signed and organising all the people and equipment to film on shoot
+    day. This project required some on-the-job learning, as it was a first time using
+    some equipment like a camera gimbal borrowed before the day of the shoot. When
+    it came time to shoot the film, it was over by lunchtime, having started at around
+    10am. The editing also took much longer, the challenge being making the footage
+    into a cohesive and interesting piece of work.</p>"
 - template: embed-youtube
   block: embed-youtube
   url: https://www.youtube.com/embed/YdFg6uC3NU4
