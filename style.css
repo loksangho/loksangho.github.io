@@ -259,9 +259,9 @@ input.inverted::placeholder {
 }
 
 .block-header-2--cta {
-    margin-left: 32px;
+/*    margin-left: 32px;
     margin-left: 2rem
-}
+*/}
 
 .block-header-3 {
     display: -ms-flexbox;
