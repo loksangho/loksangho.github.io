@@ -1,8 +1,8 @@
 <section id="list-of-portfolio-items" class="block block-list-of-portfolio-items">
     
-    <ul class="portfolio_list">
+    <div class="portfolio_list">
         {% for post in site.posts | where:"is_featured", "true" %}
-            <li>
+            
             {% for page_section in post.page_sections %}
                 
             {% if page_section.type == "post-item" %}
@@ -13,8 +13,8 @@
             </div>
             {% endif %}
             {% endfor %}
-          </li>
+          
         {% endfor %}
           
-        </ul>
+        </div>
 </section>
