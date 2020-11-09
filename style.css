@@ -901,3 +901,38 @@ ul.portfolio_list {
 .block-header-2 a.nav-item:last-of-type {
     margin: 0
 }
+
+.portfolio_list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.thumbnail img {
+    width: 100%;
+}
+
+/* -----------------------------------*/
+/*three columns*/
+.thumbnail {
+    width: 33%;
+    padding: 20px;
+}
+
+/* -----------------------------------*/
+/*two columns */
+@media screen and (max-width:1200px) {
+    .thumbnail {
+        width: 50%;
+    }
+}
+
+/* -----------------------------------*/
+/*one column */
+@media screen and (max-width:768px) {
+    .thumbnail {
+        width: 100%;
+    }
+}
+
