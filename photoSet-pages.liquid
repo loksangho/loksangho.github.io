@@ -30,5 +30,6 @@ renderData:
 </div>
 
 <div class="columns is-multiline">
+    <img src="{{portfolio-item.thumbnail.url}}" alt="Image from {{ portfolio-item.thumbnail.title }}" loading="lazy">
     {{portfolio-item.content | renderRichTextAsHtml | safe }}
 </div>
