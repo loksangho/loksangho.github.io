@@ -5,3 +5,7 @@ a {
 .hero.is-info{
     background-color: #4E97EE
 }
+
+h1 {
+    font-size: 4em;
+}
