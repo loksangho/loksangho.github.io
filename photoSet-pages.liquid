@@ -30,5 +30,5 @@ renderData:
 </div>
 
 <div class="columns is-multiline">
-    {{portfolio-item.content}}
+    {{portfolio-item.content | renderRichTextAsHtml | safe }}
 </div>
