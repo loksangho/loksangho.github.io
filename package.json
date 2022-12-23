@@ -1,0 +1,27 @@
+{
+  "name": "11ty-contentful-gallery",
+  "version": "1.0.0",
+  "description": "Contentful photogallery using 11ty.",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx eleventy",
+    "watch": "npx eleventy --watch",
+    "serve": "npx eleventy --serve",
+    "debug": "DEBUG=* npx eleventy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contentful/11ty-contentful-gallery.git"
+  },
+  "author": "Shy Ruparel",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/contentful/11ty-contentful-gallery/issues"
+  },
+  "homepage": "https://github.com/contentful/11ty-contentful-gallery#readme",
+  "dependencies": {
+    "@11ty/eleventy": "^0.10.0",
+    "contentful": "^8.1.7",
+    "dotenv": "^8.2.0"
+  }
+}
