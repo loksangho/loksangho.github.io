@@ -2,14 +2,14 @@
 pagination:
     data: contentful-photos
     size: 1
-    alias: photoSet
+    alias: portfolio-item
     addAllPagesToCollections: true
-permalink: "{{ photoSet.slug | slug }}/"
+permalink: "{{ portfolio-item.slug | slug }}/"
 tags: "photoSet"
 layout: layout.liquid
 
 renderData:
-    title: "{{ photoSet.title }}"
+    title: "{{ portfolio-item.title }}"
 
 ---
 
@@ -30,5 +30,5 @@ renderData:
 </div>
 
 <div class="columns is-multiline">
-    {{photoSet.content}}
+    {{portfolio-item.content}}
 </div>
