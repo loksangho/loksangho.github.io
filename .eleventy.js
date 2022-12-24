@@ -12,14 +12,16 @@ const pluginNavigation = require("@11ty/eleventy-navigation");
 
 module.exports = function (eleventyConfig) {
   //eleventyConfig.addPassthroughCopy('css')
+  
+
+  // Copy the `img` and `css` folders to the output
+  //eleventyConfig.addPassthroughCopy("img");
+  eleventyConfig.addPassthroughCopy("css");
+
   eleventyConfig.addFilter("renderRichTextAsHtml", (value) =>
     documentToHtmlString(value)
   );
-
-  // Copy the `img` and `css` folders to the output
-  eleventyConfig.addPassthroughCopy("img");
-  eleventyConfig.addPassthroughCopy("css");
-
+  
   // Add plugins
   eleventyConfig.addPlugin(pluginRss);
   eleventyConfig.addPlugin(pluginSyntaxHighlight);
