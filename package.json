@@ -21,7 +21,6 @@
   "homepage": "https://github.com/contentful/11ty-contentful-gallery#readme",
   "dependencies": {
     "@11ty/eleventy": "^0.10.0",
-    "@11ty/eleventy-navigation": "^0.3.5",
     "@11ty/eleventy-plugin-rss": "^1.2.0",
     "@11ty/eleventy-plugin-syntaxhighlight": "^4.2.0",
     "@contentful/rich-text-html-renderer": "^16.0.2",
