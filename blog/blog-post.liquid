@@ -17,5 +17,6 @@ renderData:
 <div class="columns is-multiline">
     <p>{{post.plainFontContent}}</p>
 </div>
-<a href="https://twitter.com/share?ref_src=twsrc%5Etfw"data-show-count="false"><i class="share-fab fab fa-twitter"></i></a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/" data-layout="button" data-size="small"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdevelopers.facebook.com%2Fdocs%2Fplugins%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore"><i class="share-fab fab fa-facebook"></i></a></div>
+
+<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" data-url="https://www.loksangho.com/blog/{{post.slug | slug}}/" data-show-count="false"><i class="share-fab fab fa-twitter"></i></a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<div data-href="https://developers.facebook.com/docs/plugins/" data-layout="button" data-size="small"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.loksangho.com%2Fblog%2F{{post.slug | slug}};src=sdkpreparse" class="fb-xfbml-parse-ignore"><i class="share-fab fab fa-facebook"></i></a></div>
