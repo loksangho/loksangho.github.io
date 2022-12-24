@@ -9,3 +9,7 @@ a {
 h1 {
     font-size: 4em;
 }
+
+ul {
+    display: none;
+}
