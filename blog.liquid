@@ -9,8 +9,9 @@ renderData:
 
 <div class="is-multiline"> 
     {%- for post in contentful-blog -%}
-    	<p>{{post.title}}</p>
+    	<p><h3>{{post.title}}</h3></p>
     	<p>{{post.plainFontContent | trimWords }}</p>
+    	<hr/>
     	<a href="/blog/{{post.slug}}/">
             Read More
         </a>  
