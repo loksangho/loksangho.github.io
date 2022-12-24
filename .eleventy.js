@@ -8,6 +8,6 @@ module.exports = function (eleventyConfig) {
     documentToHtmlString(value)
   );
   eleventyConfig.addFilter("trimWords", (value) =>
-    trimWords(value, 60, "...")
+    trimWords(value, 120, "...")
   );
 }
