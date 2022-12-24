@@ -15,9 +15,9 @@ module.exports = function link(state, silent) {
       pos,
       res,
       ref,
+      title,
       token,
       href = '',
-      title = '',
       oldPos = state.pos,
       max = state.posMax,
       start = state.pos,
@@ -60,29 +60,31 @@ module.exports = function link(state, silent) {
       } else {
         href = '';
       }
+    }
+
+    // [link](  <href>  "title"  )
+    //                ^^ skipping these spaces
+    start = pos;
+    for (; pos < max; pos++) {
+      code = state.src.charCodeAt(pos);
+      if (!isSpace(code) && code !== 0x0A) { break; }
+    }
+
+    // [link](  <href>  "title"  )
+    //                  ^^^^^^^ parsing link title
+    res = state.md.helpers.parseLinkTitle(state.src, pos, state.posMax);
+    if (pos < max && start !== pos && res.ok) {
+      title = res.str;
+      pos = res.pos;
 
       // [link](  <href>  "title"  )
-      //                ^^ skipping these spaces
-      start = pos;
+      //                         ^^ skipping these spaces
       for (; pos < max; pos++) {
         code = state.src.charCodeAt(pos);
         if (!isSpace(code) && code !== 0x0A) { break; }
       }
-
-      // [link](  <href>  "title"  )
-      //                  ^^^^^^^ parsing link title
-      res = state.md.helpers.parseLinkTitle(state.src, pos, state.posMax);
-      if (pos < max && start !== pos && res.ok) {
-        title = res.str;
-        pos = res.pos;
-
-        // [link](  <href>  "title"  )
-        //                         ^^ skipping these spaces
-        for (; pos < max; pos++) {
-          code = state.src.charCodeAt(pos);
-          if (!isSpace(code) && code !== 0x0A) { break; }
-        }
-      }
+    } else {
+      title = '';
     }
 
     if (pos >= max || state.src.charCodeAt(pos) !== 0x29/* ) */) {
