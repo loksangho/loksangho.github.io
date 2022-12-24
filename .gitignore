@@ -1,5 +1,3 @@
-
-
 # Ignore build tool output, e.g. code coverage
 .nyc_output/
 coverage/
