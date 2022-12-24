@@ -1,14 +1,14 @@
 require('dotenv').config();
 const { documentToHtmlString } = require("@contentful/rich-text-html-renderer");
-//const fs = require("fs");
+const fs = require("fs");
 
-//const { DateTime } = require("luxon");
-//const markdownIt = require("markdown-it");
-//const markdownItAnchor = require("markdown-it-anchor");
+const { DateTime } = require("luxon");
+const markdownIt = require("markdown-it");
+const markdownItAnchor = require("markdown-it-anchor");
 
-//const pluginRss = require("@11ty/eleventy-plugin-rss");
-//const pluginSyntaxHighlight = require("@11ty/eleventy-plugin-syntaxhighlight");
-//const pluginNavigation = require("@11ty/eleventy-navigation");
+const pluginRss = require("@11ty/eleventy-plugin-rss");
+const pluginSyntaxHighlight = require("@11ty/eleventy-plugin-syntaxhighlight");
+const pluginNavigation = require("@11ty/eleventy-navigation");
 
 module.exports = function (eleventyConfig) {
   //eleventyConfig.addPassthroughCopy('css')
@@ -18,17 +18,17 @@ module.exports = function (eleventyConfig) {
   //eleventyConfig.addPassthroughCopy("img");
   eleventyConfig.addPassthroughCopy("css");
 
-  eleventyConfig.addFilter("renderRichTextAsHtml", (value) =>
-    documentToHtmlString(value)
-  );
+  
 
-/*
   // Add plugins
   eleventyConfig.addPlugin(pluginRss);
   eleventyConfig.addPlugin(pluginSyntaxHighlight);
   eleventyConfig.addPlugin(pluginNavigation);
 
 
+  eleventyConfig.addFilter("renderRichTextAsHtml", (value) =>
+    documentToHtmlString(value)
+  );
 
   eleventyConfig.addFilter("readableDate", dateObj => {
     return DateTime.fromJSDate(dateObj, {zone: 'utc'}).toFormat("dd LLL yyyy");
@@ -142,5 +142,5 @@ module.exports = function (eleventyConfig) {
       data: "_data",
       output: "_site"
     }
-  };*/
-}
+  };
+};
