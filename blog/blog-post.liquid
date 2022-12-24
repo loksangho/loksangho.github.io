@@ -1,0 +1,19 @@
+---
+pagination:
+    data: contentful-blog
+    size: 1
+    alias: post
+    addAllPagesToCollections: true
+permalink: "/blog{{ post.slug | slug }}/"
+tags: "blogPost"
+layout: layout.liquid
+
+renderData:
+    title: "{{ post.title }}"
+
+---
+
+
+<div class="columns is-multiline">
+    {{post.content}}
+</div>

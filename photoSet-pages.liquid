@@ -14,22 +14,6 @@ renderData:
 ---
 
 <div class="columns is-multiline">
-    {%- for photo in photoSet.photos -%}
-    <div class="column is-one-third ">
-        <div class="box">
-            <div class="image is-3by2">
-                <img src="https:{{photo.fields.file.url}}?w=400&fm=jpg&fl=progressive&q=80&fit=fill&f=faces" alt="Photo from {{ photoSet.title }}" loading="lazy">
-                <a href="https:{{photo.fields.file.url}}?q=100" class="is-overlay">
-                <span class=" icon ">
-                        <i class="fas fa-download is-large has-text-white"></i>
-                </span></a>
-            </div>
-        </div>
-    </div>
-    {%- endfor -%}
-</div>
-
-<div class="columns is-multiline">
     <img src="{{portfolio-item.thumbnail.fields.file.url}}" alt="Image from {{ portfolio-item.itemTitle }}" loading="lazy">
     {{portfolio-item.content | renderRichTextAsHtml | safe }}
 </div>

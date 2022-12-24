@@ -10,7 +10,7 @@ renderData:
 <div class="columns is-multiline"> 
     {%- for post in contentful-blog -%}
     <div class="column is-one-third ">     
-        <a href="/blog{{portfolio-item.slug}}">
+        <a href="/blog{{post.slug}}">
             <p class="title is-4 has-text-dark">{{post.title}}</p>
         </a>  
     </div>
