@@ -23,6 +23,10 @@ ul {
     font-size: 4em;
 }
 
+.share-fab {
+    font-size: 3em;
+}
+
 .text-right {
     float: right;
 }
