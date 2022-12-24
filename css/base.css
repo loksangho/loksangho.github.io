@@ -17,3 +17,7 @@ ul {
 .footer-fab {
     font-size: 4em;
 }
+
+.text-right {
+    float: right;
+}
