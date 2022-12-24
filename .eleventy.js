@@ -18,14 +18,17 @@ module.exports = function (eleventyConfig) {
   //eleventyConfig.addPassthroughCopy("img");
   eleventyConfig.addPassthroughCopy("css");
 
-  eleventyConfig.addFilter("renderRichTextAsHtml", (value) =>
-    documentToHtmlString(value)
-  );
   
+
   // Add plugins
   eleventyConfig.addPlugin(pluginRss);
   eleventyConfig.addPlugin(pluginSyntaxHighlight);
   eleventyConfig.addPlugin(pluginNavigation);
+
+
+  eleventyConfig.addFilter("renderRichTextAsHtml", (value) =>
+    documentToHtmlString(value)
+  );
 
   eleventyConfig.addFilter("readableDate", dateObj => {
     return DateTime.fromJSDate(dateObj, {zone: 'utc'}).toFormat("dd LLL yyyy");
