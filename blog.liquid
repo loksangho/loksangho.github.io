@@ -11,11 +11,12 @@ renderData:
     {%- for post in contentful-blog -%}
     	<p><h3>{{post.title}}</h3></p>
     	<p>{{post.plainFontContent | trimWords }}</p>
-    	<div>
+    	<div class="horizontal-bars">
     	<p class="text-right"><a href="/blog/{{post.slug}}/">
             Read More
-        </div>
         <p>
+        </div>
+        
         <hr/>
     {%- endfor -%}
 </div>
