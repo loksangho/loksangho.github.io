@@ -9,13 +9,13 @@ const client = contentful.createClient({
 // This API call will request an entry with the specified ID from the space defined at the top, using a space-specific access token.
 
 module.exports = async () => {
-    return client.getEntries({ content_type: 'blogPost' }).then(function(response) {
+    return client.getEntries({ content_type: 'portfolioItem' }).then(function(response) {
 
-            const blogPost = response.items
-                .map(function(blogPost) {
-                    return blogPost.fields;
+            const portfolioItem = response.items
+                .map(function(portfolioItem) {
+                    return portfolioItem.fields;
                 });
-            return blogPost;
+            return portfolioItem;
         })
 
         .catch(console.error);
