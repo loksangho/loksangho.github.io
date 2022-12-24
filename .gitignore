@@ -1,5 +1,4 @@
-# Ignore installed npm modules
-node_modules/
+
 
 # Ignore build tool output, e.g. code coverage
 .nyc_output/
