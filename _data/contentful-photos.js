@@ -11,11 +11,11 @@ const client = contentful.createClient({
 module.exports = async () => {
     return client.getEntries({ content_type: 'portfolioItem' }).then(function(response) {
 
-            const photoSet = response.items
-                .map(function(photoSet) {
-                    return photoSet.fields;
+            const portfolioItem = response.items
+                .map(function(portfolioItem) {
+                    return portfolioItem.fields;
                 });
-            return photoSet;
+            return portfolioItem;
         })
 
         .catch(console.error);
