@@ -21,3 +21,8 @@ ul {
 .text-right {
     float: right;
 }
+
+.horizontal-bars {
+    border-top: #FFFFFF solid 1px;
+    border-bottom: #FFFFFF solid 1px;
+}
