@@ -6,6 +6,9 @@ p {
   margin-bottom: 30px;
 }
 
+p.title {
+    font-size: 4vw;
+}
 .hero.is-info{
     background-color: #296ec2
 }
