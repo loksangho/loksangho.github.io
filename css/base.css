@@ -2,6 +2,10 @@ a {
     color: #296ec2
 }
 
+p {
+  text-indent: 50px;
+}
+
 .hero.is-info{
     background-color: #296ec2
 }
