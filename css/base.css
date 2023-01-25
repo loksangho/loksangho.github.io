@@ -39,3 +39,7 @@ ul {
     border-top: #E6E6E6 solid 1px;
     border-bottom: #E6E6E6 solid 1px;
 }
+
+.navbar-end {
+    padding-top: 15px;
+}
