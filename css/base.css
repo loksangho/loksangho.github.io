@@ -7,7 +7,7 @@ p {
 }
 
 p.title {
-    font-size: 4vw;
+    font-size: 2vw !important;
 }
 .hero.is-info{
     background-color: #296ec2
