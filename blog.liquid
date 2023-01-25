@@ -10,7 +10,7 @@ renderData:
 <div class="is-multiline"> 
     {%- for post in contentful-blog -%}
     	<p><h3>{{post.title}}</h3></p>
-    	<p>{{post.richContent | trimWords }}</p>
+    	<p>{{post.richContent | renderRichTextAsHtml | trimWords }}</p>
     	<div class="horizontal-bars">
     	<p class="text-right"><a href="/blog/{{post.slug}}/">
             Read More
