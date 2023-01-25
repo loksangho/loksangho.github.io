@@ -11,6 +11,6 @@ renderData:
     <img src="https:{{contentful-brand.portraitPhoto.fields.file.url}}?w=1000" alt="{{contentful-brand.name}}">
 </div>
 <div class="columns is-multiline"> 
-    {{contentful-brand.aboutMe | renderRichTextAsPlainText }}
+    {{contentful-brand.aboutMe | renderRichTextAsHtml }}
 </div>
 
