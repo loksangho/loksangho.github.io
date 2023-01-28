@@ -1,12 +1,6 @@
-a.navbar-special:link {
-    text-decoration: none;
-}
-
-
-a:link {
+a:not(.navbar-special):link {
     text-decoration: underline;
 }
-
 
 p {
   margin-bottom: 30px;
