@@ -2,6 +2,10 @@ a:link {
     text-decoration: underline;
 }
 
+a.navbar-link:link {
+    text-decoration: none;
+}
+
 p {
   margin-bottom: 30px;
 }
