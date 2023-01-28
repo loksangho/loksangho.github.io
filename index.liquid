@@ -22,30 +22,5 @@ renderData:
     {%- endfor -%}
 </div>
 
-<script>
-var request = new XMLHttpRequest();
-request.open('GET', 'https://api.instagram.com/v1/users/self/media/recent/?access_token=EAAHGkGQz1hcBALFw2qNR4loDabjXLJoZCDB6BYjDvSbDoXxjW4AjQDy1K1JhlUV3iWWdqHnFVc1zb8QljlP5ldzBaWCvMAp0cBmOKFmcpFyckb6yUU4a2beZAATiihZBonIG2Y2C81w1NecWxjzhH0CnHZC9IZABPutkVvibRrbiwDrofnZClgM58JJ9jdZBIsWazPRi8QnNaEgXZCwGnhp5&count=8', true);
-request.onload = function(container) {
-    if (request.status >= 200 && request.status < 400) {
-        // Success!
-        var data = JSON.parse(request.responseText);
-        for (var i=0;i < data.data.length;i++) {
-            var container = document.getElementById('insta-feed');
-            var imgURL = data.data[i].images.standard_resolution.url;
-            console.log(imgURL);
-            var div = document.createElement('div');
-            div.setAttribute('class','instapic');
-            container.appendChild(div);
-            var img = document.createElement('img');
-            img.setAttribute('src',imgURL)
-            div.appendChild(img);
-        }
-        console.log(data);
-    } else { }
-};
-request.onerror = function() {
-    //There was a connection error of some sort
-};
-request.send();
-</script>
-<div id="insta-feed"></div>
+<figure data-behold-id="JcBmk4CkAWNHuyq9dZcS"></figure>
+<script src="https://w.behold.so/widget.js" type="module"></script>
