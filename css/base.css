@@ -1,5 +1,5 @@
-a {
-    color: #2587be !important;
+a:link {
+    text-decoration: underline;
 }
 
 p {
