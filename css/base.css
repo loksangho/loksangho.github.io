@@ -2,7 +2,7 @@ a:link {
     text-decoration: underline;
 }
 
-a.navbar-link:link {
+a.navbar-special:link {
     text-decoration: none;
 }
 
