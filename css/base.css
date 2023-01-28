@@ -1,10 +1,12 @@
+a.navbar-special:link {
+    text-decoration: none;
+}
+
+
 a:link {
     text-decoration: underline;
 }
 
-a.navbar-special:link {
-    text-decoration: none;
-}
 
 p {
   margin-bottom: 30px;
