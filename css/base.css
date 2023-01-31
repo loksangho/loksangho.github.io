@@ -7,6 +7,10 @@ p {
   margin-bottom: 30px;
 }
 
+.polaroid {
+    filter: sepia(100%);
+}
+
 .hero.is-info{
     background-color: #296ec2
 }
