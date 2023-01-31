@@ -1,4 +1,4 @@
-.image {
+.foil-image {
   position:relative;
   z-index:1;
   overflow:hidden;
@@ -13,7 +13,7 @@
   -moz-animation: move 3s infinite linear;
   animation: move 3s infinite linear;
 }
-.image::after {
+.foil-image::after {
   content:' ';
   position:absolute;
   height:200%;
@@ -34,7 +34,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', e
 
 }
 
-.image {
+.foil-image {
   background-blend-mode:multiply,normal;
 }
 @-webkit-keyframes move {
