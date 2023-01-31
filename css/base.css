@@ -130,6 +130,40 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', e
   }
 }
 
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+div.box {
+  width: 120px;
+  height: 120px;
+  border-radius: 60px;
+  background: linear-gradient(to bottom, #393939 0%, #151515 100%);
+  position: relative;
+}
+div.box:before {
+  content: '';
+  width: 106px;
+  height: 106px;
+  border-radius: 53px;
+  background: #19f000;
+  border: 1px solid black;
+  position: absolute;
+  left: 7px;
+  top: 7px;
+}
+div.box:after {
+  content: '';
+  width: 80px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  position: absolute;
+  transform: rotate(-18deg);
+  left: 13px;
+  top: 9px;
+}
 
 a:not(.navbar-special):link {
     text-decoration: underline;
