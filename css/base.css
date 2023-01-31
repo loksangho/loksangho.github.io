@@ -8,7 +8,7 @@ p {
 }
 
 .polaroid {
-    filter: sepia(100%);
+    filter: sepia(50%);
 }
 
 .hero.is-info{
