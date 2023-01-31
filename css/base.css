@@ -13,7 +13,7 @@
   -moz-animation: move 3s infinite linear;
   animation: move 3s infinite linear;
 }
-.foil-image::after {
+.box>a:hover::after {
   content:' ';
   position:absolute;
   height:200%;
@@ -34,7 +34,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', e
 
 }
 
-.foil-image {
+.box>a:hover {
   background-blend-mode:multiply,normal;
 }
 @-webkit-keyframes move {
