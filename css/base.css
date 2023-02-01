@@ -43,7 +43,7 @@
 
 .polaroid {
   padding: 1rem;
-
+  filter: sepia(50%);
 }
 
 .polaroid-back {
@@ -67,10 +67,6 @@ a:not(.navbar-special):link {
 
 p {
   margin-bottom: 30px;
-}
-
-.polaroid {
-    filter: sepia(50%);
 }
 
 .hero.is-info{
