@@ -46,6 +46,11 @@
 
 }
 
+.polaroid-back {
+  background: url("polaroid-back.jpg") no-repeat;
+  background-size: cover;
+}
+
 @font-face {
     font-family: sharpie;
     src: url(PermanentMarker-Regular.ttf);
