@@ -59,6 +59,8 @@
 .polaroid-back-text {
   width:100%;
   font-family: sharpie;
+  font-size: 20px;
+  color: green;
 }
 
 a:not(.navbar-special):link {
