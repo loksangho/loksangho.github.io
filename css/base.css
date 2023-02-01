@@ -41,7 +41,7 @@
 }
 
 .polaroid-back {
-	background: url("polaroid-back.jpg") no-repeat;
+	background: url("images/polaroid-back.jpg") no-repeat;
 	background-size: cover;	
 }
 
