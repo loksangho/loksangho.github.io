@@ -1,53 +1,45 @@
-.card {
-  -webkit-perspective: 150rem;
-          perspective: 150rem;
-  -moz-perspective: 150rem;
+/* The flip card container - set the width and height to whatever you want. We have added the border property to demonstrate that the flip itself goes out of the box on hover (remove perspective if you don't want the 3D effect */
+.flip-card {
+  background-color: transparent;
+  /*width: 300px;
+  height: 200px;*/
+  height:100%;
+  perspective: 1000px; /* Remove this if you don't want the 3D effect */
+}
+
+/* This container is needed to position the front and back side */
+.flip-card-inner {
   position: relative;
-  height: 100%;
-  background: rgba(0,0,0,0);
-}
-
-.card__side {
-  height: inherit;
-  -webkit-transition: all 0.8s ease;
-  transition: all 0.8s ease;
-  position: absolute;
-
   width: 100%;
-  -webkit-backface-visibility: hidden;
-          backface-visibility: hidden;
-  border-radius: 3px;
-  overflow: hidden;
-  -webkit-box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.15);
-          box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.15);
+  height: 100%;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
 }
 
-.card__side--front {
+/* Do an horizontal flip when you move the mouse over the flip box container */
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+/* Position the front and back side */
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+}
+
+/* Style the front side (fallback if image is missing) */
+.flip-card-front {
   background-color: #fff;
 }
 
-.card__side--back {
-
+/* Style the back side */
+.flip-card-back {
   background-color: #fff;
-  -webkit-transform: rotateY(180deg);
-          transform: rotateY(180deg);
-}
-
-.card:hover .card__side--front-1,
-.card:hover .card__side--front-2,
-.card:hover .card__side--front-3 {
-  -webkit-transform: rotateY(-180deg);
-          transform: rotateY(-180deg);
-}
-
-.polaroid-back {
-	background: url("images/polaroid-back.jpg") no-repeat;
-	background-size: cover;	
-}
-
-.card:hover .card__side--back {
-  -webkit-transform: rotateY(0);
-          transform: rotateY(0);
+  transform: rotateY(180deg);
+  
 }
 
 @font-face {
