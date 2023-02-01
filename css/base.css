@@ -50,8 +50,14 @@
           transform: rotateY(0);
 }
 
+@font-face {
+    font-family: sharpie;
+    src: url(PermanentMarker-Regular.ttf);
+}
+
 .polaroid-back-text {
   width:100%;
+  font-family: sharpie;
 }
 
 a:not(.navbar-special):link {
