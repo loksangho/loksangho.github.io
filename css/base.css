@@ -28,9 +28,6 @@
 }
 
 .flip-card-back {
-  /*background-color: #fff;
-  color: white;
-  transform: rotateY(180deg);*/
   transform: rotateY(180deg);
   margin-left: -100%;
 }
@@ -81,7 +78,7 @@ p {
 }
 
 .hero.is-info{
-    background-color: #296ec2
+    background-color: #485fc7
 }
 
 h1 {
