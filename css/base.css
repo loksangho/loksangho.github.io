@@ -59,7 +59,7 @@ img.polaroid_icon {
 }
 
 .polaroid {
-  padding: 1rem;
+  padding: 5%;
   filter: sepia(50%);
 }
 
