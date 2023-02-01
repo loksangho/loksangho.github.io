@@ -51,6 +51,11 @@
   margin-left: -100%;
 }
 
+img.polaroid_icon {
+     display: block;
+     margin-left: auto;
+}
+
 .polaroid {
   padding: 1rem;
   filter: sepia(50%);
