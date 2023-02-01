@@ -54,6 +54,8 @@
 img.polaroid_icon {
      display: block;
      margin-left: auto;
+     width: 10%;
+     height: auto;
 }
 
 .polaroid {
