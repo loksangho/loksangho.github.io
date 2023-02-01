@@ -1,10 +1,8 @@
-
 .flip-card {
   background-color: transparent;
   width: 400px;
   height: 450px;
   perspective: 1000px;
-  float:left; //I just added this positioning.
 }
 
 .flip-card-inner {
