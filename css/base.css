@@ -53,7 +53,7 @@
 
 @font-face {
     font-family: sharpie;
-    src: url(PermanentMarker-Regular.ttf);
+    src: url("PermanentMarker-Regular.ttf");
 }
 
 .polaroid-back-text {
