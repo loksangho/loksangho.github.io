@@ -7,7 +7,7 @@ renderData:
 
 ---
 
-<div class="columns is-multiline is-desktop"> 
+<div class="columns is-multiline is-de"> 
     {%- for portfolio-item in contentful-photos -%}
     <div class="column is-one-third ">
        
@@ -19,8 +19,8 @@ renderData:
                         <img class="polaroid" src="https:{{portfolio-item.thumbnail.fields.file.url}}?w=400&fm=jpg&fl=progressive&q=80&fit=fill&f=faces" alt="Photo from {{ portfolio-item.itemTitle }}" loading="lazy">
                		 </div>
 		
-            
-                <p class="title is-4 has-text-dark"></p>
+            	<br><br>
+                <!--<p class="title is-4 has-text-dark"></p>-->
         	</div>
 		<div class="flip-card-back polaroid-back has-text-centered is-flex is-align-items-center">
 			<div class="polaroid-back-text">
