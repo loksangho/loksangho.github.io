@@ -6,8 +6,11 @@ renderData:
     title: "Portfolio"
 
 ---
-
-<div class="columns is-multiline is-de"> 
+<div class="corkboard-top">
+<br>
+<br>
+</div> 
+<div class="child corkboard columns is-multiline is-de"> 
     {%- for portfolio-item in contentful-photos -%}
     <div class="item column is-one-third ">
        
@@ -35,6 +38,10 @@ renderData:
 	</div>
     </div>
     {%- endfor -%}
+</div>
+<div class="corkboard-bottom">
+<br>
+<br>
 </div>
 
 <h1 class="title has-text-centered">Social Media</h1>
