@@ -59,13 +59,13 @@
 
 .corkboard-top {
   background: url("corkboard_top.png") no-repeat; 
-  background-size: cover;
+  background-size: contain;
   margin: 0 auto;
 }
 
 .corkboard-bottom {
   background: url("corkboard_bottom.png") no-repeat; 
-  background-size: cover;
+  background-size: contain;
   background-position: center bottom;
   height:100%;
   margin: 0 auto;
