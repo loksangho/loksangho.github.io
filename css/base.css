@@ -72,6 +72,11 @@
   margin-top: -15px;
 }
 
+.social-media {
+  padding-left:200px;
+  padding-right:200px;
+}
+
 .social-board-middle {
   background: url("socials_middle.png") repeat-y; 
   background-size: contain;
