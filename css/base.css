@@ -93,6 +93,15 @@
   margin-top: -10px;
 }
 
+.instagram_container{
+  
+}
+
+.twitter_container {
+  display: flex; 
+  justify-content: center;
+}
+
 .flip-card {
   perspective: 1000;
 }
