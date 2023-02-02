@@ -47,6 +47,31 @@
   box-shadow: 0 2.1rem 2rem rgba(0,0,0,0.3);
 }
 
+.child, .child ~ div {
+    width:100%;
+}
+
+.corkboard {
+  background: url("corkboard_main.png") repeat-y; 
+  background-size: contain;
+  margin: 0 auto;
+}
+
+.corkboard-top {
+  background: url("corkboard_top.png") no-repeat; 
+  background-size: cover;
+  margin: 0 auto;
+}
+
+.corkboard-bottom {
+  background: url("corkboard_bottom.png") no-repeat; 
+  background-size: cover;
+  background-position: center bottom;
+  height:100%;
+  margin: 0 auto;
+  margin-top: -15px;
+}
+
 .flip-card {
   perspective: 1000;
 }
