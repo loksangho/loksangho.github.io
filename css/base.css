@@ -3,12 +3,13 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  background-color: #00BAF0;
-  background: linear-gradient(to left, #f46b45, #eea849);
+  background-color: #FFFFFF;
+  /*background: linear-gradient(to left, #f46b45, #eea849);*/
   /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   color: #FFF;
   height: 50px;
   padding: 1em;
+  width:100%;
 }
 
 .menu {
