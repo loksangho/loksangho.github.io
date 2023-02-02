@@ -72,19 +72,19 @@
   margin-top: -15px;
 }
 
-.corkboard {
+.social-board-middle {
   background: url("socials_middle.png") repeat-y; 
   background-size: contain;
   margin: 0 auto;
 }
 
-.corkboard-top {
+.social-board-top {
   background: url("socials_top.png") no-repeat; 
   background-size: 100%;
   margin: 0 auto;
 }
 
-.corkboard-bottom {
+.social-board-bottom {
   background: url("socials_bottom.png") no-repeat; 
   background-size: 100%;
   background-position: center bottom;
