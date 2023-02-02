@@ -62,6 +62,7 @@
   background-size: 100%;
   margin: 0 auto;
   background-position: center bottom;
+  max-height: 15vw;
 }
 
 .corkboard-bottom {
@@ -70,6 +71,7 @@
   background-position: center top;
   margin: 0 auto;
   margin-top: -15px;
+  max-height: 15vw;
 }
 
 .social-media {
@@ -89,6 +91,7 @@
   background-size: 100%;
   margin: 0 auto;
   background-position: center bottom;
+  max-height: 20vw;
 }
 
 .social-board-bottom {
@@ -97,6 +100,7 @@
   background-position: center top;
   margin: 0 auto;
   margin-top: -10px;
+  max-height: 30vw;
 }
 
 .instagram_container{
