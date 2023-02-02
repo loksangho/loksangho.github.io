@@ -82,15 +82,14 @@
   background: url("socials_top.png") no-repeat; 
   background-size: 100%;
   margin: 0 auto;
+  background-position: center bottom;
 }
 
 .social-board-bottom {
   background: url("socials_bottom.png") no-repeat; 
   background-size: 100%;
-  background-position: center bottom;
-  height:100%;
+  background-position: center top;
   margin: 0 auto;
-  margin-top: -15px;
 }
 
 .flip-card {
