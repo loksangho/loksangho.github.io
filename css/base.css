@@ -43,7 +43,7 @@
 .menu-button::before,
 .menu-button::after {
   display: block;
-  background-color: #fff;
+  background-color: #485fc7;
   position: absolute;
   height: 4px;
   width: 30px;
