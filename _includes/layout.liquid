@@ -35,7 +35,12 @@
 
     function ImgRandomPosition(imgAdded, width, height, offsetLeft, offsetTop)
     {
-        console.log(offsetTop);
+        var polaroids = document.getElementsByClassName("item");
+        for(const polaroid of polaroids) {
+            console.log("(" + polaroid.offsetLeft + ", " + polaroid.offsetTop + ")" + polaroid.style.transform.match(/rotate\((\d+)(._)\)/));
+            
+        }
+        
         var left = Math.floor((Math.random() * width) + 1 + offsetLeft)+"px";
         var top = Math.floor((Math.random() * height) + 1 + offsetTop)+"px";
         var imagestyle = imgAdded.style;
