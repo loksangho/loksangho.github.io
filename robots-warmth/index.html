@@ -21,11 +21,12 @@
     <script>
     function insert(numOfPins)
     {
+        console.log("here2");
         var imgDestination = document.getElementById("corkboard");
         var imgAdded = document.createElement("img");
         imgAdded.src = "css/pin.png";
         for(var i=0; i< numOfPins; i++) {
-            console.log("here " + i)
+            console.log("here " + i);
             imgDestination.appendChild(imgAdded);
             ImgRandomPosition(imgAdded, imgDestination.offsetWidth, imgDestination.offsetHeight);
         }
