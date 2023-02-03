@@ -22,8 +22,8 @@
     function insert(numOfPins)
     {
         var imgDestination = document.getElementById("corkboard");
-        imgAdded.src = "css/pin.png";
         var imgAdded = document.createElement("img");
+        imgAdded.src = "css/pin.png";
         for(var i=0; i< numOfPins; i++) {
             imgDestination.appendChild(imgAdded);
             ImgRandomPosition(imgAdded, imgDestination.width, imgDestination.height);
