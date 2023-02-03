@@ -169,6 +169,16 @@
     width:100%;
 }
 
+.polaroid_pin {
+  position:absolute;
+  top: 2%;
+  right: 50%;
+}
+
+.flip-card:hover ~ .polaroid_pin {
+  display:none;
+}
+
 .corkboard {
   background: url("corkboard_main.png") repeat-y; 
   background-size: contain;
