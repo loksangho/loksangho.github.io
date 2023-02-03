@@ -27,15 +27,16 @@
             var imgAdded = document.createElement("img");
             imgAdded.src = "css/pin.png";
             imgDestination.appendChild(imgAdded);
-            ImgRandomPosition(imgAdded, imgDestination.scrollWidth, imgDestination.scrollHeight);
+            ImgRandomPosition(imgAdded, imgDestination.scrollWidth, imgDestination.scrollHeight, imgDestination.offsetLeft, imgDestination.offsetTop);
         }
     }
 
 
-    function ImgRandomPosition(imgAdded, width, height)
+    function ImgRandomPosition(imgAdded, width, height, offsetLeft, offsetTop)
     {
-        var left = Math.floor((Math.random() * width) + 1)+"px";
-        var top = Math.floor((Math.random() * height) + 1)+"px";
+        console.log(offsetTop);
+        var left = Math.floor((Math.random() * width) + 1)+"px" + offsetLeft;
+        var top = Math.floor((Math.random() * height) + 1)+"px" + offsetTop;
         var imagestyle = imgAdded.style;
         imagestyle.position = "absolute";
         imagestyle.top = top;
