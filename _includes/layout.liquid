@@ -20,7 +20,7 @@
     <script defer src="https://use.fontawesome.com/releases/v5.10.2/js/all.js"></script>
     <script type='text/javascript' src='https://platform-api.sharethis.com/js/sharethis.js#property=63a6e40b4b058f001938ca85&product=sticky-share-buttons' async='async'></script>
     <script>
-    let polaroid_scale = 0.8;
+    
     
     
     function insert(numOfPins)
@@ -40,10 +40,10 @@
     {
         var polaroids = document.getElementsByClassName("item");
         for(const polaroid of polaroids) {
-        
+            let polaroid_scale = 0.8;    
             var offsetX = polaroid.offsetWidth * (1 - polaroid_scale);
             var offsetY = polaroid.offsetHeight * (1 - polaroid_scale);
-            console.log("(" + polaroid.offsetLeft + polaroid.offsetX + ", " + polaroid.offsetTop + polaroid.offsetY + ", " + polaroid.offsetLeft + polaroid.offsetWidth - polaroid.offsetX + ", " + polaroid.offsetTop + polaroid.offsetHeight - polaroid.offsetY + ")" +  " " + polaroid.style.transform);
+            console.log("(" + polaroid.offsetLeft + offsetX + ", " + polaroid.offsetTop + offsetY + ", " + polaroid.offsetLeft + polaroid.offsetWidth - offsetX + ", " + polaroid.offsetTop + polaroid.offsetHeight - offsetY + ")" +  " " + polaroid.style.transform);
             
         }
         
