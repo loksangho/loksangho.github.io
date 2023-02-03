@@ -42,7 +42,11 @@
             var polaroid_scale = 0.8;    
             var offsetX = polaroid.offsetWidth * (1 - polaroid_scale);
             var offsetY = polaroid.offsetHeight * (1 - polaroid_scale);
-            console.log("(" + polaroid.offsetLeft + offsetX + ", " + polaroid.offsetTop + offsetY + ", " + polaroid.offsetLeft + polaroid.offsetWidth - offsetX + ", " + polaroid.offsetTop + polaroid.offsetHeight - offsetY + ")" +  " " + polaroid.style.transform);
+            var coord1= polaroid.offsetLeft + offsetX;
+            var coord2 = polaroid.offsetTop + offsetY;
+            var coord3 = polaroid.offsetLeft + polaroid.offsetWidth - offsetX;
+            var coord4 = polaroid.offsetTop + polaroid.offsetHeight - offsetY;
+            console.log("(" + coord1 + ", " + coord2 + ", " + coord3 + ", " + coord4 + ")" +  " " + polaroid.style.transform);
             
         }
         
