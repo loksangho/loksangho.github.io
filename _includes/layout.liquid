@@ -53,15 +53,17 @@
         }
         return false;
     }
+    
 
     function ImgRandomPosition(imgAdded, width, height, offsetLeft, offsetTop)
     {
         
         while (true) {
+            frame_width = 20;
              console.log("here");
             var left = Math.floor((Math.random() * width) + 1 + offsetLeft);
             var top = Math.floor((Math.random() * height) + 1 + offsetTop);
-            if(!insidePolaroids(left, top)) break;
+            if(!insidePolaroids(left, top) && left >= offsetLeft + frame_width && left <= offsetLeft + width - frame_width && top >= offsetTop + frame_width && top <= offsetTop + height - frame_width) break;
         }
         left += "px";
         top += "px";
