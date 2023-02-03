@@ -45,7 +45,7 @@
             var coord_topLeft_y = polaroid.offsetTop + offsetY;
             var coord_bottomRight_x = polaroid.offsetLeft + polaroid.offsetWidth - offsetX;
             var coord_bottomRight_y = polaroid.offsetTop + polaroid.offsetHeight - offsetY;
-            console.log("(" + coord_topLeft_x + ", " + coord_topLeft_y + ", " + coord_bottomRight_x + ", " + coord_bottomRight_y + ")" +  " " + polaroid.style.transform);
+            //console.log("(" + coord_topLeft_x + ", " + coord_topLeft_y + ", " + coord_bottomRight_x + ", " + coord_bottomRight_y + ")" +  " " + polaroid.style.transform);
             if (x >= coord_topLeft_x && x < coord_bottomRight_x && y >= coord_topLeft_y && y < coord_bottomRight_y) {
                 return true;
             }
