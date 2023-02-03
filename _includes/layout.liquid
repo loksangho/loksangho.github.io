@@ -36,8 +36,8 @@
     function ImgRandomPosition(imgAdded, width, height, offsetLeft, offsetTop)
     {
         console.log(offsetTop);
-        var left = Math.floor((Math.random() * width) + 1)+"px" + offsetLeft;
-        var top = Math.floor((Math.random() * height) + 1)+"px" + offsetTop;
+        var left = Math.floor((Math.random() * width) + 1 + offsetLeft)+"px";
+        var top = Math.floor((Math.random() * height) + 1 + offsetTop)+"px";
         var imagestyle = imgAdded.style;
         imagestyle.position = "absolute";
         imagestyle.top = top;
