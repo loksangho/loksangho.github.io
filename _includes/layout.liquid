@@ -37,7 +37,7 @@
     {
         var polaroids = document.getElementsByClassName("item");
         for(const polaroid of polaroids) {
-            console.log("(" + polaroid.offsetLeft + ", " + polaroid.offsetTop + ", " + polaroid.offsetWidth + ", " + polaroid.offsetHeight + ")" + polaroid.style.transform.match(/rotate\((\d+)(.+)\)/) + " " + polaroid.style.transform);
+            console.log("(" + polaroid.offsetLeft + ", " + polaroid.offsetTop + ", " + polaroid.offsetWidth + ", " + polaroid.offsetHeight + ")" + polaroid.style.transform.match(/rotate\((\d+)(.+)\)/) + " " + polaroid.style);
             
         }
         
