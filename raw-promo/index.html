@@ -34,6 +34,10 @@
 
     function ImgRandomPosition(imgAdded, width, height)
     {
+        polaroids = document.getElementsByClassName("polaroid");
+        for (const polaroid of polaroids) { 
+            console.log(polaroid.offsetLeft + " " + polaroid.offsetTop); 
+        }
         var left = Math.floor((Math.random() * width) + 1)+"px";
         var top = Math.floor((Math.random() * height) + 1)+"px";
         var imagestyle = imgAdded.style;
