@@ -58,8 +58,8 @@
     {
         
         while (true) {
-            frame_width = 30;
-             console.log("here");
+            var frame_width = 30;
+            
             var left = Math.floor((Math.random() * width) + 1 + offsetLeft);
             var top = Math.floor((Math.random() * height) + 1 + offsetTop);
             outsideFrame_x = left >= offsetLeft + frame_width && left <= offsetLeft + width - frame_width;
