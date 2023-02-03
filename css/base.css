@@ -193,9 +193,11 @@
 }
 
 .social-media {
-  /*padding-left:10vw;
-  padding-right:10vw;
-  margin: 0 -10vw;*/
+    -webkit-transform: scale(0.5);
+    -moz-transform: scale(0.5);
+    -ms-transform: scale(0.5);
+    transform: scale(0.8);
+    margin-top: -10vw;
 }
 
 .social-board-middle {
