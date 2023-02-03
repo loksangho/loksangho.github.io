@@ -36,23 +36,33 @@
     }
 
 
-    function ImgRandomPosition(imgAdded, width, height, offsetLeft, offsetTop)
-    {
+    function insidePolaroids(x,y) {
         var polaroids = document.getElementsByClassName("item");
         for(const polaroid of polaroids) {
             var polaroid_scale = 0.8;    
             var offsetX = polaroid.offsetWidth * (1 - polaroid_scale);
             var offsetY = polaroid.offsetHeight * (1 - polaroid_scale);
-            var coord1= polaroid.offsetLeft + offsetX;
-            var coord2 = polaroid.offsetTop + offsetY;
-            var coord3 = polaroid.offsetLeft + polaroid.offsetWidth - offsetX;
-            var coord4 = polaroid.offsetTop + polaroid.offsetHeight - offsetY;
-            console.log("(" + coord1 + ", " + coord2 + ", " + coord3 + ", " + coord4 + ")" +  " " + polaroid.style.transform);
-            
+            var coord_topLeft_x = polaroid.offsetLeft + offsetX;
+            var coord_topLeft_y = polaroid.offsetTop + offsetY;
+            var coord_bottomRight_x = polaroid.offsetLeft + polaroid.offsetWidth - offsetX;
+            var coord_bottomRight_y = polaroid.offsetTop + polaroid.offsetHeight - offsetY;
+            console.log("(" + coord_topLeft_x + ", " + coord_topLeft_y + ", " + coord_bottomRight_x + ", " + coord_bottomRight_y + ")" +  " " + polaroid.style.transform);
+            if (x >= coord_topLeft_x && x < coord_bottomRight_x && y >= coord_topLeft_y && y < coord_bottomRight_y) {
+                return true;
+            }
         }
+        return false;
+    }
+
+    function ImgRandomPosition(imgAdded, width, height, offsetLeft, offsetTop)
+    {
         
-        var left = Math.floor((Math.random() * width) + 1 + offsetLeft)+"px";
-        var top = Math.floor((Math.random() * height) + 1 + offsetTop)+"px";
+        while (true) {
+             console.log("here");
+            var left = Math.floor((Math.random() * width) + 1 + offsetLeft)+"px";
+            var top = Math.floor((Math.random() * height) + 1 + offsetTop)+"px";
+            if(!insidePolaroids(left, top)) break;
+        }
         var imagestyle = imgAdded.style;
         imagestyle.position = "absolute";
         imagestyle.top = top;
