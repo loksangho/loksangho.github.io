@@ -20,13 +20,15 @@
     <script defer src="https://use.fontawesome.com/releases/v5.10.2/js/all.js"></script>
     <script type='text/javascript' src='https://platform-api.sharethis.com/js/sharethis.js#property=63a6e40b4b058f001938ca85&product=sticky-share-buttons' async='async'></script>
     <script>
-    function insert()
+    function insert(numOfPins)
     {
         var imgDestination = document.getElementById("corkboard");
         var imgAdded = document.createElement("img");
         imgAdded.src = "css/pin.png";
-        imgDestination.appendChild(imgAdded);
-        ImgRandomPosition(imgAdded);
+        for(var i=0; i< numOfPins; i++) {
+            imgDestination.appendChild(imgAdded);
+            ImgRandomPosition(imgAdded);
+        }
     }
 
 
