@@ -197,7 +197,8 @@
     -moz-transform: scale(0.5);
     -ms-transform: scale(0.5);
     transform: scale(0.8);
-    margin-top: -10vw;
+    margin-top: -5vw;
+    margin-bottom: -10vw;
 }
 
 .social-board-middle {
