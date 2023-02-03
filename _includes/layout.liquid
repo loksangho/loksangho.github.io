@@ -20,6 +20,9 @@
     <script defer src="https://use.fontawesome.com/releases/v5.10.2/js/all.js"></script>
     <script type='text/javascript' src='https://platform-api.sharethis.com/js/sharethis.js#property=63a6e40b4b058f001938ca85&product=sticky-share-buttons' async='async'></script>
     <script>
+    polaroid_scale = 0.8;
+    
+    
     function insert(numOfPins)
     {
         var imgDestination = document.getElementById("corkboard");
@@ -36,9 +39,10 @@
     function ImgRandomPosition(imgAdded, width, height, offsetLeft, offsetTop)
     {
         var polaroids = document.getElementsByClassName("item");
-        //var offsetX = polaroid.offsetWidth * 
+        var offsetX = polaroid.offsetWidth * (1 - polaroid_scale);
+        var offsetY = polaroid.offsetHeight * (1 - polaroid_scale);
         for(const polaroid of polaroids) {
-            console.log("(" + polaroid.offsetLeft + ", " + polaroid.offsetTop + ", " + polaroid.offsetWidth + ", " + polaroid.offsetHeight + ")" +  " " + polaroid.style.transform);
+            console.log("(" + polaroid.offsetLeft + polaroid.offsetX + ", " + polaroid.offsetTop + polaroid.offsetY + ", " + polaroid.offsetLeft + polaroid.offsetWidth - polaroid.offsetX + ", " + polaroid.offsetTop + polaroid.offsetHeight - polaroid.offsetY + ")" +  " " + polaroid.style.transform);
             
         }
         
