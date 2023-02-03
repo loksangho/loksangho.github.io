@@ -58,10 +58,12 @@
         
         while (true) {
              console.log("here");
-            var left = Math.floor((Math.random() * width) + 1 + offsetLeft)+"px";
-            var top = Math.floor((Math.random() * height) + 1 + offsetTop)+"px";
+            var left = Math.floor((Math.random() * width) + 1 + offsetLeft);
+            var top = Math.floor((Math.random() * height) + 1 + offsetTop);
             if(!insidePolaroids(left, top)) break;
         }
+        left += "px";
+        top += "px";
         var imagestyle = imgAdded.style;
         imagestyle.position = "absolute";
         imagestyle.top = top;
