@@ -63,8 +63,9 @@
              console.log("here");
             var left = Math.floor((Math.random() * width) + 1 + offsetLeft);
             var top = Math.floor((Math.random() * height) + 1 + offsetTop);
-            outsideFrame = left >= offsetLeft + frame_width && left <= offsetLeft + width - frame_width && top >= offsetTop + frame_width && top <= offsetTop + height - frame_width;
-            if(!insidePolaroids(left, top) && outsideFrame) break;
+            outsideFrame_x = left >= offsetLeft + frame_width && left <= offsetLeft + width - frame_width;
+            outsideFrame_y = top >= offsetTop + frame_width && top <= offsetTop + height - frame_width;
+            if(!insidePolaroids(left, top) && outsideFrame_x) break;
         }
         left += "px";
         top += "px";
