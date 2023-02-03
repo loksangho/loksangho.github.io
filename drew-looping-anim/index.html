@@ -23,8 +23,8 @@
     {
         var imgDestination = document.getElementById("corkboard");
         imgAdded.src = "css/pin.png";
+        var imgAdded = document.createElement("img");
         for(var i=0; i< numOfPins; i++) {
-            var imgAdded = document.createElement("img");
             imgDestination.appendChild(imgAdded);
             ImgRandomPosition(imgAdded, imgDestination.width, imgDestination.height);
         }
