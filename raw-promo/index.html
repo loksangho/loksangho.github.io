@@ -25,8 +25,9 @@
         var imgAdded = document.createElement("img");
         imgAdded.src = "css/pin.png";
         for(var i=0; i< numOfPins; i++) {
+            console.log("here " + i)
             imgDestination.appendChild(imgAdded);
-            ImgRandomPosition(imgAdded, imgDestination.width, imgDestination.height);
+            ImgRandomPosition(imgAdded, imgDestination.offsetWidth, imgDestination.offsetHeight);
         }
     }
 
