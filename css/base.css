@@ -175,7 +175,7 @@
   right: 50%;
 }
 
-.flip-card:hover ~ .polaroid_pin {
+.flip-card:hover > .polaroid_pin {
   display:none;
 }
 
