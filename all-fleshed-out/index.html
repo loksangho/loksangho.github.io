@@ -90,8 +90,13 @@
         imagestyle.left = left;
     }
     
+    var window_width = window.innerWidth;
+    
     window.onresize = function(event) {
-        insert(5);
+        if (window_width != window.innerWidth) {
+            window_width = window.innerWidth;
+            insert(5);
+        }
     }
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
