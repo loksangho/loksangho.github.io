@@ -174,7 +174,10 @@
   top: 5%;
   right: 50%;
   transform: scale(1.2,1.2);
-  visibility: visible;
+  
+  visibility: hidden;
+  animation: 1s fadeIn;
+  animation-fill-mode: forwards;
 }
 
 .flip-card:hover .polaroid_pin {
@@ -183,9 +186,6 @@
 }
 
 .flip-card:not(:hover) .polaroid_pin {
-  visibility: hidden;
-  animation: 1s fadeIn;
-  animation-fill-mode: forwards;
   
 }
 
