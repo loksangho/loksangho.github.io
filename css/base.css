@@ -184,6 +184,7 @@
 
 .flip-card:not(:hover) .polaroid_pin {
   visibility: visible;
+  transition: visibility 0.6s;
 }
 
 .corkboard {
@@ -261,8 +262,8 @@
   display: flex;
   align-items: stretch;
   width: 100%;
-  transition: transform 0.6s, visibility 0.6s;
-  will-change: transform, visibility;
+  transition: transform 0.6s;
+  will-change: transform;
 }
 
 .flip-card:hover .flip-card-inner {
