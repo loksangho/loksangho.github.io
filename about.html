@@ -27,7 +27,7 @@
         var imgDestination = document.getElementById("corkboard");
         
         var i=0;
-        for (var child of imgDestination.children) {
+        for (var child of imgDestination.childNodes) {
             console.log(i);
             if (child.tagName == 'IMG') {
                 child.parentNode.removeChild(child);
