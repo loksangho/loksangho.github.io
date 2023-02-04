@@ -184,7 +184,7 @@
 }
 
 .flip-card:not(:hover) .polaroid_pin {
-  visibility:hidden;
+  visibility:visible;
   
   animation: 1s fadeIn;
   animation-fill-mode: forwards;
@@ -192,10 +192,10 @@
 
 @keyframes fadeIn {
   99% {
-    visibility:hidden;
+    opacity:0;
   }
   100% {
-    visbility:visible;   
+    opacity:1;   
   }
 }
 
