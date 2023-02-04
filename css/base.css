@@ -174,12 +174,16 @@
   top: 5%;
   right: 50%;
   transform: scale(1.2,1.2);
-  visibility: visible;
+  
 }
 
 .flip-card:hover .polaroid_pin {
   /*display:none;*/
   visibility:hidden;
+}
+
+.flip-card:not(:hover) .polaroid_pin {
+  visibility: visible;
 }
 
 .corkboard {
