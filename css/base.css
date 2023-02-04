@@ -173,6 +173,7 @@
   position:absolute;
   top: 2%;
   right: 50%;
+  transform: scale(1.2,1.2);
 }
 
 .flip-card:hover .polaroid_pin {
