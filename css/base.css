@@ -176,7 +176,7 @@
   transform: scale(1.2,1.2);
 }
 
-.flip-card:hover .polaroid_pin {
+.flip-card:hover::after .polaroid_pin {
   display:none;
 }
 
