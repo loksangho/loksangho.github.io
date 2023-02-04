@@ -318,8 +318,8 @@ img.polaroid_icon {
   display: inline-block;
   position: relative;
   z-index: 2;
-  padding: 2em;
-  margin: -50%;
+  /*padding: 2em;
+  margin: -50%;*/
 }
 
 .polaroid {
@@ -338,10 +338,11 @@ img.polaroid_icon {
 }
 
 .polaroid-back-text {
-  width:100%;
+  width:70%;
   font-family: sharpie;
-  font-size: 20px;
+  font-size: 50px;
   color: red;
+  margin: 0 auto;
 }
 
 a:not(.navbar-special):link {
