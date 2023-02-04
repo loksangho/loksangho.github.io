@@ -27,6 +27,12 @@
     {
         var imgDestination = document.getElementById("corkboard");
         
+        for (var child of imgDestination.children) {
+            if (child.tagName == 'IMG') {
+                child.parentNode.removeChild(child);
+            }
+        }
+        
         for(var i=0; i< numOfPins; i++) {
             var imgAdded = document.createElement("img");
             imgAdded.src = "css/pin.png";
@@ -82,7 +88,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<body>
+<body onload="insert(5);">
     
     <header>
         <nav class="navbar" role="navigation" aria-label="main navigation">
