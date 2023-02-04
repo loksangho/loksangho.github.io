@@ -3,7 +3,7 @@ permalink: "/"
 layout: layout.liquid
 
 renderData:
-    title: "Portfolio"
+    title: ""
 
 ---
 
@@ -18,14 +18,17 @@ renderData:
        
         <div class="flip-card">
 		<div class=" flip-card-inner">
-       		 <div class="flip-card-front">
+
+		<div class="flip-card-front">
             
                 	<div class=" image is-1by1">
                         <img class="polaroid" src="https:{{portfolio-item.thumbnail.fields.file.url}}?w=400&fm=jpg&fl=progressive&q=80&fit=fill&f=faces" alt="Photo from {{ portfolio-item.itemTitle }}" loading="lazy">
+
                		 </div>
 		
             	<img class="polaroid_icon" src="css/icon_only.png">
-                <!--<p class="title is-4 has-text-dark"></p>-->
+		
+		<!--<p class="title is-4 has-text-dark"></p>-->
         	</div>
         	
 			<div class="flip-card-back polaroid-back has-text-centered is-flex is-align-items-center">
@@ -37,6 +40,7 @@ renderData:
 			</div>
 			
 		</div>
+		<img class="polaroid_pin" src="css/pin_yellow.png">
 	</div>
     </div>
     {%- endfor -%}
@@ -49,7 +53,7 @@ renderData:
 <br>
 <br>
 
-<h1 class="title has-text-centered">Social Media</h1>
+<!--<h1 class="title has-text-centered">Social Media</h1>-->
 <div>
 <div class="social-media">
 	<div class="social-board-top">
