@@ -174,7 +174,7 @@
   top: 5%;
   right: 50%;
   transform: scale(1.2,1.2);
-  
+  visibility: visible;
 }
 
 .flip-card:hover .polaroid_pin {
@@ -183,9 +183,19 @@
 }
 
 .flip-card:not(:hover) .polaroid_pin {
-  visibility: visible;
-  transition: visibility 0.6s;
-  will-change: visibility;
+  visibility: hidden;
+  animation: 1s fadeIn;
+  animation-fill-mode: forwards;
+  
+}
+
+@keyframes fadeIn {
+  99% {
+    visibility:hidden;
+  }
+  100% {
+    visbility:visible;   
+  }
 }
 
 .corkboard {
