@@ -28,9 +28,10 @@
         
         
         for (var j=0; j< imgDestination.childNodes.length; j++) {
-            console.log(j);
+            
             var child = imgDestination.childNodes[j];
             if (child.tagName == 'IMG') {
+                console.log(j);
                 imgDestination.removeChild(child);
             }
         }
