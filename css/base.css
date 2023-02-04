@@ -109,7 +109,7 @@
     padding: 0.5em 0;
     width: 100%;
     color: white;
-    background-color: #222;
+    background-color: #fff;
   }
   .menu > li:not(:last-child) {
     border-bottom: 1px solid #444;
