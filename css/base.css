@@ -340,7 +340,7 @@ img.polaroid_icon {
 .polaroid-back-text {
   width:70%;
   font-family: sharpie;
-  font-size: 50px;
+  font-size: 2em;
   color: red;
   margin: 0 auto;
 }
