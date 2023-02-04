@@ -27,10 +27,13 @@
     {
         var imgDestination = document.getElementById("corkboard");
         
+        var i=0;
         for (var child of imgDestination.children) {
+            console.log(i);
             if (child.tagName == 'IMG') {
                 child.parentNode.removeChild(child);
             }
+            i++;
         }
         
         for(var i=0; i< numOfPins; i++) {
