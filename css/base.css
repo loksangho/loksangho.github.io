@@ -176,11 +176,12 @@
   transform: scale(1.2,1.2);
   
   visibility: visible;
+  opacity:1;
 }
 
 .flip-card:hover .polaroid_pin {
   /*display:none;*/
-  visibility:hidden;
+  opacity:0;
 }
 
 .flip-card:not(:hover) .polaroid_pin {
