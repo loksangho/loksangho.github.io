@@ -27,9 +27,10 @@
     {
         var imgDestination = document.getElementById("corkboard");
         
-        var i=0;
-        for (var child of imgDestination.childNodes) {
+        
+        for (var i=0; i< imgDestination.childNodes.length; i++) {
             console.log(i);
+            child = imgDestination.childNodes[i];
             if (child.tagName == 'IMG') {
                 child.parentNode.removeChild(child);
             }
