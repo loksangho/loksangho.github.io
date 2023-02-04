@@ -318,8 +318,8 @@ img.polaroid_icon {
   display: inline-block;
   position: relative;
   z-index: 2;
-  padding: 2em;
-  margin: -50%;
+  /*padding: 2em;
+  margin: -50%;*/
 }
 
 .polaroid {
