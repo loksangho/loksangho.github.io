@@ -182,7 +182,7 @@
 .flip-card:hover .polaroid_pin {
   /*display:none;*/
   opacity:0;
-  cursor: url("cursor.ico"), default;
+  cursor: url("pin_yellow_cursor.ico"), default;
 }
 
 .flip-card:not(:hover) .polaroid_pin {
