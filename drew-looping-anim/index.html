@@ -73,11 +73,15 @@
         imagestyle.top = top;
         imagestyle.left = left;
     }
+    
+    window.onresize = function(event) {
+        insert(5);
+    }
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<body onload="insert(5);">
+<body>
     
     <header>
         <nav class="navbar" role="navigation" aria-label="main navigation">
