@@ -26,26 +26,27 @@
     {
         var imgDestination = document.getElementById("corkboard");
         
-        
-        toDelete = [];
-        for (var j=0; j< imgDestination.childNodes.length; j++) {
-            
-            var child = imgDestination.childNodes[j];
-            if (child.tagName == 'IMG') {
-                toDelete.push(child);
+        if (imgDestination) {
+            toDelete = [];
+            for (var j=0; j< imgDestination.childNodes.length; j++) {
+
+                var child = imgDestination.childNodes[j];
+                if (child.tagName == 'IMG') {
+                    toDelete.push(child);
+                }
             }
-        }
-        
-        while (toDelete.length != 0) {
-            imgDestination.removeChild(toDelete.pop());
-        }
-        
-        for(var i=0; i< numOfPins; i++) {
-            
-            var imgAdded = document.createElement("img");
-            imgAdded.src = "css/pin.png";
-            imgDestination.appendChild(imgAdded);
-            ImgRandomPosition(imgAdded, imgDestination.scrollWidth, imgDestination.scrollHeight, imgDestination.offsetLeft, imgDestination.offsetTop);
+
+            while (toDelete.length != 0) {
+                imgDestination.removeChild(toDelete.pop());
+            }
+
+            for(var i=0; i< numOfPins; i++) {
+
+                var imgAdded = document.createElement("img");
+                imgAdded.src = "css/pin.png";
+                imgDestination.appendChild(imgAdded);
+                ImgRandomPosition(imgAdded, imgDestination.scrollWidth, imgDestination.scrollHeight, imgDestination.offsetLeft, imgDestination.offsetTop);
+            }
         }
     }
 
