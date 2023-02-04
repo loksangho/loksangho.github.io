@@ -177,12 +177,14 @@
   
   visibility: visible;
   opacity:1;
+  cursor: default;
+
 }
 
 .flip-card:hover .polaroid_pin {
   /*display:none;*/
   opacity:0;
-  cursor: url("pin_yellow_cursor.ico"), default;
+  
 }
 
 .flip-card:not(:hover) .polaroid_pin {
@@ -190,7 +192,6 @@
   
   animation: 1s fadeIn;
   animation-fill-mode: forwards;
-  cursor: default;
 }
 
 @keyframes fadeIn {
@@ -286,6 +287,7 @@
 
 .flip-card:hover .flip-card-inner {
   transform: rotateY(180deg);
+  cursor: url("pin_yellow_cursor.ico"), default;
 }
 
 .flip-card-front, .flip-card-back {
