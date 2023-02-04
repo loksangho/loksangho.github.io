@@ -28,7 +28,7 @@
         
         
         for (var j=0; j< imgDestination.childNodes.length; j++) {
-            
+            console.log(j);
             var child = imgDestination.childNodes[j];
             if (child.tagName == 'IMG') {
                 imgDestination.removeChild(child);
@@ -36,7 +36,7 @@
         }
         
         for(var i=0; i< numOfPins; i++) {
-            console.log(i);
+            
             var imgAdded = document.createElement("img");
             imgAdded.src = "css/pin.png";
             imgDestination.appendChild(imgAdded);
