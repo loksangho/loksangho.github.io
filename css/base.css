@@ -112,9 +112,16 @@
     background-color: #fff;
   }
 
+  .menu > li > a {
+    color: #485fc7;
+  }
+
   .menu > li:hover {
-    color:white;
     background-color: #485fc7;
+  }
+
+  .menu > li:hover > a {
+    color: white;
   }
 
   .menu > li:not(:last-child) {
