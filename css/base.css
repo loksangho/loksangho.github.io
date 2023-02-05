@@ -124,6 +124,10 @@
     color: white;
   }
 
+  .menu > li:hover > a:hover {
+    color: #aaa;
+  }
+
   .menu > li:not(:last-child) {
     border-bottom: 1px solid #444;
   }
