@@ -111,6 +111,12 @@
     color: white;
     background-color: #fff;
   }
+
+  .menu > li:hover {
+    color:white;
+    background-color: #485fc7;
+  }
+
   .menu > li:not(:last-child) {
     border-bottom: 1px solid #444;
   }
