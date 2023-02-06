@@ -7,10 +7,10 @@ renderData:
 
 ---
 
-<div class="columns is-multiline"> 
-    <img src="https:{{contentful-brand.portraitPhoto.fields.file.url}}?w=1000" alt="{{contentful-brand.name}}">
-</div>
-<div class="columns is-multiline"> 
-    {{contentful-brand.aboutMe | renderRichTextAsHtml }}
-</div>
+
+<img src="https:{{contentful-brand.portraitPhoto.fields.file.url}}?w=1000" alt="{{contentful-brand.name}}">
+
+
+{{contentful-brand.aboutMe | renderRichTextAsHtml }}
+
 
