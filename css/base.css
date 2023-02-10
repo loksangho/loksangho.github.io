@@ -194,7 +194,7 @@
   
   visibility: visible;
   opacity:1;
-  cursor: default;
+  cursor: url("pin_yellow_cursor.ico"), default;
 
 }
 
