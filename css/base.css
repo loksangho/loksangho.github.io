@@ -194,7 +194,7 @@
   
   visibility: visible;
   opacity:1;
-  cursor: url("pin_yellow_cursor.ico"), default;
+  cursor: url("pin_yellow_cursor.ico") 5 32, default;
 
 }
 
@@ -304,7 +304,7 @@
 
 .flip-card:hover .flip-card-inner {
   transform: rotateY(180deg);
-  cursor: url("pin_yellow_cursor.ico"), default;
+  cursor: url("pin_yellow_cursor.ico") 5 32, default;
 }
 
 .flip-card-front, .flip-card-back {
