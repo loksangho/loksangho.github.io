@@ -7,7 +7,25 @@ renderData:
 
 ---
 
-
+<x3d width='80%' height='70%'> 
+    <scene>
+        <navigationInfo explorationMode="-zoom" reverseScroll="false" typeParams='[-0.4,60,0.05,2.8]' bind='false' disableKeys="true"></navigationInfo>
+        <inline url="time_machine.x3d"> </inline> 
+        <transform DEF="clock1">
+            <inline url="Flying_Clocks.x3d"> </inline> 
+        </transform>
+        <transform DEF="clock2">
+            <inline url="Flying_Clocks.x3d"> </inline> 
+        </transform>
+        <timeSensor DEF="time" cycleInterval="1" loop="true"></timeSensor>
+        <PositionInterpolator DEF="move1" key="0 1" keyValue="0 0 0   -100 0 0"></PositionInterpolator>
+        <Route fromNode="time" fromField ="fraction_changed" toNode="move1" toField="set_fraction"></Route>
+        <Route fromNode="move1" fromField ="value_changed" toNode="clock1" toField="translation"></Route>
+        <PositionInterpolator DEF="move2" key="0 1" keyValue="100 0 0   0 0 0"></PositionInterpolator>
+        <Route fromNode="time" fromField ="fraction_changed" toNode="move2" toField="set_fraction"></Route>
+        <Route fromNode="move2" fromField ="value_changed" toNode="clock2" toField="translation"></Route>
+    </scene> 
+</x3d>  
 
 <div class="corkboard-top">
 <br><br><br><br><br><br><br><br>
