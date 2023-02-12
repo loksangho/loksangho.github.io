@@ -188,6 +188,9 @@
 
 
 .time_machine {
+  width:80%;
+  height:20vw; 
+  margin: 0 auto;
 }
 
 .polaroid_pin {
