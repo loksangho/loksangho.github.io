@@ -189,8 +189,24 @@
 
 .time_machine {
   width:80%;
-  height:15vw; 
+  height:20vw; 
   margin: 0 auto;
+}
+
+.preloader {
+  align-items: center;
+  background: #FFF;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  top: 0;
+  transition: opacity 0.2s linear;
+  width: 100%;
+  z-index: 9999;
+  opacity: 1;
+  transform: opacity 1s linear;
 }
 
 .polaroid_pin {
