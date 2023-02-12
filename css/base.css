@@ -193,6 +193,10 @@
   margin: 0 auto;
 }
 
+#instruct_x3d{
+  text-align: center;
+}
+
 body {
   overflow: hidden;
 }
