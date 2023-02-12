@@ -6,6 +6,26 @@ renderData:
     title: "Welcome"
 
 ---
+<script>
+const myPreloader = document.querySelector('.preloader');
+
+const fadeOutEffect = setInterval(() => {
+  if (!preloader.style.opacity) {
+    preloader.style.opacity = 1;
+  }
+  if (preloader.style.opacity > 0) {
+    preloader.style.opacity -= 0.1;
+  } else {
+    clearInterval(fadeEffect);
+  }
+}, 300);
+
+window.addEventListener('load', fadeOutEffect);
+</script>
+<div class="preloader">
+  <img src="assets/simple-preloader-gif.gif" alt="spinner">
+</div>
+
 <div>
 <x3d class="time_machine"> 
     <scene>
