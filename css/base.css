@@ -186,6 +186,11 @@
     width:100%;
 }
 
+
+.time_machine {
+  margin: 0 auto;
+}
+
 .polaroid_pin {
   position:absolute;
   top: 5%;
