@@ -148,26 +148,7 @@
                     </h1>
                     
                     
-<div class="preloader">
-  <img src="assets/logo_anim.gif" alt="spinner">
-</div>
-<script>
-const preloader = document.querySelector('.preloader');
-
-const fadeOutEffect = setInterval(() => {
-  if (!preloader.style.opacity) {
-    preloader.style.opacity = 1;
-  }
-  if (preloader.style.opacity > 0) {
-    preloader.style.opacity -= 0.1;
-  } else {
-  	preloader.style.display = "none";
-    clearInterval(fadeOutEffect);
-  }
-}, 300);
-
-window.addEventListener('load', fadeOutEffect);
-</script>
+<div id="loader"></div>
 <div>
 <x3d class="time_machine"> 
     <scene>
@@ -422,6 +403,13 @@ window.addEventListener('load', fadeOutEffect);
 	</div>
 </div>
 </div>
+
+<script>
+  var preloader = document.getElementById('loader');
+  function preLoaderHandler(){
+      preloader.style.display = 'none';
+  }
+</script>
 
                 </div>
             </div>
