@@ -193,12 +193,17 @@
   margin: 0 auto;
 }
 
-#loader{
-  position: fixed;
-  width: 100%;
-  height: 100vh;
-  background: #21242d url('../assets/logo_anim.gif') no-repeat center;
-  z-index: 999;
+#preloader {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    overflow: visible;
+    background: url('../assets/logo_anim.gif') no-repeat center center;
+ }
+
+#content {
+    display: none;
 }
 
 .polaroid_pin {
