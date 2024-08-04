@@ -4,7 +4,7 @@
         "details": [
             {
                 "appID": "BL44N48Q2Y.com.loksangho.ARTestUnreal",
-                "paths": [ "*" ],
+                "paths": [ "/unreal/" ],
             }
         ]
     }
