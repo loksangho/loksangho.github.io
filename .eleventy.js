@@ -4,6 +4,7 @@ const { documentToPlainTextString } = require("@contentful/rich-text-plain-text-
 const trimWords = require('trim-words').default;
 
 module.exports = function (eleventyConfig) {
+  eleventyConfig.addPassthroughCopy('.well-known');
   eleventyConfig.addPassthroughCopy('css');
   eleventyConfig.addPassthroughCopy('assets');
   eleventyConfig.addFilter("renderRichTextAsHtml", (value) =>
