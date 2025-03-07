@@ -20,6 +20,11 @@
     font-size: 1.25em;
     color: white;
   }
+
+  /* Darken the camera feed using a CSS filter */
+  video {
+    filter: brightness(15%) contrast(100%);
+  }
 </style>
 
 <body style="margin : 0px; overflow: hidden;">
@@ -50,6 +55,19 @@
       smoothTolerance=".01"
       smoothThreshold="5"
     >
+      <a-box position="0 0.5 0" material="color: red; shader: standard;"></a-box>
+
+      <!-- Spotlight -->
+      <a-light type="spot"
+                 position="0 3 1"
+                 target="0 0.5 0"
+                 intensity="5"
+                 distance="5"
+                 angle="25"
+                 penumbra="0.3"
+                 decay="2"
+                 color="white">
+      </a-light>
       <a-light type="ambient" intensity="0.2"></a-light>
       <a-entity
         gltf-model="https://rapid-sound-6192.sangstar.workers.dev/?url=https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/trex/scene.gltf"
