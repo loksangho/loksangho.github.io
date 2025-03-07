@@ -56,7 +56,7 @@
       smoothThreshold="5"
     >
       <!-- 3D Object that will be illuminated -->
-        <a-box position="0 0.5 0" material="color: red; shader: standard;"></a-box>
+        <a-box position="50 150 0" material="color: red; shader: standard;"></a-box>
 
         <!-- Spotlight to illuminate the object -->
         <a-entity light="type: spot;
@@ -66,8 +66,8 @@
                          penumbra: 0.3;
                          decay: 2;
                          color: white;"
-                  position="0 3 1"
-                  target="0 0.5 0">
+                  position="50 200 0"
+                  target="50 150 0">
         </a-entity>
       <a-entity
         gltf-model="https://rapid-sound-6192.sangstar.workers.dev/?url=https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/trex/scene.gltf"
