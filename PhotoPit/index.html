@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Photo Carousel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0; /* Reset default body margin */
+        }
+        .carousel-container {
+            overflow: hidden;
+            position: relative;
+            width: 100vw; /* Use full viewport width */
+            height: 100vh; /* Use full viewport height */
+        }
+        .carousel-wrapper {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+        .carousel-slide {
+            flex: 0 0 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+        .carousel-slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Or cover, depending on desired effect */
+            border-radius: 0; /* Remove border-radius for full screen */
+        }
+        .carousel-nav {
+            position: absolute;
+            bottom: 2rem; /* Increased bottom margin */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem; /* Increased gap */
+        }
+        .carousel-nav-dot {
+            width: 1rem; /* Increased size */
+            height: 1rem;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .carousel-nav-dot.active {
+            background-color: white;
+        }
+        .carousel-nav-dot:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        .carousel-control {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem; /* Increased size */
+            height: 3rem;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            color: #333;
+            cursor: pointer;
+            font-size: 2rem; /* Increased size */
+            transition: background-color 0.3s ease;
+            user-select: none;
+        }
+        .carousel-control:hover {
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        .carousel-control.prev {
+            left: 2rem; /* Increased margin */
+        }
+        .carousel-control.next {
+            right: 2rem; /* Increased margin */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+    <div class="carousel-container">
+        <div class="carousel-wrapper">
+            <div class="carousel-slide">
+                <img src="1_000037.JPG" alt="Image 1">
+            </div>
+            <div class="carousel-slide">
+                <img src="2_000015.JPG" alt="Image 2">
+            </div>
+            <div class="carousel-slide">
+                <img src="3_000018.JPG" alt="Image 3">
+            </div>
+            <div class="carousel-slide">
+                <img src="4_000009.JPG" alt="Image 4">
+            </div>
+            <div class="carousel-slide">
+                <img src="9_000038.JPG" alt="Image 5">
+            </div>
+            <div class="carousel-slide">
+                <img src="10_IMG_6157.jpg" alt="Image 6">
+            </div>ßß
+        </div>
+        <div class="carousel-nav">
+        </div>
+        <button class="carousel-control prev" onclick="previousSlide()">❮</button>
+        <button class="carousel-control next" onclick="nextSlide()">❯</button>
+    </div>
+    <script>
+        const carouselWrapper = document.querySelector('.carousel-wrapper');
+        const carouselSlides = document.querySelectorAll('.carousel-slide');
+        const carouselNav = document.querySelector('.carousel-nav');
+        const slideCount = carouselSlides.length;
+        let slideIndex = 0;
+        let isDragging = false;
+        let startPosition = 0;
+        let currentPosition = 0;
+        let animationId;
+        function createNavigationDots() {
+            carouselSlides.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('carousel-nav-dot');
+                dot.addEventListener('click', () => {
+                    slideIndex = index;
+                    updateCarousel(true);
+                    updateNavigationDots();
+                });
+                carouselNav.appendChild(dot);
+            });
+            updateNavigationDots();
+        }
+        function updateNavigationDots() {
+            const dots = carouselNav.querySelectorAll('.carousel-nav-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === slideIndex);
+            });
+        }
+        function updateCarousel(animated = true) {
+            if (animated) {
+                carouselWrapper.style.transition = 'transform 0.5s ease-in-out';
+            } else {
+                carouselWrapper.style.transition = 'none';
+            }
+            const slideWidth = carouselSlides[0].offsetWidth;
+            carouselWrapper.style.transform = `translateX(${-slideIndex * slideWidth}px)`;
+        }
+        function nextSlide() {
+            slideIndex = (slideIndex + 1) % slideCount;
+            updateCarousel(true);
+            updateNavigationDots();
+        }
+        function previousSlide() {
+            slideIndex = (slideIndex - 1 + slideCount) % slideCount;
+            updateCarousel(true);
+            updateNavigationDots();
+        }
+        function handleDragStart(e) {
+            isDragging = true;
+            startPosition = e.clientX || e.touches[0].clientX;
+            currentPosition = startPosition;
+            carouselWrapper.style.transition = 'none';
+            cancelAnimationFrame(animationId);
+            e.preventDefault();
+        }
+        function handleDragMove(e) {
+            if (!isDragging) return;
+            const x = e.clientX || e.touches[0].clientX;
+            const deltaX = x - startPosition;
+            currentPosition = x;
+            carouselWrapper.style.transform = `translateX(${-slideIndex * carouselSlides[0].offsetWidth + deltaX}px)`;
+        }
+        function handleDragEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            const movedDistance = currentPosition - startPosition;
+            const sensitivity = 0.3;
+            if (Math.abs(movedDistance) > carouselSlides[0].offsetWidth * sensitivity) {
+                if (movedDistance > 0) {
+                    previousSlide();
+                } else {
+                    nextSlide();
+                }
+            } else {
+                updateCarousel(true);
+            }
+        }
+        function handleTouchStart(e) {
+            handleDragStart(e);
+        }
+        function handleTouchMove(e) {
+            handleDragMove(e);
+        }
+        function handleTouchEnd() {
+            handleDragEnd();
+        }
+        carouselWrapper.addEventListener('mousedown', handleDragStart);
+        carouselWrapper.addEventListener('mousemove', handleDragMove);
+        carouselWrapper.addEventListener('mouseup', handleDragEnd);
+        carouselWrapper.addEventListener('mouseleave', handleDragEnd);
+        carouselWrapper.addEventListener('touchstart', handleTouchStart);
+        carouselWrapper.addEventListener('touchmove', handleTouchMove);
+        carouselWrapper.addEventListener('touchend', handleTouchEnd);
+        createNavigationDots();
+    </script>
+</body>
+</html>
+
+            
+        
