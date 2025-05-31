@@ -124,13 +124,17 @@
             height: auto; /* Maintain aspect ratio */
             width: 300px; /* Example: Set a fixed width */
         }
-        h1 {
-            font-size: 40px;
+        .title {
+          margin: 0;
+          display: flex; /* Enable flexbox for the container */
+          justify-content: center; /* Center items horizontally */
+          align-items: center; /* Center items vertically (if needed) */
+          gap: 1rem; /* Optional: Add some space between the images */
         }
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900">
-    <div><h1>Photo Pit</h1></div>
+    <div class="title"><h1>Photo Pit</h1></div>
     <div class="icon">
         <img src="photopit_icon.png">
     </div>
