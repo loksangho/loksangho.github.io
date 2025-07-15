@@ -6,16 +6,36 @@
     <title>WebXR AR with Saved Mesh</title>
     <style>
         body { margin: 0; overflow: hidden; background-color: #333; }
-        #webcamVideo { /* Will be hidden when in AR mode */
+        
+        /* Canvases for WebARRocks */
+        #ARCanvas, #threeCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: none; /* Hidden until WebARRocks starts */
+        }
+        #ARCanvas { z-index: 1; }
+        #threeCanvas { z-index: 2; }
+        
+        /* Main canvas for MediaPipe and UI */
+        #outputCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 3;
+        }
+
+        #webcamVideo {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
             object-fit: cover; transform: scaleX(-1); z-index: 1; display: none;
         }
-        #outputCanvas {
-            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2;
-        }
         #loading {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            color: white; font-family: sans-serif; font-size: 2em; z-index: 3;
+            color: white; font-family: sans-serif; font-size: 2em; z-index: 4;
         }
         #saveButton {
             position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
@@ -23,23 +43,17 @@
             color: white; border: none; border-radius: 5px; cursor: pointer;
         }
         #saveButton:hover { background-color: #0056b3; }
-        #arButton { /* Styling for the new AR button */
-            position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
-            z-index: 10; padding: 10px 20px; font-size: 1.2em; background-color: #28a745;
-            color: white; border: none; border-radius: 5px; cursor: pointer;
-        }
-        #arButton:hover { background-color: #218838; }
         #onScreenConsole {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 150px; /* This sets the fixed height */
+            height: 150px;
             background-color: rgba(0, 0, 0, 0.7);
             color: limegreen;
             font-family: 'Courier New', Courier, monospace;
             font-size: 0.8em;
-            overflow-y: scroll; /* This enables vertical scrolling if content exceeds height */
+            overflow-y: scroll;
             padding: 5px;
             box-sizing: border-box;
             z-index: 9999;
@@ -51,11 +65,15 @@
 <body>
     <div id="onScreenConsole"></div>
     <video id="webcamVideo" autoplay playsinline muted></video>
+    
     <canvas id="outputCanvas"></canvas>
+    <canvas id="ARCanvas"></canvas>
+    <canvas id="threeCanvas"></canvas>
+
     <div id="loading">Loading MediaPipe model...</div>
     
     <button id="saveButton" style="display:none;">Save Mesh</button>
-    <button id="arButtonPlaceholder" style="display:none;"></button>
+    <div id="arButtonPlaceholder"></div>
     
     <script type="importmap">
         {
@@ -66,12 +84,13 @@
             }
         }
     </script>
-    <script type="module" src="main.js"></script>
-    <script src = "./dist/WebARRocksObject.js"></script>
-    <script src = "./helpers/WebARRocksMediaStreamAPIHelper.js"></script>
-    <script src='./helpers/DeviceOrientationHelper.js'></script>
-    <script src='./helpers/WebARRocksObjectThreeHelper.js'></script>
-    <script src='./helpers/stabilizers/WebARRocksThreeStabilizer2.js'></script>
 
+    <script src="./dist/WebARRocksObject.js"></script>
+    <script src="./helpers/WebARRocksMediaStreamAPIHelper.js"></script>
+    <script src="./helpers/DeviceOrientationHelper.js"></script>
+    <script src="./helpers/WebARRocksObjectThreeHelper.js"></script>
+    <script src="./helpers/stabilizers/WebARRocksThreeStabilizer2.js"></script>
+
+    <script type="module" src="main.js"></script>
 </body>
 </html>
