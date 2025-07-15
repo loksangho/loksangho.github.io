@@ -337,33 +337,26 @@ async function animate() {
 
                 // In your animate() function, inside the 'if (results...)' block:
 
-                // Load MediaPipe's matrix
-                // Load MediaPipe's matrix
+               // Load MediaPipe's matrix
                 const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix);
                 
-                // --- Core Alignment Steps (Adjust these precisely) ---
+                // --- Apply axis flips first (based on what previously made it visible and somewhat oriented) ---
+                // If the mesh was visible but upside down, makeScale(1, -1, 1) was likely needed for Y.
+                // If it was visible but facing away, makeScale(1, 1, -1) was likely needed for Z.
+                // Let's try to include both common axis corrections as a starting point.
                 
-                // Step 1: Apply overall desired scale
-                // (It's often good to apply scale first, or last, depending on the effect desired. Let's try last for now)
-                // threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor)); // Moved below
+                // Common Correction 1: Flip Y-axis (for upside-down)
+                threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1));
                 
-                // Step 2: Correct inherent orientation issues from MediaPipe's coordinate system
-                // This is a common pattern for MediaPipe faces: a Z-flip and/or a Y-flip.
-                // Test these combinations systematically:
-                
-                // Option A: Flip Z-axis (common for making it face forward)
+                // Common Correction 2: Flip Z-axis (for inside-out / facing away initially)
                 threeMatrix.multiply(new THREE.Matrix4().makeScale(1, 1, -1));
                 
-                // Option B: Flip Y-axis (for "upside down" issue) - Add this after Option A if needed
-                // threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1));
+                // --- Now, apply the 180-degree rotation to make it face you ---
+                // If the above flips still don't make it face you, this should explicitly turn it around.
+                threeMatrix.multiply(new THREE.Matrix4().makeRotationY(Math.PI)); // Rotate 180 degrees around Y-axis
                 
-                // Option C: Rotate 180 degrees around Y (if it's facing away AFTER other flips) - Add this last if needed
-                // threeMatrix.multiply(new THREE.Matrix4().makeRotationY(Math.PI));
-                
-                // Step 3: Apply the overall desired scale (now apply it after flips)
+                // --- Apply the overall desired scale (always last) ---
                 threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
-                
-                // --- END Core Alignment ---
                 
                 faceMesh.matrix.copy(threeMatrix);
                 faceMesh.matrixAutoUpdate = false;
