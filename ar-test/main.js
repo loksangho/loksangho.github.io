@@ -7,9 +7,11 @@ let scene, camera, renderer;
 let video, faceLandmarker, runningMode = "VIDEO";
 let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
 let debugCube;
-let meshBoxHelper; // For visualizing the mesh's bounding box
+let meshBoxHelper;
 
-const NUM_LANDMARKS = UV_LANDMARKS_COUNT; // Ensure this is correct and matches your UV_COORDS length
+// *** CORRECTED LINE HERE ***
+const NUM_LANDMARKS = UV_COORDS.length; // Correctly get the number of landmarks from your UV_COORDS data
+// *************************
 
 const VIDEO_WIDTH = 640;
 const VIDEO_HEIGHT = 480;
@@ -50,10 +52,10 @@ async function init() {
     console.log("Directional light added.");
 
     // Debug Cube
-    const debugGeometry = new THREE.BoxGeometry(20, 20, 20);
+    const debugGeometry = new THREE.BoxGeometry(20, 20, 20); // Make it slightly larger to ensure visibility
     const debugMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
     debugCube = new THREE.Mesh(debugGeometry, debugMaterial);
-    debugCube.position.set(0, 0, 0);
+    debugCube.position.set(0, 0, 0); // Place it at the center of the scene
     scene.add(debugCube);
     console.log("Debug cube added to scene at (0,0,0).");
 
@@ -249,7 +251,6 @@ async function animate() {
                 faceTexture.needsUpdate = true;
 
                 // --- Live Debugging Logs ---
-                // console.log("Face Mesh Position:", faceMesh.position); // Will show (0,0,0) due to matrixAutoUpdate=false
                 // console.log("Face Mesh World Position:", new THREE.Vector3().setFromMatrixPosition(faceMesh.matrixWorld));
                 // if (faceMesh.geometry.boundingBox) {
                 //     console.log("Face Mesh Bounding Box:", faceMesh.geometry.boundingBox);
