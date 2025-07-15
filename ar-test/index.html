@@ -83,11 +83,14 @@
         }
     </script>
 
-    <script src="https://unpkg.com/three@0.178.0/build/three.core.min.js"></script>
-    <script src="https://unpkg.com/three@0.178.0/build/three.module.min.js"></script>
-    
-    <script src="https://unpkg.com/three@0.178.0/examples/jsm/loaders/GLTFLoader.js"></script>
-    <script src="https://unpkg.com/three@0.178.0/examples/jsm/exporters/GLTFExporter.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://threejs.org/build/three.module.js",
+            "three/addons/": "https://threejs.org/examples/jsm/"
+        }
+    }
+    </script>
 
     <script src="./dist/WebARRocksObject.js"></script>
     <script src="./helpers/WebARRocksMediaStreamAPIHelper.js"></script>
