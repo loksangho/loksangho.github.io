@@ -4,6 +4,8 @@ import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { FACEMESH_TESSELATION, UV_COORDS } from './face_mesh_data.js';
 import { VertexNormalsHelper } from 'three/addons/helpers/VertexNormalsHelper.js'; // Add this at the top of main.js
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'; // NEW: For loading GLTF from memory
+import { ARButton } from 'three/addons/webxr/ARButton.js'; // NEW: For WebXR AR sessions
 
 let scene, camera, renderer;
 let video, faceLandmarker, runningMode = "VIDEO";
@@ -12,6 +14,12 @@ let debugCube;
 let meshBoxHelper;
 let saveButton;
 let exportedMeshData = null;
+
+// WebXR specific variables
+let arHitTestSource = null;
+let arRefSpace = null;
+let placedObject = null; // To hold the loaded GLTF model in AR
+let reticle = null; // A visual indicator for hit-testing
 
 const NUM_LANDMARKS = UV_COORDS.length;
 
@@ -22,6 +30,7 @@ const VIDEO_HEIGHT = 480;
 // === Removed DOMContentLoaded listener, rely on window.onload from index.html ===
 // No direct init() call here in main.js
 // ==============================================================================
+window.init = init;
 
 async function init() {
     console.log("init() started.");
@@ -187,6 +196,29 @@ async function init() {
         }
     });
 
+    document.getElementById('loading').style.display = 'none';
+
+    // --- SAVE MESH BUTTON ---
+    const saveButton = document.getElementById('saveButton');
+    if (saveButton) {
+        saveButton.style.display = 'block';
+        saveButton.addEventListener('click', saveMesh);
+    }
+
+    // --- AR BUTTON SETUP ---
+    // 1. Hide the video element and the initial canvas setup
+    video.style.display = 'none';
+    outputCanvasElement.style.zIndex = 2; // Ensure Three.js canvas is on top
+
+    // 2. Set up WebXR for AR
+    renderer.xr.enabled = true;
+    const arButtonContainer = document.getElementById('arButton');
+    // The ARButton handles checking for AR support and requesting a session
+    document.body.appendChild(ARButton.createButton(renderer, {
+        optionalFeatures: ['dom-overlay', 'dom-overlay-for-handheld-ar', 'hit-test'], // Request hit-test for placement
+        domOverlay: { root: document.body } // Use the whole document body as AR overlay
+    }));
+
     // Start the animation loop
     animate();
     console.log("init() finished, animation loop started.");
@@ -267,137 +299,142 @@ function loadMeshFromMemory() {
     }
 }
 
+// --- Main Animation Loop (Modified for WebXR) ---
 let lastVideoTime = -1;
-// ... (animate function) ...
-async function animate() {
-    requestAnimationFrame(animate);
+function animate() {
+    renderer.setAnimationLoop(render); // WebXR animation loop replaces requestAnimationFrame
+}
 
-    if (debugCube) {
-        debugCube.rotation.x += 0.005;
-        debugCube.rotation.y += 0.005;
-    }
+// --- WebXR Render Loop ---
+function render(time, frame) {
+    // If we're in an XR session (AR mode)
+    if (renderer.xr.isPresenting) {
+        // Hide the original webcam feed
+        video.style.display = 'none';
+        faceMesh.visible = false; // Hide the face mesh
+        // If you had debug helpers, hide them too
+        if (normalsHelper) normalsHelper.visible = false;
+        if (meshBoxHelper) meshBoxHelper.visible = false;
 
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        if (lastVideoTime !== video.currentTime) {
-            lastVideoTime = video.currentTime;
+        // Perform hit-testing to place objects
+        if (frame && renderer.xr.getSession() && !placedObject) {
+            const session = renderer.xr.getSession();
+            if (arHitTestSource === null) {
+                session.requestReferenceSpace('viewer').then((refSpace) => {
+                    arRefSpace = refSpace;
+                    session.requestHitTestSource({ space: arRefSpace }).then((source) => {
+                        arHitTestSource = source;
+                    });
+                });
+            }
 
-            // ... (console.logs for video state) ...
+            if (arHitTestSource) {
+                const hitTestResults = frame.getHitTestResults(arHitTestSource);
+                if (hitTestResults.length > 0) {
+                    const hit = hitTestResults[0];
+                    const pose = hit.getPose(arRefSpace);
 
-            const results = await faceLandmarker.detectForVideo(video, performance.now());
+                    // --- Show Reticle (Optional, but good UX) ---
+                    if (!reticle) {
+                        reticle = new THREE.Mesh(
+                            new THREE.RingGeometry(0.1, 0.12, 32).rotateX(-Math.PI / 2),
+                            new THREE.MeshBasicMaterial({ color: 0xffffff })
+                        );
+                        reticle.matrixAutoUpdate = false;
+                        scene.add(reticle);
+                    }
+                    reticle.matrix.fromArray(pose.transform.matrix);
+                    reticle.visible = true;
 
-            // ... (console.logs for MediaPipe Results) ...
+                    // --- Place Object on Tap (Example) ---
+                    // Attach an event listener for user tap (only once)
+                    if (!renderer.domElement.onclick) {
+                        renderer.domElement.onclick = () => {
+                            if (exportedMeshData && reticle.visible && !placedObject) {
+                                // Load the GLTF from memory
+                                const loader = new GLTFLoader();
+                                const gltfJsonString = JSON.stringify(exportedMeshData); // Parse expects JSON string
+                                loader.parse(gltfJsonString, function(gltf) {
+                                    placedObject = gltf.scene; // Store the loaded scene
 
-            // *** CRITICAL CHANGE TO THE IF CONDITION AND transformMatrix ACCESS ***
-            if (results && results.faceLandmarks && results.faceLandmarks.length > 0 &&
-                results.facialTransformationMatrixes && results.facialTransformationMatrixes.length > 0 &&
-                results.facialTransformationMatrixes[0] && results.facialTransformationMatrixes[0].data && // CHECK FOR '.data' HERE
-                results.facialTransformationMatrixes[0].data.length === 16) { // ADD LENGTH CHECK FOR ROBUSTNESS
+                                    // Position the loaded object at the reticle's location
+                                    placedObject.position.setFromMatrixPosition(reticle.matrix);
+                                    // Scale it down, as the saved face mesh might be large
+                                    placedObject.scale.set(0.1, 0.1, 0.1); // ADJUST THIS SCALE!
 
-                // Hide debug cube, show face mesh and its helper
-                if (debugCube) debugCube.visible = false;
-                faceMesh.visible = true;
-                if (meshBoxHelper) meshBoxHelper.visible = true;
-                
-                console.log("FACE DETECTED! Processing mesh..."); // Confirmation log
-
-                const faceLandmarks = results.faceLandmarks[0];
-                const blendshapes = results.faceBlendshapes && results.faceBlendshapes.length > 0 ? results.faceBlendshapes[0] : null;
-                // *** CHANGE THIS LINE TO USE '.data' ***
-                const transformMatrix = results.facialTransformationMatrixes[0].data; // Use the 'data' property
-                // ****************************************
-
-                // 1. Update Mesh Positions using normalized landmarks
-                const positions = faceMesh.geometry.attributes.position.array;
-                for (let i = 0; i < NUM_LANDMARKS; i++) {
-                    const landmark = faceLandmarks[i];
-                    positions[i * 3 + 0] = landmark.x;
-                    positions[i * 3 + 1] = landmark.y;
-                    positions[i * 3 + 2] = landmark.z;
+                                    scene.add(placedObject);
+                                    reticle.visible = false; // Hide reticle after placement
+                                    arHitTestSource.cancel(); // Stop hit testing
+                                    arHitTestSource = null;
+                                    renderer.domElement.onclick = null; // Remove click listener
+                                }, undefined, function(error) {
+                                    console.error("Error loading GLTF from memory:", error);
+                                });
+                            }
+                        };
+                    }
+                } else {
+                    if (reticle) reticle.visible = false;
                 }
-                faceMesh.geometry.attributes.position.needsUpdate = true;
-                faceMesh.geometry.computeVertexNormals();
-                faceMesh.geometry.computeBoundingBox();
-                faceMesh.geometry.computeBoundingSphere();
+            }
+        }
+    } else {
+        // Not in an AR session (front camera mode)
+        // MediaPipe Face Landmarker processing
+        video.style.display = 'block'; // Show the video element
+        faceMesh.visible = true; // Show the face mesh
+        // And its helpers
+        // if (normalsHelper) normalsHelper.visible = true;
+        // if (meshBoxHelper) meshBoxHelper.visible = true;
 
-                
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            if (time !== lastVideoTime) { // Using 'time' from render callback for consistent updates
+                lastVideoTime = time;
+                const results = faceLandmarker.detectForVideo(video, performance.now());
 
-                // 2. Apply Blendshapes (placeholder)
-                /*if (blendshapes && faceMesh.morphTargetInfluences) {
-                     for (const blendshape of blendshapes.categories) {
-                         const { categoryName, score } = blendshape;
-                         if (faceMesh.morphTargetDictionary && faceMesh.morphTargetDictionary[categoryName] !== undefined) {
-                             faceMesh.morphTargetInfluences[faceMesh.morphTargetDictionary[categoryName]] = score;
-                         }
-                     }
-                }*/
+                if (results && results.faceLandmarks && results.faceLandmarks.length > 0 &&
+                    results.facialTransformationMatrixes && results.facialTransformationMatrixes.length > 0 &&
+                    results.facialTransformationMatrixes[0] && results.facialTransformationMatrixes[0].data &&
+                    results.facialTransformationMatrixes[0].data.length === 16) {
 
-                // 3. Apply Transformation Matrix for global pose
-                const scaleFactor = 100; // Keep experimenting with this value if needed
-                // In your animate() function, inside the 'if (results...)' block:
+                    // FACE DETECTED!
+                    const faceLandmarks = results.faceLandmarks[0];
+                    const transformMatrix = results.facialTransformationMatrixes[0].data;
 
-                // In your animate() function, inside the 'if (results...)' block:
+                    const positions = faceMesh.geometry.attributes.position.array;
+                    for (let i = 0; i < NUM_LANDMARKS; i++) {
+                        const landmark = faceLandmarks[i];
+                        positions[i * 3 + 0] = landmark.x;
+                        positions[i * 3 + 1] = landmark.y;
+                        positions[i * 3 + 2] = landmark.z;
+                    }
+                    faceMesh.geometry.attributes.position.needsUpdate = true;
+                    faceMesh.geometry.computeVertexNormals();
+                    faceMesh.geometry.computeBoundingBox();
+                    faceMesh.geometry.computeBoundingSphere();
+                    // if (normalsHelper) normalsHelper.update();
+                    // if (meshBoxHelper) meshBoxHelper.update();
 
-               // Load MediaPipe's matrix
-                const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix);
-                
-                // --- Apply axis flips first (based on what previously made it visible and somewhat oriented) ---
-                // If the mesh was visible but upside down, makeScale(1, -1, 1) was likely needed for Y.
-                // If it was visible but facing away, makeScale(1, 1, -1) was likely needed for Z.
-                // Let's try to include both common axis corrections as a starting point.
-                
-                // Common Correction 1: Flip Y-axis (for upside-down)
-                threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1));
-                
-                // Common Correction 2: Flip Z-axis (for inside-out / facing away initially)
-                threeMatrix.multiply(new THREE.Matrix4().makeScale(1, 1, -1));
-                
-                // --- Now, apply the 180-degree rotation to make it face you ---
-                // If the above flips still don't make it face you, this should explicitly turn it around.
-                threeMatrix.multiply(new THREE.Matrix4().makeRotationY(Math.PI)); // Rotate 180 degrees around Y-axis
-                
-                // --- Apply the overall desired scale (always last) ---
-                threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
-                
-                faceMesh.matrix.copy(threeMatrix);
-                faceMesh.matrixAutoUpdate = false;
-                faceMesh.matrixWorldNeedsUpdate = true;
-                
-                // Keep these logs active to diagnose the effect of transformations
-                const worldPosition = new THREE.Vector3();
-                faceMesh.updateWorldMatrix(true, false);
-                worldPosition.setFromMatrixPosition(faceMesh.matrixWorld);
-                console.log("Face Mesh World Position (XYZ):", worldPosition.x, worldPosition.y, worldPosition.z);
-                
-                if (faceMesh.geometry.boundingBox) {
-                    faceMesh.geometry.boundingBox.applyMatrix4(faceMesh.matrixWorld);
-                    const size = faceMesh.geometry.boundingBox.getSize(new THREE.Vector3());
-                    console.log("Face Mesh World Size (XYZ):", size.x, size.y, size.z);
-                    console.log("Face Mesh World Bounding Box Min/Max:", faceMesh.geometry.boundingBox.min, faceMesh.geometry.boundingBox.max);
+                    const scaleFactor = 300;
+                    const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix);
+                    threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1)); // Flip Y-axis (for upside down)
+                    threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
+                    faceMesh.matrix.copy(threeMatrix);
+                    faceMesh.matrixAutoUpdate = false;
+                    faceMesh.matrixWorldNeedsUpdate = true;
+
+                    drawFaceTexture(faceLandmarks, video.videoWidth, video.videoHeight);
+                    faceTexture.needsUpdate = true;
+
+                } else {
+                    // No face detected, or data not available.
+                    faceMesh.visible = false;
+                    // if (normalsHelper) normalsHelper.visible = false;
+                    // if (meshBoxHelper) meshBoxHelper.visible = false;
                 }
-                
-                if (meshBoxHelper) {
-                    meshBoxHelper.update();
-                }
-
-                // Generate Face Texture
-                drawFaceTexture(faceLandmarks, video.videoWidth, video.videoHeight);
-                faceTexture.needsUpdate = true;
-
-            } else {
-                // No face detected, or data not available.
-                faceMesh.visible = false;
-                if (meshBoxHelper) meshBoxHelper.visible = false;
-                if (debugCube) debugCube.visible = true; // Show debug cube if no face
-                // Optionally log why it's not detecting:
-                // if (results && results.faceLandmarks && results.faceLandmarks.length === 0) {
-                //    console.log("No faces detected in this frame (faceLandmarks empty).");
-                // } else if (results && results.facialTransformationMatrixes && results.facialTransformationMatrixes.length === 0) {
-                //    console.log("No transformation matrixes in this frame.");
-                // }
             }
         }
     }
-
     renderer.render(scene, camera);
 }
 
