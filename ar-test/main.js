@@ -170,8 +170,7 @@ async function animate() {
     }
 
 
-    console.log("video.videoWidth: " + video.videoWidth);
-    console.log("video.videoHeight: " + video.videoHeight);
+    console.log("Video state for MediaPipe:", video.videoWidth, video.videoHeight, video.currentTime);
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
         if (lastVideoTime !== video.currentTime) {
             lastVideoTime = video.currentTime;
