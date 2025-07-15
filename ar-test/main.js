@@ -352,7 +352,7 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
 
 
         WebARRocksMediaStreamAPIHelper.get(DOMVIDEO, initWebARRocks, function(){
-          alert('Cannot get video bro :(');
+          console.log('Cannot get video bro :(');
         }, {
           video: true, //mediaConstraints
           audio: false
