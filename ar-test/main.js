@@ -339,40 +339,44 @@ async function animate() {
                 // Load MediaPipe's matrix
                 const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix);
                 
-                // --- Step 1: Correct Y-axis polarity if needed (often necessary) ---
-                // This negates the Y-component of position and Y-related rotations/scales.
-                // If your mesh is upside down, this could be the fix.
-                threeMatrix.elements[5] *= -1;  // m11 (scaleY, rotationY)
-                threeMatrix.elements[9] *= -1;  // m21 (scaleY, rotationZ)
-                threeMatrix.elements[13] *= -1; // m31 (positionY)
+                // --- CORE ALIGNMENT STEPS (Apply these in this order) ---
                 
-                // --- Step 2: Apply overall scale ---
+                // Step 1: Ensure positive Z is "forward" towards camera (if MediaPipe Z is "out")
+                // A Z-flip is often necessary here.
+                threeMatrix.multiply(new THREE.Matrix4().makeScale(1, 1, -1)); // Flip Z-axis (common for face models)
+                
+                // Step 2: Correct Y-axis orientation (for "upside down" issue)
+                // This should ensure positive Y is "up".
+                threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1)); // Flip Y-axis
+                
+                // Step 3: Apply the overall desired scale
                 threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
                 
-                // --- Step 3: Apply a 180-degree rotation around Y to turn the model around ---
-                // This assumes the model's "front" after axis corrections needs to be spun around.
-                threeMatrix.multiply(new THREE.Matrix4().makeRotationY(Math.PI)); // Rotate 180 degrees around Y-axis
+                // No additional 180-degree Y rotations (Math.PI) should be needed for "facing away" if Step 1 (Z-flip) is correct.
+                // If after all these, it's still facing away, it might be due to MediaPipe's X axis definition.
+                // In that rare case, you might need: threeMatrix.multiply(new THREE.Matrix4().makeRotationY(Math.PI));
+                // but let's try without it first.
+                
+                // --- END CORE ALIGNMENT ---
+                
                 
                 faceMesh.matrix.copy(threeMatrix);
                 faceMesh.matrixAutoUpdate = false;
                 faceMesh.matrixWorldNeedsUpdate = true;
-
-                // Inside the 'if (results && results.faceLandmarks ...)' block in animate()
-                // after faceMesh.matrixWorldNeedsUpdate = true;
                 
-                // --- Live Debugging Logs ---
+                // *** Keep these logs active to diagnose the effect of transformations ***
                 const worldPosition = new THREE.Vector3();
-                faceMesh.updateWorldMatrix(true, false); // Ensure world matrix is updated for correct position extraction
+                faceMesh.updateWorldMatrix(true, false); // Ensure world matrix is updated
                 worldPosition.setFromMatrixPosition(faceMesh.matrixWorld);
                 console.log("Face Mesh World Position (XYZ):", worldPosition.x, worldPosition.y, worldPosition.z);
                 
                 if (faceMesh.geometry.boundingBox) {
-                    faceMesh.geometry.boundingBox.applyMatrix4(faceMesh.matrixWorld); // Apply world matrix to bounding box
+                    faceMesh.geometry.boundingBox.applyMatrix4(faceMesh.matrixWorld);
                     const size = faceMesh.geometry.boundingBox.getSize(new THREE.Vector3());
                     console.log("Face Mesh World Size (XYZ):", size.x, size.y, size.z);
                     console.log("Face Mesh World Bounding Box Min/Max:", faceMesh.geometry.boundingBox.min, faceMesh.geometry.boundingBox.max);
                 }
-                // ---------------------------
+                // *******************************************************************
                 
                 if (meshBoxHelper) {
                     meshBoxHelper.update();
