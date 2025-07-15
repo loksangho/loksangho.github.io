@@ -14,7 +14,6 @@ const NUM_LANDMARKS = UV_COORDS.length;
 
 const VIDEO_WIDTH = 640;
 const VIDEO_HEIGHT = 480;
-let normalsHelper; // Declare this near your other global variables
 
 
 // === Removed DOMContentLoaded listener, rely on window.onload from index.html ===
@@ -129,7 +128,6 @@ async function init() {
     //geometry.morphAttributes.position = [];
     //geometry.morphTargets = true;
 
-    geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(NUM_LANDMARKS * 3), 3));
     
     textureCanvas = document.createElement('canvas');
     textureCanvas.width = 512;
@@ -151,7 +149,6 @@ async function init() {
     const material = new THREE.MeshStandardMaterial({
         map: faceTexture, // Re-enable the texture mapping
         side: THREE.DoubleSide,
-        wireframe: true,
         // transparent: true, // Keep transparent if alphaTest is needed, or for blendshape-style transparency
         // alphaTest: 0.1,    // Keep if you have parts of texture with low alpha you want to discard
         // color: 0x0000FF, // Remove the test color
@@ -168,11 +165,6 @@ async function init() {
     scene.add(meshBoxHelper);
     meshBoxHelper.visible = false;
     console.log("Face mesh BoxHelper added (initially hidden).");
-
-
-    normalsHelper = new VertexNormalsHelper(faceMesh, 2, 0x00FF00); // Mesh, size of arrows, color (green)
-    scene.add(normalsHelper);
-    normalsHelper.visible = false; // Initially hidden
     
      // *** ADD THE RESIZE LISTENER HERE ***
     window.addEventListener('resize', () => {
@@ -219,8 +211,6 @@ async function animate() {
                 if (debugCube) debugCube.visible = false;
                 faceMesh.visible = true;
                 if (meshBoxHelper) meshBoxHelper.visible = true;
-                if (normalsHelper) normalsHelper.visible = true;
-
                 
                 console.log("FACE DETECTED! Processing mesh..."); // Confirmation log
 
@@ -240,7 +230,6 @@ async function animate() {
                 }
                 faceMesh.geometry.attributes.position.needsUpdate = true;
                 faceMesh.geometry.computeVertexNormals();
-                if (normalsHelper) normalsHelper.update();
                 faceMesh.geometry.computeBoundingBox();
                 faceMesh.geometry.computeBoundingSphere();
 
@@ -282,14 +271,6 @@ async function animate() {
                     console.log("Face Mesh World Bounding Box Min/Max:", faceMesh.geometry.boundingBox.min, faceMesh.geometry.boundingBox.max);
                 }
                 // ---------------------------
-
-                const diagnosticMaterial = new THREE.MeshBasicMaterial({
-                    color: 0xFF0000, // Bright red
-                    wireframe: true, // Render only the edges of triangles
-                    side: THREE.DoubleSide // Ensure both sides are drawn
-                });
-                // In your animate loop, temporarily apply this material to faceMesh
-                 faceMesh.material = diagnosticMaterial;
                 
                 if (meshBoxHelper) {
                     meshBoxHelper.update();
