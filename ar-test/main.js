@@ -27,7 +27,7 @@ async function init() {
     console.log("Scene created.");
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 10;
+    camera.position.z = 50;
     console.log("Camera created. Position Z:", camera.position.z);
 
     const outputCanvasElement = document.getElementById('outputCanvas');
@@ -231,7 +231,7 @@ async function animate() {
                 }*/
 
                 // 3. Apply Transformation Matrix for global pose
-                const scaleFactor = 10; // Keep experimenting with this value if needed
+                const scaleFactor = 100; // Keep experimenting with this value if needed
                 const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix); // This should now work!
                 threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
                 faceMesh.matrix.copy(threeMatrix);
