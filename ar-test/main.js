@@ -31,6 +31,19 @@ async function init() {
     directionalLight.position.set(0, 0, 1).normalize();
     scene.add(directionalLight);
 
+    // Add this in your init() function, after scene and camera are set up, but before the animate() call.
+    // Inside init() after scene.add(directionalLight);
+    
+    // Add a simple debug cube
+    const debugGeometry = new THREE.BoxGeometry(10, 10, 10); // Adjust size as needed
+    const debugMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true }); // Basic material doesn't need light
+    const debugCube = new THREE.Mesh(debugGeometry, debugMaterial);
+    debugCube.position.set(0, 0, 0); // Place it at the origin
+    scene.add(debugCube);
+    
+    // You can make this cube follow the face's general position later for debugging transformation matrix
+    // by uncommenting debugCube.position.copy(faceMesh.position); in the animate loop
+
     video = document.getElementById('webcamVideo');
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
