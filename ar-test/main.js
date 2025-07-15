@@ -405,8 +405,8 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
         let currentVideoTime = video.currentTime; // Get current time here
 
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            if (currentVideoTime !== (this._lastVideoTime || -1)) { // Use a property of 'this' or a local variable
-                this._lastVideoTime = currentVideoTime; // Store last video time
+            if (currentVideoTime !== (lastVideoTime || -1)) { // Use a property of 'this' or a local variable
+                lastVideoTime = currentVideoTime; // Store last video time
 
                 const results = faceLandmarker.detectForVideo(video, performance.now());
 
