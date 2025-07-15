@@ -510,6 +510,7 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
 }
 
 function initWebARRocks(){
+  alert("Got to here");
   WEBARROCKSOBJECT.init({
     canvasId: 'outputCanvas',
     video: DOMVIDEO,
