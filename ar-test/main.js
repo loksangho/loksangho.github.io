@@ -129,6 +129,8 @@ async function init() {
     //geometry.morphAttributes.position = [];
     //geometry.morphTargets = true;
 
+    geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(NUM_LANDMARKS * 3), 3));
+    
     textureCanvas = document.createElement('canvas');
     textureCanvas.width = 512;
     textureCanvas.height = 512;
