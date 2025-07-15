@@ -319,23 +319,31 @@ function loadMeshFromMemory() {
 
 // --- Main Animation Loop (Modified for WebXR) ---
 let lastVideoTime = -1;
-function animate() {
-    renderer.setAnimationLoop(render); // WebXR animation loop replaces requestAnimationFrame
+// --- Main Animation Loop ---
+// This function needs to ensure the render loop runs whether in AR or not.
+function animate() { // This is the function called by init()
+    requestAnimationFrame(animate); // Keep this for the non-AR loop
+
+    // The 'render' function is now solely for the content within the loop.
+    // It is called by requestAnimationFrame when not in XR, and by renderer.setAnimationLoop when in XR.
+    render(); // Call your main rendering logic (which handles both modes)
 }
 
-// --- WebXR Render Loop ---
-function render(time, frame) {
+// --- WebXR Render Loop (renamed for clarity, handles both modes) ---
+function render(time, frame) { // 'time' and 'frame' are provided by setAnimationLoop in XR, but will be undefined for requestAnimationFrame
     // If we're in an XR session (AR mode)
     if (renderer.xr.isPresenting) {
-        // Hide the original webcam feed
+        // --- AR MODE LOGIC ---
+        // This 'time' and 'frame' are provided by WebXR
+        // Hide the original webcam feed and face mesh
         video.style.display = 'none';
-        faceMesh.visible = false; // Hide the face mesh
-        // If you had debug helpers, hide them too
+        faceMesh.visible = false;
         if (normalsHelper) normalsHelper.visible = false;
         if (meshBoxHelper) meshBoxHelper.visible = false;
 
-        // Perform hit-testing to place objects
+        // WebXR hit-testing and object placement logic
         if (frame && renderer.xr.getSession() && !placedObject) {
+            // ... (your existing AR hit-test and placement logic) ...
             const session = renderer.xr.getSession();
             if (arHitTestSource === null) {
                 session.requestReferenceSpace('viewer').then((refSpace) => {
@@ -345,15 +353,12 @@ function render(time, frame) {
                     });
                 });
             }
-
             if (arHitTestSource) {
                 const hitTestResults = frame.getHitTestResults(arHitTestSource);
                 if (hitTestResults.length > 0) {
                     const hit = hitTestResults[0];
                     const pose = hit.getPose(arRefSpace);
-
-                    // --- Show Reticle (Optional, but good UX) ---
-                    if (!reticle) {
+                    if (!reticle) { // Reticle for placement
                         reticle = new THREE.Mesh(
                             new THREE.RingGeometry(0.1, 0.12, 32).rotateX(-Math.PI / 2),
                             new THREE.MeshBasicMaterial({ color: 0xffffff })
@@ -364,30 +369,22 @@ function render(time, frame) {
                     reticle.matrix.fromArray(pose.transform.matrix);
                     reticle.visible = true;
 
-                    // --- Place Object on Tap (Example) ---
-                    // Attach an event listener for user tap (only once)
-                    if (!renderer.domElement.onclick) {
+                    // Place Object on Tap (Example)
+                    if (!renderer.domElement.onclick) { // Attach click listener only once
                         renderer.domElement.onclick = () => {
                             if (exportedMeshData && reticle.visible && !placedObject) {
-                                // Load the GLTF from memory
                                 const loader = new GLTFLoader();
-                                const gltfJsonString = JSON.stringify(exportedMeshData); // Parse expects JSON string
+                                const gltfJsonString = JSON.stringify(exportedMeshData);
                                 loader.parse(gltfJsonString, function(gltf) {
-                                    placedObject = gltf.scene; // Store the loaded scene
-
-                                    // Position the loaded object at the reticle's location
+                                    placedObject = gltf.scene;
                                     placedObject.position.setFromMatrixPosition(reticle.matrix);
-                                    // Scale it down, as the saved face mesh might be large
-                                    placedObject.scale.set(0.1, 0.1, 0.1); // ADJUST THIS SCALE!
-
+                                    placedObject.scale.set(0.1, 0.1, 0.1); // Adjust scale!
                                     scene.add(placedObject);
-                                    reticle.visible = false; // Hide reticle after placement
-                                    arHitTestSource.cancel(); // Stop hit testing
+                                    reticle.visible = false;
+                                    arHitTestSource.cancel();
                                     arHitTestSource = null;
-                                    renderer.domElement.onclick = null; // Remove click listener
-                                }, undefined, function(error) {
-                                    console.error("Error loading GLTF from memory:", error);
-                                });
+                                    renderer.domElement.onclick = null;
+                                }, undefined, function(error) { console.error("Error loading GLTF from memory:", error); });
                             }
                         };
                     }
@@ -397,17 +394,20 @@ function render(time, frame) {
             }
         }
     } else {
-        // Not in an AR session (front camera mode)
-        // MediaPipe Face Landmarker processing
+        // --- NON-AR MODE (Front Camera & Face Tracking) LOGIC ---
+        // This is the code that handles your front camera MediaPipe detection
+        // and mesh updates.
         video.style.display = 'block'; // Show the video element
-        faceMesh.visible = true; // Show the face mesh
-        // And its helpers
-        // if (normalsHelper) normalsHelper.visible = true;
-        // if (meshBoxHelper) meshBoxHelper.visible = true;
+        // The face mesh visibility will be controlled by the MediaPipe results check
+        // if (faceMesh) faceMesh.visible = true; // No, let the MediaPipe detection control its visibility
+
+        // Ensure lastVideoTime is managed correctly within this scope if not global
+        let currentVideoTime = video.currentTime; // Get current time here
 
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            if (time !== lastVideoTime) { // Using 'time' from render callback for consistent updates
-                lastVideoTime = time;
+            if (currentVideoTime !== (this._lastVideoTime || -1)) { // Use a property of 'this' or a local variable
+                this._lastVideoTime = currentVideoTime; // Store last video time
+
                 const results = faceLandmarker.detectForVideo(video, performance.now());
 
                 if (results && results.faceLandmarks && results.faceLandmarks.length > 0 &&
@@ -416,6 +416,10 @@ function render(time, frame) {
                     results.facialTransformationMatrixes[0].data.length === 16) {
 
                     // FACE DETECTED!
+                    faceMesh.visible = true; // Make face mesh visible
+                    // if (normalsHelper) normalsHelper.visible = true;
+                    // if (meshBoxHelper) meshBoxHelper.visible = true;
+
                     const faceLandmarks = results.faceLandmarks[0];
                     const transformMatrix = results.facialTransformationMatrixes[0].data;
 
@@ -445,15 +449,15 @@ function render(time, frame) {
                     faceTexture.needsUpdate = true;
 
                 } else {
-                    // No face detected, or data not available.
-                    faceMesh.visible = false;
+                    // No face detected in non-AR mode
+                    faceMesh.visible = false; // Hide face mesh
                     // if (normalsHelper) normalsHelper.visible = false;
                     // if (meshBoxHelper) meshBoxHelper.visible = false;
                 }
             }
         }
     }
-    renderer.render(scene, camera);
+    renderer.render(scene, camera); // This must be called at the end of the loop
 }
 
 function drawFaceTexture(faceLandmarks, videoWidth, videoHeight) {
