@@ -12,7 +12,7 @@ let video, faceLandmarker, runningMode = "VIDEO";
 let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
 let debugCube;
 let meshBoxHelper;
-var saveButton=null;
+let saveButton;
 let exportedMeshData = null;
 
 // WebXR specific variables
