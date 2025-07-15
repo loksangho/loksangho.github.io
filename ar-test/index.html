@@ -32,13 +32,14 @@
     </style>
 </head>
 <body>
+    <div id="onScreenConsole"></div>
     <video id="webcamVideo" autoplay playsinline muted></video>
     <canvas id="outputCanvas"></canvas>
     <div id="loading">Loading MediaPipe model...</div>
     
     <button id="saveButton" style="display:none;">Save Mesh</button>
-    <button id="arButton" style="display:none;"></button>
-    <div id="onScreenConsole"></div>
+    <button id="arButtonPlaceholder" style="display:none;"></button>
+    
     <script type="importmap">
         {
             "imports": {
