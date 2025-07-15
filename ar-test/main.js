@@ -100,7 +100,12 @@ async function init() {
         outputFaceBlendshapes: true,
         outputFacialTransformationMatrixes: true,
         runningMode: runningMode,
-        numFaces: 1
+        numFaces: 1,
+        // *** LOWER THESE FOR DEBUGGING DETECTION ***
+        minDetectionConfidence: 0.05, // Try extremely low for testing
+        minFacePresenceConfidence: 0.05, // Try extremely low for testing
+        minTrackingConfidence: 0.05 // Try extremely low for testing
+        // ***************************************
     });
     console.log("MediaPipe FaceLandmarker loaded.");
 
