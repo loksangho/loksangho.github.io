@@ -136,11 +136,19 @@ async function init() {
     faceTexture.magFilter = THREE.LinearFilter;
     faceTexture.encoding = THREE.sRGBEncoding;
 
-    const material = new THREE.MeshBasicMaterial({
+    /*const material = new THREE.MeshBasicMaterial({
         color: 0x0000FF, // Blue color for testing
         side: THREE.DoubleSide,
         transparent: true,
         alphaTest: 0.1,
+    });*/
+    const material = new THREE.MeshStandardMaterial({
+        map: faceTexture, // Re-enable the texture mapping
+        side: THREE.DoubleSide,
+        // transparent: true, // Keep transparent if alphaTest is needed, or for blendshape-style transparency
+        // alphaTest: 0.1,    // Keep if you have parts of texture with low alpha you want to discard
+        // color: 0x0000FF, // Remove the test color
+        // wireframe: true // Remove wireframe unless you want it for visual effect
     });
 
     faceMesh = new THREE.Mesh(geometry, material);
