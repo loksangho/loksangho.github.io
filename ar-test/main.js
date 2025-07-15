@@ -393,12 +393,15 @@ let lastVideoTime = -1;
 // --- Main Animation Loop ---
 // This function needs to ensure the render loop runs whether in AR or not.
 function animate() { // This is the function called by init()
-    WebARRocksObjectThreeHelper.animate();
+    
     requestAnimationFrame(animate); // Keep this for the non-AR loop
 
     // The 'render' function is now solely for the content within the loop.
     // It is called by requestAnimationFrame when not in XR, and by renderer.setAnimationLoop when in XR.
     render(); // Call your main rendering logic (which handles both modes)
+    if (renderer.xr.isPresenting) {
+        WebARRocksObjectThreeHelper.animate();
+    }
     
 }
 
