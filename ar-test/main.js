@@ -44,24 +44,50 @@ async function init() {
     camera.position.z = 50;
     console.log("Camera created. Position Z:", camera.position.z);
 
-    const outputCanvasElement = document.getElementById('outputCanvas');
-    if (!outputCanvasElement) {
-        console.error("ERROR: 'outputCanvas' element not found in HTML! This is why rendering fails.");
-        document.getElementById('loading').innerText = "Error: Canvas not found.";
-        return;
-    }
-
     saveButton = document.getElementById('saveButton');
     if (saveButton) {
         saveButton.style.display = 'block'; // Show the button once app is loaded
         saveButton.addEventListener('click', saveMesh); // Attach click listener
     }
     
-    renderer = new THREE.WebGLRenderer({ antialias: true, canvas: outputCanvasElement, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    const outputCanvasElement = document.getElementById('outputCanvas'); // Should be found by now
+    if (!outputCanvasElement) {
+        console.error("ERROR: 'outputCanvas' element not found in HTML! Renderer cannot be created.");
+        document.getElementById('loading').innerText = "Error: Canvas not found.";
+        return;
+    }
+    console.log("Canvas element found for renderer:", outputCanvasElement); // New diagnostic log
+
+    try {
+        // Attempt to create the WebGLRenderer
+        renderer = new THREE.WebGLRenderer({
+            canvas: outputCanvasElement,
+            antialias: true,
+            alpha: true, // Crucial for transparent background if needed
+            // powerPreference: "high-performance" // Optional: hint for dedicated GPU on some systems
+        });
+        console.log("WebGLRenderer created successfully."); // New diagnostic log
+
+        // If assignment failed *without* throwing, renderer would still be undefined
+        if (!renderer) {
+            console.error("ERROR: Renderer variable is still undefined after successful WebGLRenderer constructor. This is highly unexpected.");
+            document.getElementById('loading').innerText = "Error: Renderer assignment failed.";
+            return;
+        }
+
+    } catch (e) {
+        // Catch any errors during WebGLRenderer creation
+        console.error("ERROR: Failed to create WebGLRenderer!", e);
+        console.error("Possible reasons: WebGL not supported, context lost, out of memory, or driver issues.");
+        document.getElementById('loading').innerText = "Error: WebGL not available or failed to initialize. See console for details.";
+        return;
+    }
+
+    // Now, after successful creation, proceed with setup
     renderer.setPixelRatio(window.devicePixelRatio);
-    document.body.appendChild(renderer.domElement);
-    console.log("Renderer created and attached to canvas.");
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement); // This is where the canvas is put in the DOM (already exists via HTML)
+
 
     // Add ambient light
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
