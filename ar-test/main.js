@@ -9,15 +9,20 @@ let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
 let debugCube;
 let meshBoxHelper;
 
-// *** CORRECTED LINE HERE ***
-const NUM_LANDMARKS = UV_COORDS.length; // Correctly get the number of landmarks from your UV_COORDS data
-// *************************
+const NUM_LANDMARKS = UV_COORDS.length;
 
 const VIDEO_WIDTH = 640;
 const VIDEO_HEIGHT = 480;
 
+// === Move init() call inside DOMContentLoaded listener ===
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM fully loaded and parsed. Calling init().");
+    init();
+});
+// =========================================================
+
 async function init() {
-    console.log("init() started.");
+    console.log("init() started."); // THIS SHOULD NOW BE THE FIRST LOG IF CANVAS IS FOUND
 
     // 1. Setup Three.js Scene
     scene = new THREE.Scene();
@@ -30,11 +35,11 @@ async function init() {
 
     const outputCanvasElement = document.getElementById('outputCanvas');
     if (!outputCanvasElement) {
-        console.error("ERROR: 'outputCanvas' element not found in HTML!");
+        console.error("ERROR: 'outputCanvas' element not found in HTML! This is why rendering fails.");
         document.getElementById('loading').innerText = "Error: Canvas not found.";
         return;
     }
-    renderer = new THREE.WebGLRenderer({ antialias: true, canvas: outputCanvasElement });
+    renderer = new THREE.WebGLRenderer({ antialias: true, canvas: outputCanvasElement, alpha: true }); // Ensure alpha is true if background is transparent
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     document.body.appendChild(renderer.domElement);
@@ -63,7 +68,7 @@ async function init() {
     video = document.getElementById('webcamVideo');
     console.log("Webcam video element:", video);
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } }); // Explicitly request front camera
         video.srcObject = stream;
         await new Promise((resolve) => {
             video.onloadedmetadata = () => {
@@ -194,17 +199,12 @@ async function animate() {
                 const positions = faceMesh.geometry.attributes.position.array;
                 for (let i = 0; i < NUM_LANDMARKS; i++) {
                     const landmark = faceLandmarks[i];
-                    // These normalized coordinates (0-1) are relative to the video frame.
-                    // The 'z' is relative depth.
-                    // When applying the transformMatrix later, it scales these into a world space.
-                    // For now, these raw positions might be small (0-1 range).
                     positions[i * 3 + 0] = landmark.x;
                     positions[i * 3 + 1] = landmark.y;
                     positions[i * 3 + 2] = landmark.z;
                 }
                 faceMesh.geometry.attributes.position.needsUpdate = true;
                 faceMesh.geometry.computeVertexNormals();
-                // After updating positions, compute bounding box for the helper
                 faceMesh.geometry.computeBoundingBox();
                 faceMesh.geometry.computeBoundingSphere();
 
@@ -220,28 +220,13 @@ async function animate() {
                 }
 
                 // 3. Apply Transformation Matrix for global pose
-                // Important: The scaleFactor here is CRITICAL.
-                // MediaPipe's matrix often assumes a normalized object size.
-                // We're applying it directly to the mesh.
-                const scaleFactor = 300; // Increased scale factor - EXPERIMENT with this!
-                                        // Typical values are between 100 and 500 depending on camera.position.z
-
+                const scaleFactor = 300;
                 const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix);
-
-                // Apply additional scale *after* the MediaPipe matrix.
-                // Multiply from the right to apply after initial transform.
                 threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
-
-                // Adjust for Y-axis inversion and Z-axis direction if necessary (common with MediaPipe)
-                // If the face is upside down or inside out, tweak these.
-                // threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1)); // Flip Y
-                // threeMatrix.multiply(new THREE.Matrix4().makeScale(1, 1, -1)); // Flip Z
-
                 faceMesh.matrix.copy(threeMatrix);
                 faceMesh.matrixAutoUpdate = false;
-                faceMesh.matrixWorldNeedsUpdate = true; // Tell Three.js to recompute world matrix
+                faceMesh.matrixWorldNeedsUpdate = true;
 
-                // Update the BoxHelper to reflect the mesh's new position and scale
                 if (meshBoxHelper) {
                     meshBoxHelper.update();
                 }
@@ -249,13 +234,6 @@ async function animate() {
                 // Generate Face Texture
                 drawFaceTexture(faceLandmarks, video.videoWidth, video.videoHeight);
                 faceTexture.needsUpdate = true;
-
-                // --- Live Debugging Logs ---
-                // console.log("Face Mesh World Position:", new THREE.Vector3().setFromMatrixPosition(faceMesh.matrixWorld));
-                // if (faceMesh.geometry.boundingBox) {
-                //     console.log("Face Mesh Bounding Box:", faceMesh.geometry.boundingBox);
-                // }
-                // ---------------------------
 
             } else {
                 // No face detected, or data not available.
@@ -316,4 +294,4 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-init();
+// init(); // Removed this direct call, now triggered by DOMContentLoaded
