@@ -10,8 +10,8 @@ import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { FACEMESH_TESSELATION, UV_COORDS } from './face_mesh_data.js';
 
 import * as THREE from "three"
-//import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
-//import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 //let THREE = window.THREE;
 
@@ -197,7 +197,7 @@ function saveMesh() {
         return;
     }
     // --- CHANGE #2: Use THREE.GLTFExporter ---
-    const exporter = new THREE.GLTFExporter();
+    const exporter = new GLTFExporter();
     exporter.parse(
         faceMesh,
         function (gltfData) {
@@ -350,7 +350,7 @@ function initWebARRocks(){
 function startWebARRocks(){
   if (exportedMeshData) {
       // --- CHANGE #3: Use THREE.GLTFLoader ---
-      const loader = new THREE.GLTFLoader();
+      const loader = new GLTFLoader();
       const gltfJsonString = JSON.stringify(exportedMeshData);
       loader.parse(gltfJsonString, (gltf) => {
           const loadedMesh = gltf.scene;
