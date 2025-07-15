@@ -15,10 +15,10 @@ const VIDEO_WIDTH = 640;
 const VIDEO_HEIGHT = 480;
 
 // === Move init() call inside DOMContentLoaded listener ===
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM fully loaded and parsed. Calling init().");
-    init();
-});
+//document.addEventListener('DOMContentLoaded', () => {
+//    console.log("DOM fully loaded and parsed. Calling init().");
+//    init();
+//});
 // =========================================================
 
 async function init() {
@@ -294,4 +294,4 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// init(); // Removed this direct call, now triggered by DOMContentLoaded
+init(); // Removed this direct call, now triggered by DOMContentLoaded
