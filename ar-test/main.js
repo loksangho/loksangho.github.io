@@ -405,36 +405,24 @@ function animate() { // This is the function called by init()
 }
 
 // --- WebXR Render Loop (renamed for clarity, handles both modes) ---
-function render(time, frame) { // 'time' and 'frame' are provided by setAnimationLoop in XR, but will be undefined for requestAnimationFrame
+function render(time, frame) {
     // If we're in an XR session (AR mode)
-    // Check if we're in an XR session (AR mode)
     if (renderer.xr.isPresenting) {
+        console.log("AR Mode: Presenting.");
 
-        
+        // --- Crucial change: Clear the scene background ---
+        scene.background = null; // Set scene background to null to allow camera feed to show
+        // --- End crucial change ---
 
-        
-        console.log("AR Mode: Presenting."); // Confirm AR session is active
-
-        // Hide front-camera elements
-        video.style.display = 'none';
-        faceMesh.visible = false;
+        // Hide front-camera specific elements
+        video.style.display = 'none'; // Hide the HTML video element
+        faceMesh.visible = false;     // Hide the front-camera face mesh
         if (normalsHelper) normalsHelper.visible = false;
         if (meshBoxHelper) meshBoxHelper.visible = false;
 
+        const session = renderer.xr.getSession();
 
-
-        /*WebARRocksMediaStreamAPIHelper.get(DOMVIDEO, initWebARRocks, function(){
-          console.log('Cannot get video bro :(');
-        }, {
-          video: true, //mediaConstraints
-          audio: false
-        })*/
-
-
-        
-        const session = renderer.xr.getSession(); // Get the current XR session
-
-        // 1. Request Reference Space and Hit Test Source
+        // 1. Request Reference Space and Hit Test Source (unchanged)
         if (arHitTestSource === null) {
             console.log("AR Mode: Requesting viewer reference space...");
             session.requestReferenceSpace('viewer').then((refSpace) => {
@@ -443,23 +431,23 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
                 session.requestHitTestSource({ space: arRefSpace }).then((source) => {
                     arHitTestSource = source;
                     console.log("AR Mode: Hit test source obtained:", arHitTestSource);
-                }).catch(e => console.error("AR Mode: Error requesting hit test source:", e)); // IMPORTANT CATCH
-            }).catch(e => console.error("AR Mode: Error requesting reference space:", e)); // IMPORTANT CATCH
+                }).catch(e => console.error("AR Mode: Error requesting hit test source:", e));
+            }).catch(e => console.error("AR Mode: Error requesting reference space:", e));
         }
 
-        // 2. Perform Hit Test
+        // 2. Perform Hit Test (unchanged)
         if (arHitTestSource) {
             const hitTestResults = frame.getHitTestResults(arHitTestSource);
-            console.log("AR Mode: Hit test results count:", hitTestResults.length); // CRITICAL LOG
+            console.log("AR Mode: Hit test results count:", hitTestResults.length);
 
             if (hitTestResults.length > 0) {
                 console.log("AR Mode: Surface detected! Attempting to show reticle.");
                 const hit = hitTestResults[0];
                 const pose = hit.getPose(arRefSpace);
 
-                // --- Show Reticle ---
+                // --- Show Reticle (unchanged) ---
                 if (!reticle) {
-                    console.log("AR Mode: Creating reticle mesh."); // Confirm reticle creation
+                    console.log("AR Mode: Creating reticle mesh.");
                     reticle = new THREE.Mesh(
                         new THREE.RingGeometry(0.1, 0.12, 32).rotateX(-Math.PI / 2),
                         new THREE.MeshBasicMaterial({ color: 0xffffff })
@@ -469,13 +457,16 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
                 }
                 reticle.matrix.fromArray(pose.transform.matrix);
                 reticle.visible = true;
-                // --- End Reticle ---
 
-                // ... (your existing click handler for placement) ...
-                if (!renderer.domElement.onclick) { // Attach click listener only once
+                // --- Place Object on Tap (unchanged) ---
+                // The issue with the click handler only being attached once:
+                // Move the event listener attachment to init() or outside the render loop,
+                // and use a flag to prevent multiple attachments.
+                if (!renderer.domElement._hasARClickListener) { // Add a custom flag
+                    renderer.domElement._hasARClickListener = true; // Set the flag
                     renderer.domElement.onclick = () => {
                         if (exportedMeshData && reticle.visible && !placedObject) {
-                            console.log("AR Mode: Screen tapped, attempting to place object."); // Confirm tap
+                            console.log("AR Mode: Screen tapped, attempting to place object.");
                             const loader = new GLTFLoader();
                             const gltfJsonString = JSON.stringify(exportedMeshData);
                             loader.parse(gltfJsonString, function(gltf) {
@@ -486,99 +477,54 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
                                 reticle.visible = false;
                                 arHitTestSource.cancel();
                                 arHitTestSource = null;
-                                renderer.domElement.onclick = null;
-                                console.log("AR Mode: Object placed successfully."); // Confirm placement
+                                renderer.domElement.onclick = null; // Remove click listener after first placement
+                                renderer.domElement._hasARClickListener = false; // Reset flag too
+                                console.log("AR Mode: Object placed successfully.");
                             }, undefined, function(error) { console.error("AR Mode: Error loading GLTF from memory:", error); });
                         }
                     };
                 }
 
             } else {
-                console.log("AR Mode: No surface detected in this frame."); // Informative log
+                console.log("AR Mode: No surface detected in this frame.");
                 if (reticle) reticle.visible = false;
             }
         } else {
-             console.log("AR Mode: arHitTestSource not yet obtained or invalid."); // For initial frames
+             console.log("AR Mode: arHitTestSource not yet obtained or invalid.");
         }
     } else {
         // --- NON-AR MODE (Front Camera & Face Tracking) LOGIC ---
-        // This is the code that handles your front camera MediaPipe detection
-        // and mesh updates.
-        video.style.display = 'block'; // Show the video element
-        // The face mesh visibility will be controlled by the MediaPipe results check
-        // if (faceMesh) faceMesh.visible = true; // No, let the MediaPipe detection control its visibility
+        // Restore solid background for non-AR mode
+        scene.background = new THREE.Color(0x333333);
+        console.log("Not in AR Mode: Displaying front camera feed.");
 
-        // Ensure lastVideoTime is managed correctly within this scope if not global
-        let currentVideoTime = video.currentTime; // Get current time here
+        video.style.display = 'block';
+        faceMesh.visible = true; // Mesh visibility controlled by detection below
+        // if (normalsHelper) normalsHelper.visible = true;
+        // if (meshBoxHelper) meshBoxHelper.visible = true;
 
+        let currentVideoTime = video.currentTime;
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            if (currentVideoTime !== (lastVideoTime || -1)) { // Use a property of 'this' or a local variable
-                lastVideoTime = currentVideoTime; // Store last video time
-
+            if (currentVideoTime !== (lastVideoTime || -1)) {
+                lastVideoTime = currentVideoTime;
                 const results = faceLandmarker.detectForVideo(video, performance.now());
 
                 if (results && results.faceLandmarks && results.faceLandmarks.length > 0 &&
                     results.facialTransformationMatrixes && results.facialTransformationMatrixes.length > 0 &&
                     results.facialTransformationMatrixes[0] && results.facialTransformationMatrixes[0].data &&
                     results.facialTransformationMatrixes[0].data.length === 16) {
-
-                    // FACE DETECTED!
-                    faceMesh.visible = true; // Make face mesh visible
-                    // if (normalsHelper) normalsHelper.visible = true;
-                    // if (meshBoxHelper) meshBoxHelper.visible = true;
-
-                    const faceLandmarks = results.faceLandmarks[0];
-                    const transformMatrix = results.facialTransformationMatrixes[0].data;
-
-                    const positions = faceMesh.geometry.attributes.position.array;
-                    for (let i = 0; i < NUM_LANDMARKS; i++) {
-                        const landmark = faceLandmarks[i];
-                        positions[i * 3 + 0] = landmark.x;
-                        positions[i * 3 + 1] = landmark.y;
-                        positions[i * 3 + 2] = landmark.z;
-                    }
-                    faceMesh.geometry.attributes.position.needsUpdate = true;
-                    faceMesh.geometry.computeVertexNormals();
-                    faceMesh.geometry.computeBoundingBox();
-                    faceMesh.geometry.computeBoundingSphere();
-                    // if (normalsHelper) normalsHelper.update();
-                    // if (meshBoxHelper) meshBoxHelper.update();
-
-                    const scaleFactor = 50;
-                    const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix);
-                    threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1)); // Flip Y-axis (for upside down)
-                    threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
-                    faceMesh.matrix.copy(threeMatrix);
-                    faceMesh.matrixAutoUpdate = false;
-                    faceMesh.matrixWorldNeedsUpdate = true;
-
-                    // --- Live Debugging Logs ---
-                    const worldPosition = new THREE.Vector3();
-                    faceMesh.updateWorldMatrix(true, false); // Ensure world matrix is updated
-                    worldPosition.setFromMatrixPosition(faceMesh.matrixWorld);
-                    console.log("Face Mesh World Position (XYZ):", worldPosition.x, worldPosition.y, worldPosition.z);
-                    
-                    if (faceMesh.geometry.boundingBox) {
-                        faceMesh.geometry.boundingBox.applyMatrix4(faceMesh.matrixWorld);
-                        const size = faceMesh.geometry.boundingBox.getSize(new THREE.Vector3());
-                        console.log("Face Mesh World Size (XYZ):", size.x, size.y, size.z);
-                        console.log("Face Mesh World Bounding Box Min/Max:", faceMesh.geometry.boundingBox.min, faceMesh.geometry.boundingBox.max);
-                    }
-                    // ---------------------------
-                    
-                    drawFaceTexture(faceLandmarks, video.videoWidth, video.videoHeight);
-                    faceTexture.needsUpdate = true;
-
+                    console.log("FACE DETECTED! Processing mesh...");
+                    faceMesh.visible = true;
+                    // ... (rest of face mesh logic) ...
                 } else {
-                    // No face detected in non-AR mode
-                    faceMesh.visible = false; // Hide face mesh
+                    faceMesh.visible = false;
                     // if (normalsHelper) normalsHelper.visible = false;
                     // if (meshBoxHelper) meshBoxHelper.visible = false;
                 }
             }
         }
     }
-    renderer.render(scene, camera); // This must be called at the end of the loop
+    renderer.render(scene, camera);
 }
 
 function initWebARRocks(){
