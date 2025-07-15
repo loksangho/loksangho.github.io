@@ -42,12 +42,6 @@ async function init() {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 50;
     console.log("Camera created. Position Z:", camera.position.z);
-
-    const saveButton = document.getElementById('saveButton');
-    if (saveButton) {
-        saveButton.style.display = 'block'; // Show the button once app is loaded
-        saveButton.addEventListener('click', saveMesh); // Attach click listener
-    }
     
     const outputCanvasElement = document.getElementById('outputCanvas'); // Should be found by now
     if (!outputCanvasElement) {
