@@ -248,10 +248,19 @@ async function animate() {
 
                 // 3. Apply Transformation Matrix for global pose
                 const scaleFactor = 100; // Keep experimenting with this value if needed
-                const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix); // This should now work!
+                // In your animate() function, inside the 'if (results...)' block:
+
+                const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix);
+                
+                // Apply your overall scale factor
                 threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
-                threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1)); // Flip Y-axis
-                threeMatrix.multiply(new THREE.Matrix4().makeMakeRotationY(Math.PI)); // Rotate 180 degrees around Y-axis
+                
+                // *** THE KEY CORRECTION: ONLY FLIP Y-AXIS ***
+                // This should correct the "upside down" if the Z-axis orientation is already correct
+                threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1)); // Flip Y-axis only
+                // ********************************************
+                
+                // No additional rotations like makeMakeRotationY(Math.PI) should be needed here.
                 
                 faceMesh.matrix.copy(threeMatrix);
                 faceMesh.matrixAutoUpdate = false;
