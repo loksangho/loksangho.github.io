@@ -76,24 +76,20 @@
     <div id="arButtonPlaceholder"></div>
 
 
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://threejs.org/build/three.module.js",
-            "three/addons/": "https://threejs.org/examples/jsm/"
-        }
-    }
-    </script>
+   
 
+    <script src='./libs/three/v136/three.js'></script>
     <script src="./dist/WebARRocksObject.js"></script>
     <script src="./helpers/WebARRocksMediaStreamAPIHelper.js"></script>
     <script src="./helpers/DeviceOrientationHelper.js"></script>
     <script src="./helpers/WebARRocksObjectThreeHelper.js"></script>
     <script src="./helpers/stabilizers/WebARRocksThreeStabilizer2.js"></script>
 
+
     <script type="importmap">
         {
             "imports": {
+                "three/addons/": "https://threejs.org/examples/jsm/",
                 "@mediapipe/tasks-vision": "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/vision_bundle.mjs"
             }
         }
