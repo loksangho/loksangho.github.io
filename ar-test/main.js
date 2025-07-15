@@ -265,6 +265,14 @@ async function animate() {
                     console.log("Face Mesh World Bounding Box Min/Max:", faceMesh.geometry.boundingBox.min, faceMesh.geometry.boundingBox.max);
                 }
                 // ---------------------------
+
+                const diagnosticMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xFF0000, // Bright red
+                    wireframe: true, // Render only the edges of triangles
+                    side: THREE.DoubleSide // Ensure both sides are drawn
+                });
+                // In your animate loop, temporarily apply this material to faceMesh
+                 faceMesh.material = diagnosticMaterial;
                 
                 if (meshBoxHelper) {
                     meshBoxHelper.update();
