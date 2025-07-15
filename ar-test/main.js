@@ -525,7 +525,7 @@ function initWebARRocks(){
 }
 
 function load_neuralNet(){
-  WEBARROCKSOBJECT.set_NN('../../neuralNets/NN_OBJ4_0.json', function(errLabel){
+  WEBARROCKSOBJECT.set_NN('./neuralNets/NN_OBJ4_0.json', function(errLabel){
     if (errLabel){
       console.log('ERROR: cannot load the neural net', errLabel);
     } else {
@@ -545,7 +545,7 @@ function start(){
   } else { // portrait
     sx = aspectRatioVideo;
   }
-  const domCanvas = document.getElementById('debugWebARRocksObjectCanvas');
+  const domCanvas = document.getElementById('outputCanvas');
   domCanvas.style.transformOrigin = '50% 0%';
   domCanvas.style.transform = 'scale('+sx.toFixed(2)+','+sy.toFixed(2)+') translate(-50%, -50%) rotateY(180deg)';
 
