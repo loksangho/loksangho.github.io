@@ -243,6 +243,8 @@ async function animate() {
                 const scaleFactor = 100; // Keep experimenting with this value if needed
                 const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix); // This should now work!
                 threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
+                threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1)); // Flip Y-axis
+
                 faceMesh.matrix.copy(threeMatrix);
                 faceMesh.matrixAutoUpdate = false;
                 faceMesh.matrixWorldNeedsUpdate = true;
