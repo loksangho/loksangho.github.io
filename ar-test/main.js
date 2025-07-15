@@ -123,8 +123,8 @@ async function init() {
     geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
     const indices = new Uint16Array(FACEMESH_TESSELATION);
     geometry.setIndex(new THREE.BufferAttribute(indices, 1));
-    geometry.morphAttributes.position = [];
-    geometry.morphTargets = true;
+    //geometry.morphAttributes.position = [];
+    //geometry.morphTargets = true;
 
     textureCanvas = document.createElement('canvas');
     textureCanvas.width = 512;
@@ -221,14 +221,14 @@ async function animate() {
                 faceMesh.geometry.computeBoundingSphere();
 
                 // 2. Apply Blendshapes (placeholder)
-                if (blendshapes && faceMesh.morphTargetInfluences) {
+                /*if (blendshapes && faceMesh.morphTargetInfluences) {
                      for (const blendshape of blendshapes.categories) {
                          const { categoryName, score } = blendshape;
                          if (faceMesh.morphTargetDictionary && faceMesh.morphTargetDictionary[categoryName] !== undefined) {
                              faceMesh.morphTargetInfluences[faceMesh.morphTargetDictionary[categoryName]] = score;
                          }
                      }
-                }
+                }*/
 
                 // 3. Apply Transformation Matrix for global pose
                 const scaleFactor = 10; // Keep experimenting with this value if needed
