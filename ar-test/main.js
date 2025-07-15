@@ -14,6 +14,7 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 
+
 let scene, camera, renderer;
 let video, faceLandmarker, runningMode = "VIDEO";
 let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
@@ -196,7 +197,7 @@ function saveMesh() {
         return;
     }
     // --- CHANGE #2: Use THREE.GLTFExporter ---
-    const exporter = new THREE.GLTFExporter();
+    const exporter = new GLTFExporter();
     exporter.parse(
         faceMesh,
         function (gltfData) {
@@ -349,7 +350,7 @@ function initWebARRocks(){
 function startWebARRocks(){
   if (exportedMeshData) {
       // --- CHANGE #3: Use THREE.GLTFLoader ---
-      const loader = new THREE.GLTFLoader();
+      const loader = new GLTFLoader();
       const gltfJsonString = JSON.stringify(exportedMeshData);
       loader.parse(gltfJsonString, (gltf) => {
           const loadedMesh = gltf.scene;
