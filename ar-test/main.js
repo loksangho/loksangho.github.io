@@ -408,7 +408,12 @@ function render(time, frame) {
     // Check if we're in an XR session (AR mode)
     if (renderer.xr.isPresenting) {
         console.log("AR Mode: renderer.xr.isPresenting is TRUE."); // Confirm AR session is seen as active
-
+        WebARRocksMediaStreamAPIHelper.get(DOMVIDEO, initWebARRocks, function(){
+          console.log('Cannot get video bro :(');
+        }, {
+          video: true, //mediaConstraints
+          audio: false
+        })
         // --- Core AR Background Setup ---
         scene.background = null; // Clear scene background to show camera feed
         renderer.setClearAlpha(0); // *** NEW: Ensure full transparency when clearing ***
