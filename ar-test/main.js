@@ -278,12 +278,33 @@ async function init() {
 
     // 2. Set up WebXR for AR
     renderer.xr.enabled = true;
-    const arButtonContainer = document.getElementById('arButton');
+    const arButtonPlaceholder = document.getElementById('arButtonPlaceholder');
+    //const arButtonContainer = document.getElementById('arButton');
     // The ARButton handles checking for AR support and requesting a session
-    document.body.appendChild(ARButton.createButton(renderer, {
-        optionalFeatures: ['dom-overlay', 'dom-overlay-for-handheld-ar', 'hit-test'], // Request hit-test for placement
+
+    const createdArButton = ARButton.createButton(renderer, {
+        optionalFeatures: ['dom-overlay', 'dom-overlay-for-handheld-ar', 'hit-test'],
         domOverlay: { root: document.body } // Use the whole document body as AR overlay
-    }));
+    });
+    //document.body.appendChild(ARButton.createButton(renderer, {
+    //    optionalFeatures: ['dom-overlay', 'dom-overlay-for-handheld-ar', 'hit-test'], // Request hit-test for placement
+    //    domOverlay: { root: document.body } // Use the whole document body as AR overlay
+    //}));
+
+    if (arButtonPlaceholder) {
+        arButtonPlaceholder.innerHTML = ''; // Clear any default content
+        arButtonPlaceholder.appendChild(createdArButton);
+        arButtonPlaceholder.style.display = 'block'; // Make the placeholder visible
+        // You might need to adjust arButtonPlaceholder's CSS (position, bottom, z-index)
+        // to ensure it's not overlapping the save button visually in your HTML
+    } else {
+        // Fallback: append directly to body if placeholder not found
+        document.body.appendChild(createdArButton);
+    }
+    console.log("AR Button created and added.");
+
+    document.getElementById('loading').style.display = 'none';
+    console.log("Loading screen hidden. Console should remain visible.");
 
     // Start the animation loop
     animate();
