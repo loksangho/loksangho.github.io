@@ -676,7 +676,7 @@ function mainWebARRocks(){
 
   } else {
     // get video from camera:
-    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, init, function(err){
+    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
       throw new Error('Cannot get video feed ' + err);
     }, {
       video: {
