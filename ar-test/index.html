@@ -53,18 +53,6 @@
     </script>
     <script type="module" src="main.js"></script>
 
-    <script>
-        // Use window.onload to ensure all elements are ready.
-        // This script runs AFTER main.js (as it's below it)
-        // and init() should be globally accessible via the module.
-        window.onload = () => {
-            console.log("window.onload fired. Attempting to call init().");
-            if (typeof init === 'function') {
-                init();
-            } else {
-                console.error("Error: init() function not found. Module scope issue?");
-            }
-        };
-    </script>
+    
     </body>
 </html>
