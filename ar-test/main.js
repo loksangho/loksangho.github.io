@@ -398,6 +398,7 @@ function animate() { // This is the function called by init()
     // The 'render' function is now solely for the content within the loop.
     // It is called by requestAnimationFrame when not in XR, and by renderer.setAnimationLoop when in XR.
     render(); // Call your main rendering logic (which handles both modes)
+    WebARRocksObjectThreeHelper.animate();
 }
 
 
@@ -702,7 +703,7 @@ function initWebARRocks(){
     NNPath: _settings.NNPath,
     
     callbackReady: function(){
-      start();
+      startWebARRocks();
 
       // fix a weird bug noticed on Chrome 98:
       threeCanvas.style.position = 'fixed';
@@ -724,7 +725,7 @@ function initWebARRocks(){
 }
 
 // Executed when WebAR.rocks.object is initialized and NN is loaded:
-function start(){
+function startWebARRocks(){
   const s = 0.5;
   const debugCube = new THREE.Mesh(
     new THREE.BoxGeometry(s,s,s),
@@ -737,11 +738,6 @@ function start(){
 }
 
 
-// main loop (rendering + detecting):
-function animate(){
-  WebARRocksObjectThreeHelper.animate();
-  window.requestAnimationFrame(animate);
-}
 
 
 //window.addEventListener('load', mainWebARRocks);
