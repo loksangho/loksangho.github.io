@@ -445,6 +445,20 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
                     faceMesh.matrixAutoUpdate = false;
                     faceMesh.matrixWorldNeedsUpdate = true;
 
+                    // --- Live Debugging Logs ---
+                    const worldPosition = new THREE.Vector3();
+                    faceMesh.updateWorldMatrix(true, false); // Ensure world matrix is updated
+                    worldPosition.setFromMatrixPosition(faceMesh.matrixWorld);
+                    console.log("Face Mesh World Position (XYZ):", worldPosition.x, worldPosition.y, worldPosition.z);
+                    
+                    if (faceMesh.geometry.boundingBox) {
+                        faceMesh.geometry.boundingBox.applyMatrix4(faceMesh.matrixWorld);
+                        const size = faceMesh.geometry.boundingBox.getSize(new THREE.Vector3());
+                        console.log("Face Mesh World Size (XYZ):", size.x, size.y, size.z);
+                        console.log("Face Mesh World Bounding Box Min/Max:", faceMesh.geometry.boundingBox.min, faceMesh.geometry.boundingBox.max);
+                    }
+                    // ---------------------------
+                    
                     drawFaceTexture(faceLandmarks, video.videoWidth, video.videoHeight);
                     faceTexture.needsUpdate = true;
 
