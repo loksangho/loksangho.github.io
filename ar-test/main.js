@@ -366,7 +366,7 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
 
 
         
-        /*const session = renderer.xr.getSession(); // Get the current XR session
+        const session = renderer.xr.getSession(); // Get the current XR session
 
         // 1. Request Reference Space and Hit Test Source
         if (arHitTestSource === null) {
@@ -433,7 +433,7 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
             }
         } else {
              console.log("AR Mode: arHitTestSource not yet obtained or invalid."); // For initial frames
-        }*/
+        }
     } else {
         // --- NON-AR MODE (Front Camera & Face Tracking) LOGIC ---
         // This is the code that handles your front camera MediaPipe detection
