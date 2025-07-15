@@ -137,6 +137,7 @@ async function init() {
     geometry.setIndex(new THREE.BufferAttribute(indices, 1));
     //geometry.morphAttributes.position = [];
     //geometry.morphTargets = true;
+    geometry.center(); // Center the geometry's vertices around its own local origin (0,0,0)
 
     
     textureCanvas = document.createElement('canvas');
@@ -337,36 +338,40 @@ async function animate() {
                 // In your animate() function, inside the 'if (results...)' block:
 
                 // Load MediaPipe's matrix
+                // Load MediaPipe's matrix
                 const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix);
                 
-                // --- CORE ALIGNMENT STEPS (Apply these in this order) ---
+                // --- Core Alignment Steps (Adjust these precisely) ---
                 
-                // Step 1: Ensure positive Z is "forward" towards camera (if MediaPipe Z is "out")
-                // A Z-flip is often necessary here.
-                threeMatrix.multiply(new THREE.Matrix4().makeScale(1, 1, -1)); // Flip Z-axis (common for face models)
+                // Step 1: Apply overall desired scale
+                // (It's often good to apply scale first, or last, depending on the effect desired. Let's try last for now)
+                // threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor)); // Moved below
                 
-                // Step 2: Correct Y-axis orientation (for "upside down" issue)
-                // This should ensure positive Y is "up".
-                threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1)); // Flip Y-axis
+                // Step 2: Correct inherent orientation issues from MediaPipe's coordinate system
+                // This is a common pattern for MediaPipe faces: a Z-flip and/or a Y-flip.
+                // Test these combinations systematically:
                 
-                // Step 3: Apply the overall desired scale
+                // Option A: Flip Z-axis (common for making it face forward)
+                threeMatrix.multiply(new THREE.Matrix4().makeScale(1, 1, -1));
+                
+                // Option B: Flip Y-axis (for "upside down" issue) - Add this after Option A if needed
+                // threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1));
+                
+                // Option C: Rotate 180 degrees around Y (if it's facing away AFTER other flips) - Add this last if needed
+                // threeMatrix.multiply(new THREE.Matrix4().makeRotationY(Math.PI));
+                
+                // Step 3: Apply the overall desired scale (now apply it after flips)
                 threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
                 
-                // No additional 180-degree Y rotations (Math.PI) should be needed for "facing away" if Step 1 (Z-flip) is correct.
-                // If after all these, it's still facing away, it might be due to MediaPipe's X axis definition.
-                // In that rare case, you might need: threeMatrix.multiply(new THREE.Matrix4().makeRotationY(Math.PI));
-                // but let's try without it first.
-                
-                // --- END CORE ALIGNMENT ---
-                
+                // --- END Core Alignment ---
                 
                 faceMesh.matrix.copy(threeMatrix);
                 faceMesh.matrixAutoUpdate = false;
                 faceMesh.matrixWorldNeedsUpdate = true;
                 
-                // *** Keep these logs active to diagnose the effect of transformations ***
+                // Keep these logs active to diagnose the effect of transformations
                 const worldPosition = new THREE.Vector3();
-                faceMesh.updateWorldMatrix(true, false); // Ensure world matrix is updated
+                faceMesh.updateWorldMatrix(true, false);
                 worldPosition.setFromMatrixPosition(faceMesh.matrixWorld);
                 console.log("Face Mesh World Position (XYZ):", worldPosition.x, worldPosition.y, worldPosition.z);
                 
@@ -376,7 +381,6 @@ async function animate() {
                     console.log("Face Mesh World Size (XYZ):", size.x, size.y, size.z);
                     console.log("Face Mesh World Bounding Box Min/Max:", faceMesh.geometry.boundingBox.min, faceMesh.geometry.boundingBox.max);
                 }
-                // *******************************************************************
                 
                 if (meshBoxHelper) {
                     meshBoxHelper.update();
