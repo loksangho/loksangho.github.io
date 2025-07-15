@@ -13,7 +13,7 @@
             width: 100vw;
             height: 100vh;
             object-fit: cover;
-            /*transform: scaleX(-1); Mirror the video for typical selfie view */
+            transform: scaleX(-1); /* Mirror the video for typical selfie view */
             z-index: 1;
             display: none; /* Hidden, only used as texture source */
         }
@@ -35,24 +35,49 @@
             font-size: 2em;
             z-index: 3;
         }
+        #saveButton { /* Add some basic styling for the button */
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10; /* Ensure it's above the canvas */
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #saveButton:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <video id="webcamVideo" autoplay playsinline muted></video>
     <canvas id="outputCanvas"></canvas>
     <div id="loading">Loading MediaPipe model...</div>
-
-    <script type="importmap">
+    <button id="saveButton" style="display:none;">Save Mesh</button> <script type="importmap">
         {
             "imports": {
                 "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
                 "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/",
-                "@mediapipe/tasks-vision": "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/vision_bundle.mjs"
+                "@mediapipe/tasks-vision": "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/vision_bundle.mjs"
             }
         }
     </script>
     <script type="module" src="main.js"></script>
 
-    
-    </body>
+    <script>
+        window.onload = () => {
+            console.log("window.onload fired. Attempting to call init().");
+            if (typeof init === 'function') {
+                init();
+            } else {
+                console.error("Error: init() function not found. Module scope issue?");
+            }
+        };
+    </script>
+</body>
 </html>
