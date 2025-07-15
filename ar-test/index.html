@@ -35,9 +35,11 @@
     <video id="webcamVideo" autoplay playsinline muted></video>
     <canvas id="outputCanvas"></canvas>
     <div id="loading">Loading MediaPipe model...</div>
-    <div id="error"></div>
+    
     <button id="saveButton" style="display:none;">Save Mesh</button>
-    <button id="arButton" style="display:none;"></button> <script type="importmap">
+    <button id="arButton" style="display:none;"></button>
+    <div id="onScreenConsole"></div>
+    <script type="importmap">
         {
             "imports": {
                 "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
