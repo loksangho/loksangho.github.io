@@ -38,7 +38,7 @@
     </style>
 </head>
 <body>
-    <video id="webcamVideo" autoplay playsinline></video>
+    <video id="webcamVideo" autoplay playsinline muted></video>
     <canvas id="outputCanvas"></canvas>
     <div id="loading">Loading MediaPipe model...</div>
 
@@ -46,8 +46,7 @@
         {
             "imports": {
                 "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/",
-                "@mediapipe/tasks-vision": "https://unpkg.com/@mediapipe/tasks-vision@0.10.7/vision_bundle.mjs"
+                "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/"
             }
         }
     </script>
