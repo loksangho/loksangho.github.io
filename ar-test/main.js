@@ -35,7 +35,7 @@ const VIDEO_HEIGHT = 480;
 window.init = init;
 
 async function init() {
-    console.log("init() started.");
+    log("init() started.");
 
     // 1. Setup Three.js Scene
     scene = new THREE.Scene();
