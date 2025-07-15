@@ -20,6 +20,9 @@ let arRefSpace = null;
 let placedObject = null; // To hold the loaded GLTF model in AR
 let reticle = null; // A visual indicator for hit-testing
 
+let DOMVIDEO = null;
+
+
 const NUM_LANDMARKS = UV_COORDS.length;
 
 const VIDEO_WIDTH = 640;
@@ -411,6 +414,14 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
              console.log("AR Mode: arHitTestSource not yet obtained or invalid."); // For initial frames
         }
     } else {
+
+
+        WebARRocksMediaStreamAPIHelper.get(DOMVIDEO, initWebARRocks, function(){
+          alert('Cannot get video bro :(');
+        }, {
+          video: true //mediaConstraints
+          audio: false
+        })
         // --- NON-AR MODE (Front Camera & Face Tracking) LOGIC ---
         // This is the code that handles your front camera MediaPipe detection
         // and mesh updates.
@@ -489,6 +500,57 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
         }
     }
     renderer.render(scene, camera); // This must be called at the end of the loop
+}
+
+function initWebARRocks(){
+  WEBARROCKSOBJECT.init({
+    canvasId: 'outputCanvas',
+    video: DOMVIDEO,
+    callbackReady: function(errLabel){
+      if (errLabel){
+        alert('An error happens bro: ',errLabel);
+      } else {
+        load_neuralNet();
+      }
+    }
+  });
+}
+
+function load_neuralNet(){
+  WEBARROCKSOBJECT.set_NN('../../neuralNets/NN_OBJ4_0.json', function(errLabel){
+    if (errLabel){
+      console.log('ERROR: cannot load the neural net', errLabel);
+    } else {
+      start();
+    }
+  });
+}
+
+function start(){
+  console.log('INFO in demo.js: start()');
+
+  // scale the canvas with CSS to have the same aspectRatio than the video:
+  let sx = 1, sy = 1;
+  const aspectRatioVideo = DOMVIDEO.videoWidth / DOMVIDEO.videoHeight;
+  if (aspectRatioVideo>1){ // landscape
+    sy = 1 / aspectRatioVideo;
+  } else { // portrait
+    sx = aspectRatioVideo;
+  }
+  const domCanvas = document.getElementById('debugWebARRocksObjectCanvas');
+  domCanvas.style.transformOrigin = '50% 0%';
+  domCanvas.style.transform = 'scale('+sx.toFixed(2)+','+sy.toFixed(2)+') translate(-50%, -50%) rotateY(180deg)';
+
+  // start drawing and detection loop:
+  iterate();
+}
+
+function iterate(){ // detect loop
+  const detectState = WEBARROCKSOBJECT.detect(3);
+  if (detectState.label){
+    console.log('INFO in demo.js: ', detectState.label, 'IS CONFIRMED YEAH!!!');
+  }
+  window.requestAnimationFrame(iterate);
 }
 
 function drawFaceTexture(faceLandmarks, videoWidth, videoHeight) {
