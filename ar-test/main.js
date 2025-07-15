@@ -14,23 +14,20 @@ const NUM_LANDMARKS = UV_COORDS.length;
 const VIDEO_WIDTH = 640;
 const VIDEO_HEIGHT = 480;
 
-// === Move init() call inside DOMContentLoaded listener ===
-//document.addEventListener('DOMContentLoaded', () => {
-//    console.log("DOM fully loaded and parsed. Calling init().");
-//    init();
-//});
-// =========================================================
+// === Removed DOMContentLoaded listener, rely on window.onload from index.html ===
+// No direct init() call here in main.js
+// ==============================================================================
 
 async function init() {
-    console.log("init() started."); // THIS SHOULD NOW BE THE FIRST LOG IF CANVAS IS FOUND
+    console.log("init() started.");
 
     // 1. Setup Three.js Scene
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x333333); // Darker background to distinguish from potential black mesh
+    scene.background = new THREE.Color(0x333333);
     console.log("Scene created.");
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 100; // Keep this consistent for now. Will adjust dynamically.
+    camera.position.z = 100;
     console.log("Camera created. Position Z:", camera.position.z);
 
     const outputCanvasElement = document.getElementById('outputCanvas');
@@ -39,28 +36,28 @@ async function init() {
         document.getElementById('loading').innerText = "Error: Canvas not found.";
         return;
     }
-    renderer = new THREE.WebGLRenderer({ antialias: true, canvas: outputCanvasElement, alpha: true }); // Ensure alpha is true if background is transparent
+    renderer = new THREE.WebGLRenderer({ antialias: true, canvas: outputCanvasElement, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     document.body.appendChild(renderer.domElement);
     console.log("Renderer created and attached to canvas.");
 
     // Add ambient light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // Slightly brighter ambient
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
     console.log("Ambient light added.");
 
     // Add directional light for better shading
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7); // Slightly brighter directional
-    directionalLight.position.set(0, 0, 1).normalize(); // Light coming from front
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
+    directionalLight.position.set(0, 0, 1).normalize();
     scene.add(directionalLight);
     console.log("Directional light added.");
 
     // Debug Cube
-    const debugGeometry = new THREE.BoxGeometry(20, 20, 20); // Make it slightly larger to ensure visibility
+    const debugGeometry = new THREE.BoxGeometry(20, 20, 20);
     const debugMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
     debugCube = new THREE.Mesh(debugGeometry, debugMaterial);
-    debugCube.position.set(0, 0, 0); // Place it at the center of the scene
+    debugCube.position.set(0, 0, 0);
     scene.add(debugCube);
     console.log("Debug cube added to scene at (0,0,0).");
 
@@ -68,7 +65,7 @@ async function init() {
     video = document.getElementById('webcamVideo');
     console.log("Webcam video element:", video);
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } }); // Explicitly request front camera
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
         video.srcObject = stream;
         await new Promise((resolve) => {
             video.onloadedmetadata = () => {
@@ -97,7 +94,8 @@ async function init() {
     faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
         baseOptions: {
             modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
-            delegate: "GPU"
+            // *** IMPORTANT: Try explicitly setting delegate to CPU ***
+            delegate: "CPU" // Changed from "GPU" to "CPU" for mobile debugging
         },
         outputFaceBlendshapes: true,
         outputFacialTransformationMatrixes: true,
@@ -133,17 +131,12 @@ async function init() {
     faceTexture.magFilter = THREE.LinearFilter;
     faceTexture.encoding = THREE.sRGBEncoding;
 
-    // *** TEST MATERIAL: Use BasicMaterial with a color for debugging mesh visibility ***
-    // If you see a solid color, it's a texture/lighting issue.
-    // If you don't, it's a position/scale issue.
     const material = new THREE.MeshBasicMaterial({
         color: 0x0000FF, // Blue color for testing
         side: THREE.DoubleSide,
         transparent: true,
         alphaTest: 0.1,
-        // wireframe: true // Uncomment to see the mesh wireframe
     });
-    // **********************************************************************************
 
     faceMesh = new THREE.Mesh(geometry, material);
     faceMesh.visible = false;
@@ -151,9 +144,9 @@ async function init() {
     console.log("Face mesh created and added to scene (initially hidden).");
 
     // Add a BoxHelper for the face mesh to visualize its bounding box
-    meshBoxHelper = new THREE.BoxHelper(faceMesh, 0xFF0000); // Red box
+    meshBoxHelper = new THREE.BoxHelper(faceMesh, 0xFF0000);
     scene.add(meshBoxHelper);
-    meshBoxHelper.visible = false; // Initially hidden
+    meshBoxHelper.visible = false;
     console.log("Face mesh BoxHelper added (initially hidden).");
 
     window.addEventListener('resize', () => {
@@ -171,7 +164,6 @@ let lastVideoTime = -1;
 async function animate() {
     requestAnimationFrame(animate);
 
-    // Keep debug cube rotating even if face is not found
     if (debugCube) {
         debugCube.rotation.x += 0.005;
         debugCube.rotation.y += 0.005;
@@ -180,7 +172,23 @@ async function animate() {
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
         if (lastVideoTime !== video.currentTime) {
             lastVideoTime = video.currentTime;
+
+            // --- DEBUGGING MediaPipe Input and Output ---
+            console.log("Video state for MediaPipe:", video.videoWidth, video.videoHeight, video.currentTime);
+            if (video.videoWidth === 0 || video.videoHeight === 0) {
+                console.warn("MediaPipe input video has zero dimensions! Cannot detect.");
+            }
+            // --- END DEBUGGING ---
+
             const results = await faceLandmarker.detectForVideo(video, performance.now());
+
+            // --- DEBUGGING MediaPipe Output ---
+            console.log("MediaPipe Results:", results);
+            if (results && results.faceLandmarks && results.faceLandmarks.length === 0) {
+                console.log("MediaPipe detected NO faces in this frame.");
+            }
+            // --- END DEBUGGING ---
+
 
             if (results && results.faceLandmarks && results.faceLandmarks.length > 0 &&
                 results.facialTransformationMatrixes && results.facialTransformationMatrixes.length > 0 &&
@@ -190,6 +198,7 @@ async function animate() {
                 if (debugCube) debugCube.visible = false;
                 faceMesh.visible = true;
                 if (meshBoxHelper) meshBoxHelper.visible = true;
+                console.log("FACE DETECTED! Processing mesh..."); // Confirmation log
 
                 const faceLandmarks = results.faceLandmarks[0];
                 const blendshapes = results.faceBlendshapes && results.faceBlendshapes.length > 0 ? results.faceBlendshapes[0] : null;
@@ -207,7 +216,6 @@ async function animate() {
                 faceMesh.geometry.computeVertexNormals();
                 faceMesh.geometry.computeBoundingBox();
                 faceMesh.geometry.computeBoundingSphere();
-
 
                 // 2. Apply Blendshapes (placeholder)
                 if (blendshapes && faceMesh.morphTargetInfluences) {
@@ -287,11 +295,12 @@ function drawFaceTexture(faceLandmarks, videoWidth, videoHeight) {
     );
     textureCanvasCtx.restore();
 }
-
+// Removed window.addEventListener('resize') from init() to ensure it's always active
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-init(); // Removed this direct call, now triggered by DOMContentLoaded
+// Assuming init() is called via window.onload from index.html now.
+// Do NOT call init() directly here anymore.
