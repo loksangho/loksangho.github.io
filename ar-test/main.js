@@ -249,17 +249,24 @@ async function animate() {
                 const scaleFactor = 100; // Keep experimenting with this value if needed
                 // In your animate() function, inside the 'if (results...)' block:
 
+                // In your animate() function, inside the 'if (results...)' block:
+
+                // Load MediaPipe's matrix
                 const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix);
                 
-                // Apply your overall scale factor
+                // --- Step 1: Correct Y-axis polarity if needed (often necessary) ---
+                // This negates the Y-component of position and Y-related rotations/scales.
+                // If your mesh is upside down, this could be the fix.
+                threeMatrix.elements[5] *= -1;  // m11 (scaleY, rotationY)
+                threeMatrix.elements[9] *= -1;  // m21 (scaleY, rotationZ)
+                threeMatrix.elements[13] *= -1; // m31 (positionY)
+                
+                // --- Step 2: Apply overall scale ---
                 threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
                 
-                // *** THE KEY CORRECTION: ONLY FLIP Y-AXIS ***
-                // This should correct the "upside down" if the Z-axis orientation is already correct
-                threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1)); // Flip Y-axis only
-                // ********************************************
-                
-                // No additional rotations like makeMakeRotationY(Math.PI) should be needed here.
+                // --- Step 3: Apply a 180-degree rotation around Y to turn the model around ---
+                // This assumes the model's "front" after axis corrections needs to be spun around.
+                threeMatrix.multiply(new THREE.Matrix4().makeRotationY(Math.PI)); // Rotate 180 degrees around Y-axis
                 
                 faceMesh.matrix.copy(threeMatrix);
                 faceMesh.matrixAutoUpdate = false;
