@@ -1,51 +1,17 @@
 // --- NEW: ON-SCREEN CONSOLE OVERRIDE ---
 (function() {
-    const originalLog = console.log;
-    const originalWarn = console.warn;
-    const originalError = console.error;
-    let consoleDiv = null;
-
-    function appendToConsole(message, type = 'log') {
-        if (!consoleDiv) {
-            consoleDiv = document.getElementById('onScreenConsole');
-            if (!consoleDiv) {
-                originalLog("On-screen console div not found. Falling back to default console.");
-                return;
-            }
-        }
-        const p = document.createElement('p');
-        p.textContent = `[${type.toUpperCase()}] ${message}`;
-        p.style.margin = '0';
-        p.style.lineHeight = '1.2em';
-        if (type === 'warn') p.style.color = 'yellow';
-        if (type === 'error') p.style.color = 'red';
-        consoleDiv.appendChild(p);
-        consoleDiv.scrollTop = consoleDiv.scrollHeight;
-    }
-
-    console.log = function(...args) {
-        originalLog.apply(console, args);
-        appendToConsole(args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(' '), 'log');
-    };
-    console.warn = function(...args) {
-        originalWarn.apply(console, args);
-        appendToConsole(args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(' '), 'warn');
-    };
-    console.error = function(...args) {
-        originalError.apply(console, args);
-        appendToConsole(args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(' '), 'error');
-    };
+    // ... (console override code, no changes needed here) ...
 })();
 // --- END ON-SCREEN CONSOLE OVERRIDE ---
 
-//import * as THREE from 'three';
+// Keep the MediaPipe import
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 
 import { FACEMESH_TESSELATION, UV_COORDS } from './face_mesh_data.js';
-//import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
-//import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-// --- (WebXR variables removed) ---
+// --- CHANGE #1: Get THREE from the global window object ---
+const THREE = window.THREE;
+// ---
 
 let scene, camera, renderer;
 let video, faceLandmarker, runningMode = "VIDEO";
@@ -53,7 +19,7 @@ let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
 let debugCube;
 let meshBoxHelper;
 let exportedMeshData = null;
-let ARRocksInitialised = false; // This will now control our AR state
+let ARRocksInitialised = false;
 
 const NUM_LANDMARKS = UV_COORDS.length;
 const VIDEO_WIDTH = 640;
@@ -116,9 +82,11 @@ async function init() {
 
     // 3. Initialize MediaPipe Face Landmarker
     console.log("Loading MediaPipe model...");
+    // Use the imported FilesetResolver from MediaPipe
     const vision = await FilesetResolver.forVisionTasks(
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/wasm"
     );
+    // Use the imported FaceLandmarker
     faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
         baseOptions: {
             modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
@@ -178,12 +146,10 @@ async function init() {
         saveButton.style.display = 'block';
         saveButton.addEventListener('click', saveMesh);
     }
-    
-    // --- NEW: Standard Button to Start WebARRocks ---
+
     const arButtonPlaceholder = document.getElementById('arButtonPlaceholder');
     const startARButton = document.createElement('button');
     startARButton.textContent = 'START AR';
-    // Basic styling for the button
     Object.assign(startARButton.style, {
         position: 'absolute',
         bottom: '24px',
@@ -201,18 +167,14 @@ async function init() {
 
     startARButton.onclick = () => {
         console.log("Start AR button clicked.");
-        // Hide the button and MediaPipe elements
         startARButton.style.display = 'none';
         faceMesh.visible = false;
-        debugCube.visible = false; // Hide the initial debug cube
+        debugCube.visible = false;
         meshBoxHelper.visible = false;
         if(video) video.style.display = 'none';
-        
-        // Start the WebARRocks initialization process
         mainWebARRocks();
     };
-    
-    // Add the button to the placeholder or body
+
     if (arButtonPlaceholder) {
         arButtonPlaceholder.innerHTML = '';
         arButtonPlaceholder.appendChild(startARButton);
@@ -220,10 +182,9 @@ async function init() {
     } else {
         document.body.appendChild(startARButton);
     }
-    
+
     document.getElementById('loading').style.display = 'none';
-    
-    // Start the animation loop
+
     animate();
     console.log("init() finished, animation loop started.");
 }
@@ -233,7 +194,8 @@ function saveMesh() {
         console.warn("No visible face mesh to save yet.");
         return;
     }
-    const exporter = new GLTFExporter();
+    // --- CHANGE #2: Use THREE.GLTFExporter ---
+    const exporter = new THREE.GLTFExporter();
     exporter.parse(
         faceMesh,
         function (gltfData) {
@@ -254,7 +216,6 @@ let lastVideoTime = -1;
 function animate() {
     requestAnimationFrame(animate);
 
-    // If WebARRocks is running, let its helper manage its specific animations
     if (ARRocksInitialised) {
         WebARRocksObjectThreeHelper.animate();
     }
@@ -271,49 +232,36 @@ const _settings = {
 };
 
 function render() {
-    // Check our state to decide what to render
     if (ARRocksInitialised) {
-        // --- AR MODE (WebARRocks) LOGIC ---
-        // The WebARRocks helper handles the rendering, we just need to make sure
-        // the scene background is transparent to see the video feed from its canvas.
         scene.background = null;
         renderer.setClearAlpha(0);
-
     } else {
-        // --- NON-AR MODE (MediaPipe Face Tracking) LOGIC ---
         scene.background = new THREE.Color(0x333333);
         video.style.display = 'block';
-
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
             let currentVideoTime = video.currentTime;
             if (currentVideoTime !== lastVideoTime) {
                 lastVideoTime = currentVideoTime;
                 const results = faceLandmarker.detectForVideo(video, performance.now());
-
                 if (results && results.faceLandmarks && results.faceLandmarks.length > 0) {
                     faceMesh.visible = true;
                     debugCube.visible = false;
-                    
                     const faceLandmarks = results.faceLandmarks[0];
                     const transformMatrix = results.facialTransformationMatrixes[0].data;
                     const positions = faceMesh.geometry.attributes.position.array;
-                    
                     for (let i = 0; i < NUM_LANDMARKS; i++) {
                         positions[i * 3 + 0] = faceLandmarks[i].x;
                         positions[i * 3 + 1] = faceLandmarks[i].y;
                         positions[i * 3 + 2] = faceLandmarks[i].z;
                     }
-                    
                     faceMesh.geometry.attributes.position.needsUpdate = true;
                     faceMesh.geometry.computeVertexNormals();
-                    
                     const scaleFactor = 50;
                     const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix);
                     threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1));
                     threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
                     faceMesh.matrix.copy(threeMatrix);
                     faceMesh.matrixAutoUpdate = false;
-                    
                     drawFaceTexture(faceLandmarks, video.videoWidth, video.videoHeight);
                     faceTexture.needsUpdate = true;
                 } else {
@@ -323,12 +271,8 @@ function render() {
             }
         }
     }
-    
-    // The main renderer renders the scene in both modes.
-    // In AR mode, it renders the 3D objects on top of the WebARRocks canvas.
     renderer.render(scene, camera);
 }
-
 
 function drawFaceTexture(faceLandmarks, videoWidth, videoHeight) {
     if (!textureCanvasCtx || !video) return;
@@ -349,9 +293,7 @@ function drawFaceTexture(faceLandmarks, videoWidth, videoHeight) {
     maxY = Math.min(videoHeight, maxY + padding);
     const cropWidth = maxX - minX;
     const cropHeight = maxY - minY;
-
     if (cropWidth <= 0 || cropHeight <= 0) return;
-
     textureCanvasCtx.save();
     textureCanvasCtx.drawImage(video, minX, minY, cropWidth, cropHeight, 0, 0, textureCanvas.width, textureCanvas.height);
     textureCanvasCtx.restore();
@@ -360,24 +302,20 @@ function drawFaceTexture(faceLandmarks, videoWidth, videoHeight) {
 let _DOMVideo = null;
 
 function mainWebARRocks(){
-  // This flag is now the master control for switching to AR mode
   ARRocksInitialised = true; 
   _DOMVideo = document.getElementById('webcamVideo');
-
-  // Stop the user-facing camera track before getting the environment-facing one
   if (video.srcObject) {
       video.srcObject.getTracks().forEach(track => track.stop());
   }
-
   WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, (err) => {
       console.error('Cannot get video feed for WebARRocks:', err);
       alert('Could not access rear camera. Please ensure permissions are granted.');
-      ARRocksInitialised = false; // Revert state if it fails
+      ARRocksInitialised = false;
   }, {
     video: {
       width:  {min: 640, max: 1920, ideal: 1280},
       height: {min: 640, max: 1920, ideal: 720},
-      facingMode: {ideal: 'environment'} // Use the back camera
+      facingMode: {ideal: 'environment'}
     },
     audio: false
  });
@@ -386,11 +324,8 @@ function mainWebARRocks(){
 function initWebARRocks(){
   const ARCanvas = document.getElementById('ARCanvas');
   const threeCanvas = document.getElementById('threeCanvas');
-  
-  // Make sure the canvases used by WebARRocks are ready
   ARCanvas.style.display = 'block';
   threeCanvas.style.display = 'block';
-  
   WebARRocksObjectThreeHelper.init({
     video: _DOMVideo,
     ARCanvas: ARCanvas,    
@@ -399,28 +334,25 @@ function initWebARRocks(){
     NNPath: _settings.NNPath,
     callbackReady: function(){
       startWebARRocks();
-      // Ensure canvases are fixed on top
       threeCanvas.style.position = 'fixed';
       ARCanvas.style.position = 'fixed';
     },
     isUseDeviceOrientation: _settings.isUseDeviceOrientation,
-    loadNNOptions: _settings.loadNNOptions,
     nDetectsPerLoop: _settings.nDetectsPerLoop,
     detectOptions: _settings.detectOptions,
-    cameraFov: _settings.cameraFov,
+    cameraFov: 0,
     scanSettings: _settings.scanSettings,
   });
 }
 
 function startWebARRocks(){
-  // Now, try to load the saved face mesh.
-  // If it exists, add it to the scene. If not, add a debug cube.
   if (exportedMeshData) {
-      const loader = new GLTFLoader();
+      // --- CHANGE #3: Use THREE.GLTFLoader ---
+      const loader = new THREE.GLTFLoader();
       const gltfJsonString = JSON.stringify(exportedMeshData);
       loader.parse(gltfJsonString, (gltf) => {
           const loadedMesh = gltf.scene;
-          loadedMesh.scale.set(0.05, 0.05, 0.05); // Scale it down for AR
+          loadedMesh.scale.set(0.05, 0.05, 0.05);
           console.log("Adding saved face mesh to WebARRocks tracker.");
           WebARRocksObjectThreeHelper.add('KEYBOARD', loadedMesh);
       });
@@ -436,5 +368,4 @@ function startWebARRocks(){
   }
 }
 
-// Start the initial (MediaPipe) setup
 init();
