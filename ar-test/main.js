@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 
 import { FACEMESH_TESSELATION, UV_COORDS } from './face_mesh_data.js';
+import { VertexNormalsHelper } from 'three/addons/helpers/VertexNormalsHelper.js'; // Add this at the top of main.js
 
 let scene, camera, renderer;
 let video, faceLandmarker, runningMode = "VIDEO";
@@ -13,6 +14,8 @@ const NUM_LANDMARKS = UV_COORDS.length;
 
 const VIDEO_WIDTH = 640;
 const VIDEO_HEIGHT = 480;
+let normalsHelper; // Declare this near your other global variables
+
 
 // === Removed DOMContentLoaded listener, rely on window.onload from index.html ===
 // No direct init() call here in main.js
@@ -163,6 +166,11 @@ async function init() {
     meshBoxHelper.visible = false;
     console.log("Face mesh BoxHelper added (initially hidden).");
 
+
+    normalsHelper = new VertexNormalsHelper(faceMesh, 2, 0x00FF00); // Mesh, size of arrows, color (green)
+    scene.add(normalsHelper);
+    normalsHelper.visible = false; // Initially hidden
+    
      // *** ADD THE RESIZE LISTENER HERE ***
     window.addEventListener('resize', () => {
         if (camera && renderer) { // Add a check to be extra safe, though it should be defined here
@@ -208,6 +216,9 @@ async function animate() {
                 if (debugCube) debugCube.visible = false;
                 faceMesh.visible = true;
                 if (meshBoxHelper) meshBoxHelper.visible = true;
+                if (normalsHelper) normalsHelper.visible = true;
+
+                
                 console.log("FACE DETECTED! Processing mesh..."); // Confirmation log
 
                 const faceLandmarks = results.faceLandmarks[0];
@@ -226,8 +237,11 @@ async function animate() {
                 }
                 faceMesh.geometry.attributes.position.needsUpdate = true;
                 faceMesh.geometry.computeVertexNormals();
+                if (normalsHelper) normalsHelper.update();
                 faceMesh.geometry.computeBoundingBox();
                 faceMesh.geometry.computeBoundingSphere();
+
+                
 
                 // 2. Apply Blendshapes (placeholder)
                 /*if (blendshapes && faceMesh.morphTargetInfluences) {
