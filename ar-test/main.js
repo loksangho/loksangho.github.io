@@ -1,3 +1,48 @@
+// --- NEW: ON-SCREEN CONSOLE OVERRIDE ---
+(function() {
+    const originalLog = console.log;
+    const originalWarn = console.warn;
+    const originalError = console.error;
+    let consoleDiv = null;
+
+    function appendToConsole(message, type = 'log') {
+        if (!consoleDiv) {
+            consoleDiv = document.getElementById('onScreenConsole');
+            if (!consoleDiv) {
+                // If the div isn't ready, fall back to original console and return
+                originalLog("On-screen console div not found. Falling back to default console.");
+                return;
+            }
+        }
+
+        const p = document.createElement('p');
+        p.textContent = `[${type.toUpperCase()}] ${message}`;
+        p.style.margin = '0';
+        p.style.lineHeight = '1.2em';
+        if (type === 'warn') p.style.color = 'yellow';
+        if (type === 'error') p.style.color = 'red';
+
+        consoleDiv.appendChild(p);
+        consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto-scroll to bottom
+    }
+
+    console.log = function(...args) {
+        originalLog.apply(console, args); // Still log to browser console
+        appendToConsole(args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(' '), 'log');
+    };
+
+    console.warn = function(...args) {
+        originalWarn.apply(console, args); // Still log to browser console
+        appendToConsole(args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(' '), 'warn');
+    };
+
+    console.error = function(...args) {
+        originalError.apply(console, args); // Still log to browser console
+        appendToConsole(args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(' '), 'error');
+    };
+})();
+// --- END ON-SCREEN CONSOLE OVERRIDE ---
+
 import * as THREE from 'three';
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 
@@ -35,7 +80,7 @@ const VIDEO_HEIGHT = 480;
 window.init = init;
 
 async function init() {
-    log("init() started.");
+    console.log("init() started.");
 
     // 1. Setup Three.js Scene
     scene = new THREE.Scene();
@@ -347,7 +392,7 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
         
 
         
-        log("AR Mode: Presenting."); // Confirm AR session is active
+        console.log("AR Mode: Presenting."); // Confirm AR session is active
 
         // Hide front-camera elements
         video.style.display = 'none';
@@ -358,7 +403,7 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
 
 
         WebARRocksMediaStreamAPIHelper.get(DOMVIDEO, initWebARRocks, function(){
-          log('Cannot get video bro :(');
+          console.log('Cannot get video bro :(');
         }, {
           video: true, //mediaConstraints
           audio: false
@@ -521,7 +566,7 @@ function initWebARRocks(){
     video: DOMVIDEO,
     callbackReady: function(errLabel){
       if (errLabel){
-        log('An error happens bro: ',errLabel);
+        console.log('An error happens bro: ',errLabel);
       } else {
         load_neuralNet();
       }
@@ -532,7 +577,7 @@ function initWebARRocks(){
 function load_neuralNet(){
   WEBARROCKSOBJECT.set_NN('./neuralNets/NN_OBJ4_0.json', function(errLabel){
     if (errLabel){
-      log('ERROR: cannot load the neural net', errLabel);
+      console.log('ERROR: cannot load the neural net', errLabel);
     } else {
       start();
     }
@@ -540,7 +585,7 @@ function load_neuralNet(){
 }
 
 function start(){
-  log('INFO in demo.js: start()');
+  console.log('INFO in demo.js: start()');
 
   // scale the canvas with CSS to have the same aspectRatio than the video:
   let sx = 1, sy = 1;
@@ -561,7 +606,7 @@ function start(){
 function iterate(){ // detect loop
   const detectState = WEBARROCKSOBJECT.detect(3);
   if (detectState.label){
-    log('INFO in demo.js: ', detectState.label, 'IS CONFIRMED YEAH!!!');
+    console.log('INFO in demo.js: ', detectState.label, 'IS CONFIRMED YEAH!!!');
   }
   window.requestAnimationFrame(iterate);
 }
