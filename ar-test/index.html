@@ -48,15 +48,6 @@
     <script type="module" src="main.js"></script>
     <script src = "./dist/WebARRocksObject.js"></script>
     <script src = "./helpers/WebARRocksMediaStreamAPIHelper.js"></script>
-    <script>
-        window.onload = () => {
-            console.log("window.onload fired. Attempting to call init().");
-            if (typeof init === 'function') {
-                init();
-            } else {
-                console.error("Error: init() function not found. Module scope issue?");
-            }
-        };
-    </script>
+
 </body>
 </html>
