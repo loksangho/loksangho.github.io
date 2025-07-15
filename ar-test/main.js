@@ -437,7 +437,7 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
                     // if (normalsHelper) normalsHelper.update();
                     // if (meshBoxHelper) meshBoxHelper.update();
 
-                    const scaleFactor = 300;
+                    const scaleFactor = 50;
                     const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix);
                     threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1)); // Flip Y-axis (for upside down)
                     threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
