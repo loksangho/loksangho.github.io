@@ -148,8 +148,7 @@ async function init() {
     });*/
     const material = new THREE.MeshStandardMaterial({
         map: faceTexture, // Re-enable the texture mapping
-        side: THREE.DoubleSide,
-        wireframe: true
+        side: THREE.DoubleSide
         // transparent: true, // Keep transparent if alphaTest is needed, or for blendshape-style transparency
         // alphaTest: 0.1,    // Keep if you have parts of texture with low alpha you want to discard
         // color: 0x0000FF, // Remove the test color
