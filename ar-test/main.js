@@ -197,7 +197,6 @@ async function init() {
     });
 
     document.getElementById('loading').style.display = 'none';
-
     // --- SAVE MESH BUTTON ---
     const saveButton = document.getElementById('saveButton');
     if (saveButton) {
