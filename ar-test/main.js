@@ -24,6 +24,11 @@
 // Use the global 'vision' object from MediaPipe's vision_bundle.js
 const { FaceLandmarker, FilesetResolver } = vision;
 
+import * as THREE from 'three';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';    
+
+
 let scene, camera, renderer;
 let video, faceLandmarker, runningMode = "VIDEO";
 let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
@@ -121,7 +126,7 @@ async function init() {
 
 function saveMesh() {
     if (!faceMesh || !faceMesh.visible) { console.warn("No visible face mesh to save."); return; }
-    const exporter = new THREE.GLTFExporter();
+    const exporter = new GLTFExporter();
     exporter.parse(faceMesh, (gltfData) => {
         exportedMeshData = gltfData;
         console.log("Mesh exported to GLTF in memory.");
@@ -194,7 +199,7 @@ function initWebARRocks(){
 
 function startWebARRocks(){
     if (exportedMeshData) {
-        const loader = new THREE.GLTFLoader();
+        const loader = new GLTFLoader();
         loader.parse(exportedMeshData, (gltf) => {
             const loadedMesh = gltf.scene;
             loadedMesh.scale.set(0.2, 0.2, 0.2); // Adjust scale for AR
