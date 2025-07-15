@@ -58,6 +58,7 @@ let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
 let debugCube;
 let meshBoxHelper;
 let exportedMeshData = null;
+let ARRocksInitialised = false;
 
 // WebXR specific variables
 let arHitTestSource = null;
@@ -414,7 +415,10 @@ function render(time, frame) {
           video: true, //mediaConstraints
           audio: false
         })*/
-        initWebARRocks();
+        if (!ARRocksInitialised) {
+            initWebARRocks();
+            
+        }
         // --- Core AR Background Setup ---
         scene.background = null; // Clear scene background to show camera feed
         renderer.setClearAlpha(0); // *** NEW: Ensure full transparency when clearing ***
@@ -563,6 +567,7 @@ function initWebARRocks(){
       if (errLabel){
         console.log('An error happens bro: ',errLabel);
       } else {
+        ARRocksInitialised = true;
         load_neuralNet();
       }
     }
