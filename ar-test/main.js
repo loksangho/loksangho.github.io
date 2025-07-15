@@ -650,6 +650,7 @@ let _DOMVideo = null;
 
 // entry point:
 function mainWebARRocks(){
+  ARRocksInitialised = true;
   _DOMVideo = document.getElementById('webcamVideo');
 
   if (_settings.videoURL){
@@ -665,7 +666,7 @@ function mainWebARRocks(){
         //if (isPlaying) return;
         _DOMVideo.play();
         isPlaying = true;
-        init();
+        initWebARRocks();
       }
       window.addEventListener('click', onUserEvent); // desktop
       window.addEventListener('touchstart', onUserEvent); // mobile      
@@ -688,7 +689,7 @@ function mainWebARRocks(){
 
 
 // executed when video is ready:
-function init(){
+function initWebARRocks(){
   const ARCanvas = document.getElementById('ARCanvas');
   const threeCanvas = document.getElementById('threeCanvas');
   
