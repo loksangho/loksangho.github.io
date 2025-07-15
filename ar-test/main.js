@@ -424,11 +424,14 @@ function render(time, frame) {
         renderer.setClearAlpha(0); // *** NEW: Ensure full transparency when clearing ***
         // --- End Core AR Background Setup ---
 
+
+        /*
         // Hide front-camera specific elements
         video.style.display = 'none';
         faceMesh.visible = false;
         if (normalsHelper) normalsHelper.visible = false;
         if (meshBoxHelper) meshBoxHelper.visible = false;
+
 
         const session = renderer.xr.getSession(); // Get the current XR session
         console.log("AR Mode: XR Session obtained.", session); // Log the session object
@@ -508,7 +511,7 @@ function render(time, frame) {
             }
         } else {
              console.log("AR Mode: arHitTestSource not yet obtained.");
-        }
+        }*/
     } else {
         // --- NON-AR MODE (Front Camera & Face Tracking) LOGIC ---
         scene.background = new THREE.Color(0x333333);
