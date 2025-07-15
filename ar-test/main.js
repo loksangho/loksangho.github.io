@@ -149,6 +149,7 @@ async function init() {
     const material = new THREE.MeshStandardMaterial({
         map: faceTexture, // Re-enable the texture mapping
         side: THREE.DoubleSide,
+        wireframe: true
         // transparent: true, // Keep transparent if alphaTest is needed, or for blendshape-style transparency
         // alphaTest: 0.1,    // Keep if you have parts of texture with low alpha you want to discard
         // color: 0x0000FF, // Remove the test color
@@ -250,7 +251,8 @@ async function animate() {
                 const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix); // This should now work!
                 threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
                 threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1)); // Flip Y-axis
-
+                threeMatrix.multiply(new THREE.Matrix4().makeMakeRotationY(Math.PI)); // Rotate 180 degrees around Y-axis
+                
                 faceMesh.matrix.copy(threeMatrix);
                 faceMesh.matrixAutoUpdate = false;
                 faceMesh.matrixWorldNeedsUpdate = true;
