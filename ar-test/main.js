@@ -302,3 +302,4 @@ function drawFaceTexture(faceLandmarks, videoWidth, videoHeight) {
 
 // Assuming init() is called via window.onload from index.html now.
 // Do NOT call init() directly here anymore.
+init();
