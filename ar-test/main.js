@@ -169,6 +169,9 @@ async function animate() {
         debugCube.rotation.y += 0.005;
     }
 
+
+    console.log("video.videoWidth: " + video.videoWidth);
+    console.log("video.videoHeight: " + video.videoHeight);
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
         if (lastVideoTime !== video.currentTime) {
             lastVideoTime = video.currentTime;
