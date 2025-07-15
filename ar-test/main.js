@@ -337,6 +337,10 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
     // If we're in an XR session (AR mode)
     // Check if we're in an XR session (AR mode)
     if (renderer.xr.isPresenting) {
+
+        
+
+        
         console.log("AR Mode: Presenting."); // Confirm AR session is active
 
         // Hide front-camera elements
@@ -345,7 +349,18 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
         if (normalsHelper) normalsHelper.visible = false;
         if (meshBoxHelper) meshBoxHelper.visible = false;
 
-        const session = renderer.xr.getSession(); // Get the current XR session
+
+
+        WebARRocksMediaStreamAPIHelper.get(DOMVIDEO, initWebARRocks, function(){
+          alert('Cannot get video bro :(');
+        }, {
+          video: true //mediaConstraints
+          audio: false
+        })
+
+
+        
+        /*const session = renderer.xr.getSession(); // Get the current XR session
 
         // 1. Request Reference Space and Hit Test Source
         if (arHitTestSource === null) {
@@ -412,16 +427,8 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
             }
         } else {
              console.log("AR Mode: arHitTestSource not yet obtained or invalid."); // For initial frames
-        }
+        }*/
     } else {
-
-
-        WebARRocksMediaStreamAPIHelper.get(DOMVIDEO, initWebARRocks, function(){
-          alert('Cannot get video bro :(');
-        }, {
-          video: true //mediaConstraints
-          audio: false
-        })
         // --- NON-AR MODE (Front Camera & Face Tracking) LOGIC ---
         // This is the code that handles your front camera MediaPipe detection
         // and mesh updates.
