@@ -9,11 +9,11 @@ import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 
 import { FACEMESH_TESSELATION, UV_COORDS } from './face_mesh_data.js';
 
-//import * as THREE from "three"
+import * as THREE from "three"
 //import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 //import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-let THREE = window.THREE;
+//let THREE = window.THREE;
 
 let scene, camera, renderer;
 let video, faceLandmarker, runningMode = "VIDEO";
