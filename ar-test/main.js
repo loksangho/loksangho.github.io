@@ -341,7 +341,7 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
         
 
         
-        console.log("AR Mode: Presenting."); // Confirm AR session is active
+        alert("AR Mode: Presenting."); // Confirm AR session is active
 
         // Hide front-camera elements
         video.style.display = 'none';
