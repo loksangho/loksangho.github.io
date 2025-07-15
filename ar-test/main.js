@@ -238,6 +238,23 @@ async function animate() {
                 faceMesh.matrixAutoUpdate = false;
                 faceMesh.matrixWorldNeedsUpdate = true;
 
+                // Inside the 'if (results && results.faceLandmarks ...)' block in animate()
+                // after faceMesh.matrixWorldNeedsUpdate = true;
+                
+                // --- Live Debugging Logs ---
+                const worldPosition = new THREE.Vector3();
+                faceMesh.updateWorldMatrix(true, false); // Ensure world matrix is updated for correct position extraction
+                worldPosition.setFromMatrixPosition(faceMesh.matrixWorld);
+                console.log("Face Mesh World Position (XYZ):", worldPosition.x, worldPosition.y, worldPosition.z);
+                
+                if (faceMesh.geometry.boundingBox) {
+                    faceMesh.geometry.boundingBox.applyMatrix4(faceMesh.matrixWorld); // Apply world matrix to bounding box
+                    const size = faceMesh.geometry.boundingBox.getSize(new THREE.Vector3());
+                    console.log("Face Mesh World Size (XYZ):", size.x, size.y, size.z);
+                    console.log("Face Mesh World Bounding Box Min/Max:", faceMesh.geometry.boundingBox.min, faceMesh.geometry.boundingBox.max);
+                }
+                // ---------------------------
+                
                 if (meshBoxHelper) {
                     meshBoxHelper.update();
                 }
