@@ -416,7 +416,7 @@ function render(time, frame) {
           audio: false
         })*/
         if (!ARRocksInitialised) {
-            initWebARRocks();
+            mainWebARRocks();
             
         }
         // --- Core AR Background Setup ---
@@ -557,6 +557,20 @@ function render(time, frame) {
         }
     }
     renderer.render(scene, camera);
+}
+
+function mainWebARRocks(){ // entry point
+  DOMVIDEO = WebARRocksMediaStreamAPIHelper.get_videoElement();
+  //document.body.appendChild(DOMVIDEO);
+  WebARRocksMediaStreamAPIHelper.get(DOMVIDEO, init, function(){
+    alert('Cannot get video bro :(');
+  }, {
+    "video": true,/*
+      "width": {"min": VIDEOSETTINGS.minWidth, "max": VIDEOSETTINGS.maxWidth, "ideal": VIDEOSETTINGS.idealWidth},
+      "height": {"min": VIDEOSETTINGS.minHeight, "max": VIDEOSETTINGS.maxHeight, "ideal": VIDEOSETTINGS.idealHeight}
+    },*/
+    "audio": false
+  })
 }
 
 function initWebARRocks(){
