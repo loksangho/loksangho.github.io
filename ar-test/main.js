@@ -170,6 +170,7 @@ async function init() {
 }
 
 let lastVideoTime = -1;
+// ... (animate function) ...
 async function animate() {
     requestAnimationFrame(animate);
 
@@ -182,26 +183,17 @@ async function animate() {
         if (lastVideoTime !== video.currentTime) {
             lastVideoTime = video.currentTime;
 
-            // --- DEBUGGING MediaPipe Input and Output ---
-            console.log("Video state for MediaPipe:", video.videoWidth, video.videoHeight, video.currentTime);
-            if (video.videoWidth === 0 || video.videoHeight === 0) {
-                console.warn("MediaPipe input video has zero dimensions! Cannot detect.");
-            }
-            // --- END DEBUGGING ---
+            // ... (console.logs for video state) ...
 
             const results = await faceLandmarker.detectForVideo(video, performance.now());
 
-            // --- DEBUGGING MediaPipe Output ---
-            console.log("MediaPipe Results:", results);
-            if (results && results.faceLandmarks && results.faceLandmarks.length === 0) {
-                console.log("MediaPipe detected NO faces in this frame.");
-            }
-            // --- END DEBUGGING ---
+            // ... (console.logs for MediaPipe Results) ...
 
-
+            // *** CRITICAL CHANGE TO THE IF CONDITION AND transformMatrix ACCESS ***
             if (results && results.faceLandmarks && results.faceLandmarks.length > 0 &&
                 results.facialTransformationMatrixes && results.facialTransformationMatrixes.length > 0 &&
-                results.facialTransformationMatrixes[0] && results.facialTransformationMatrixes[0].matrix) {
+                results.facialTransformationMatrixes[0] && results.facialTransformationMatrixes[0].data && // CHECK FOR '.data' HERE
+                results.facialTransformationMatrixes[0].data.length === 16) { // ADD LENGTH CHECK FOR ROBUSTNESS
 
                 // Hide debug cube, show face mesh and its helper
                 if (debugCube) debugCube.visible = false;
@@ -211,7 +203,9 @@ async function animate() {
 
                 const faceLandmarks = results.faceLandmarks[0];
                 const blendshapes = results.faceBlendshapes && results.faceBlendshapes.length > 0 ? results.faceBlendshapes[0] : null;
-                const transformMatrix = results.facialTransformationMatrixes[0].matrix;
+                // *** CHANGE THIS LINE TO USE '.data' ***
+                const transformMatrix = results.facialTransformationMatrixes[0].data; // Use the 'data' property
+                // ****************************************
 
                 // 1. Update Mesh Positions using normalized landmarks
                 const positions = faceMesh.geometry.attributes.position.array;
@@ -237,27 +231,12 @@ async function animate() {
                 }
 
                 // 3. Apply Transformation Matrix for global pose
-                const scaleFactor = 300;
-                const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix);
+                const scaleFactor = 300; // Keep experimenting with this value if needed
+                const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix); // This should now work!
                 threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
                 faceMesh.matrix.copy(threeMatrix);
                 faceMesh.matrixAutoUpdate = false;
                 faceMesh.matrixWorldNeedsUpdate = true;
-
-                // --- Live Debugging Logs ---
-                const worldPosition = new THREE.Vector3();
-                faceMesh.updateWorldMatrix(true, false); // Ensure world matrix is updated for correct position extraction
-                worldPosition.setFromMatrixPosition(faceMesh.matrixWorld);
-                console.log("Face Mesh World Position (XYZ):", worldPosition.x, worldPosition.y, worldPosition.z);
-                
-                if (faceMesh.geometry.boundingBox) {
-                    // Ensure bounding box is up-to-date
-                    faceMesh.geometry.boundingBox.applyMatrix4(faceMesh.matrixWorld); // Apply world matrix to bounding box
-                    const size = faceMesh.geometry.boundingBox.getSize(new THREE.Vector3());
-                    console.log("Face Mesh World Size (XYZ):", size.x, size.y, size.z);
-                    console.log("Face Mesh World Bounding Box Min/Max:", faceMesh.geometry.boundingBox.min, faceMesh.geometry.boundingBox.max);
-                }
-                // ---------------------------
 
                 if (meshBoxHelper) {
                     meshBoxHelper.update();
@@ -272,6 +251,12 @@ async function animate() {
                 faceMesh.visible = false;
                 if (meshBoxHelper) meshBoxHelper.visible = false;
                 if (debugCube) debugCube.visible = true; // Show debug cube if no face
+                // Optionally log why it's not detecting:
+                // if (results && results.faceLandmarks && results.faceLandmarks.length === 0) {
+                //    console.log("No faces detected in this frame (faceLandmarks empty).");
+                // } else if (results && results.facialTransformationMatrixes && results.facialTransformationMatrixes.length === 0) {
+                //    console.log("No transformation matrixes in this frame.");
+                // }
             }
         }
     }
