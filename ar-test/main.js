@@ -332,66 +332,83 @@ function animate() { // This is the function called by init()
 // --- WebXR Render Loop (renamed for clarity, handles both modes) ---
 function render(time, frame) { // 'time' and 'frame' are provided by setAnimationLoop in XR, but will be undefined for requestAnimationFrame
     // If we're in an XR session (AR mode)
+    // Check if we're in an XR session (AR mode)
     if (renderer.xr.isPresenting) {
-        // --- AR MODE LOGIC ---
-        // This 'time' and 'frame' are provided by WebXR
-        // Hide the original webcam feed and face mesh
+        console.log("AR Mode: Presenting."); // Confirm AR session is active
+
+        // Hide front-camera elements
         video.style.display = 'none';
         faceMesh.visible = false;
         if (normalsHelper) normalsHelper.visible = false;
         if (meshBoxHelper) meshBoxHelper.visible = false;
 
-        // WebXR hit-testing and object placement logic
-        if (frame && renderer.xr.getSession() && !placedObject) {
-            // ... (your existing AR hit-test and placement logic) ...
-            const session = renderer.xr.getSession();
-            if (arHitTestSource === null) {
-                session.requestReferenceSpace('viewer').then((refSpace) => {
-                    arRefSpace = refSpace;
-                    session.requestHitTestSource({ space: arRefSpace }).then((source) => {
-                        arHitTestSource = source;
-                    });
-                });
-            }
-            if (arHitTestSource) {
-                const hitTestResults = frame.getHitTestResults(arHitTestSource);
-                if (hitTestResults.length > 0) {
-                    const hit = hitTestResults[0];
-                    const pose = hit.getPose(arRefSpace);
-                    if (!reticle) { // Reticle for placement
-                        reticle = new THREE.Mesh(
-                            new THREE.RingGeometry(0.1, 0.12, 32).rotateX(-Math.PI / 2),
-                            new THREE.MeshBasicMaterial({ color: 0xffffff })
-                        );
-                        reticle.matrixAutoUpdate = false;
-                        scene.add(reticle);
-                    }
-                    reticle.matrix.fromArray(pose.transform.matrix);
-                    reticle.visible = true;
+        const session = renderer.xr.getSession(); // Get the current XR session
 
-                    // Place Object on Tap (Example)
-                    if (!renderer.domElement.onclick) { // Attach click listener only once
-                        renderer.domElement.onclick = () => {
-                            if (exportedMeshData && reticle.visible && !placedObject) {
-                                const loader = new GLTFLoader();
-                                const gltfJsonString = JSON.stringify(exportedMeshData);
-                                loader.parse(gltfJsonString, function(gltf) {
-                                    placedObject = gltf.scene;
-                                    placedObject.position.setFromMatrixPosition(reticle.matrix);
-                                    placedObject.scale.set(0.1, 0.1, 0.1); // Adjust scale!
-                                    scene.add(placedObject);
-                                    reticle.visible = false;
-                                    arHitTestSource.cancel();
-                                    arHitTestSource = null;
-                                    renderer.domElement.onclick = null;
-                                }, undefined, function(error) { console.error("Error loading GLTF from memory:", error); });
-                            }
-                        };
-                    }
-                } else {
-                    if (reticle) reticle.visible = false;
+        // 1. Request Reference Space and Hit Test Source
+        if (arHitTestSource === null) {
+            console.log("AR Mode: Requesting viewer reference space...");
+            session.requestReferenceSpace('viewer').then((refSpace) => {
+                arRefSpace = refSpace;
+                console.log("AR Mode: Viewer reference space obtained. Requesting hit test source...");
+                session.requestHitTestSource({ space: arRefSpace }).then((source) => {
+                    arHitTestSource = source;
+                    console.log("AR Mode: Hit test source obtained:", arHitTestSource);
+                }).catch(e => console.error("AR Mode: Error requesting hit test source:", e)); // IMPORTANT CATCH
+            }).catch(e => console.error("AR Mode: Error requesting reference space:", e)); // IMPORTANT CATCH
+        }
+
+        // 2. Perform Hit Test
+        if (arHitTestSource) {
+            const hitTestResults = frame.getHitTestResults(arHitTestSource);
+            console.log("AR Mode: Hit test results count:", hitTestResults.length); // CRITICAL LOG
+
+            if (hitTestResults.length > 0) {
+                console.log("AR Mode: Surface detected! Attempting to show reticle.");
+                const hit = hitTestResults[0];
+                const pose = hit.getPose(arRefSpace);
+
+                // --- Show Reticle ---
+                if (!reticle) {
+                    console.log("AR Mode: Creating reticle mesh."); // Confirm reticle creation
+                    reticle = new THREE.Mesh(
+                        new THREE.RingGeometry(0.1, 0.12, 32).rotateX(-Math.PI / 2),
+                        new THREE.MeshBasicMaterial({ color: 0xffffff })
+                    );
+                    reticle.matrixAutoUpdate = false;
+                    scene.add(reticle);
                 }
+                reticle.matrix.fromArray(pose.transform.matrix);
+                reticle.visible = true;
+                // --- End Reticle ---
+
+                // ... (your existing click handler for placement) ...
+                if (!renderer.domElement.onclick) { // Attach click listener only once
+                    renderer.domElement.onclick = () => {
+                        if (exportedMeshData && reticle.visible && !placedObject) {
+                            console.log("AR Mode: Screen tapped, attempting to place object."); // Confirm tap
+                            const loader = new GLTFLoader();
+                            const gltfJsonString = JSON.stringify(exportedMeshData);
+                            loader.parse(gltfJsonString, function(gltf) {
+                                placedObject = gltf.scene;
+                                placedObject.position.setFromMatrixPosition(reticle.matrix);
+                                placedObject.scale.set(0.1, 0.1, 0.1); // Adjust this scale!
+                                scene.add(placedObject);
+                                reticle.visible = false;
+                                arHitTestSource.cancel();
+                                arHitTestSource = null;
+                                renderer.domElement.onclick = null;
+                                console.log("AR Mode: Object placed successfully."); // Confirm placement
+                            }, undefined, function(error) { console.error("AR Mode: Error loading GLTF from memory:", error); });
+                        }
+                    };
+                }
+
+            } else {
+                console.log("AR Mode: No surface detected in this frame."); // Informative log
+                if (reticle) reticle.visible = false;
             }
+        } else {
+             console.log("AR Mode: arHitTestSource not yet obtained or invalid."); // For initial frames
         }
     } else {
         // --- NON-AR MODE (Front Camera & Face Tracking) LOGIC ---
