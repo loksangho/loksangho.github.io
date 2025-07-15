@@ -321,7 +321,8 @@ function drawFaceTexture(faceLandmarks, videoWidth, videoHeight) {
     textureCanvasCtx.save();
     //textureCanvasCtx.translate(textureCanvas.width, 0);
     //textureCanvasCtx.scale(-1, 1);
-
+    textureCanvasCtx.translate(textureCanvas.width, 0);
+    textureCanvasCtx.scale(-1, 1);
     textureCanvasCtx.drawImage(
         video,
         minX, minY, cropWidth, cropHeight,
