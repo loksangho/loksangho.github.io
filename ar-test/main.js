@@ -3,12 +3,15 @@ import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 
 import { FACEMESH_TESSELATION, UV_COORDS } from './face_mesh_data.js';
 import { VertexNormalsHelper } from 'three/addons/helpers/VertexNormalsHelper.js'; // Add this at the top of main.js
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 
 let scene, camera, renderer;
 let video, faceLandmarker, runningMode = "VIDEO";
 let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
 let debugCube;
 let meshBoxHelper;
+let saveButton;
+let exportedMeshData = null;
 
 const NUM_LANDMARKS = UV_COORDS.length;
 
@@ -38,6 +41,13 @@ async function init() {
         document.getElementById('loading').innerText = "Error: Canvas not found.";
         return;
     }
+
+    saveButton = document.getElementById('saveButton');
+    if (saveButton) {
+        saveButton.style.display = 'block'; // Show the button once app is loaded
+        saveButton.addEventListener('click', saveMesh); // Attach click listener
+    }
+    
     renderer = new THREE.WebGLRenderer({ antialias: true, canvas: outputCanvasElement, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -179,6 +189,81 @@ async function init() {
     // Start the animation loop
     animate();
     console.log("init() finished, animation loop started.");
+}
+
+function saveMesh() {
+    if (!faceMesh) {
+        console.warn("No face mesh to save yet.");
+        return;
+    }
+
+    const exporter = new GLTFExporter();
+
+    // Options for exporter
+    const options = {
+        binary: false,      // Set to true if you want .glb (ArrayBuffer) instead of .gltf (JSON object)
+        embedImages: true   // Embeds textures directly in the GLTF/GLB
+    };
+
+    exporter.parse(
+        faceMesh,
+        function (gltfData) { // `gltfData` will be the GLTF JSON object (if binary: false) or ArrayBuffer (if binary: true)
+            console.log("Mesh exported to GLTF in memory.");
+
+            // Store the GLTF data in your global variable
+            exportedMeshData = gltfData;
+
+            // --- Optional: Console log the data to inspect it ---
+            if (options.binary) {
+                console.log("GLB data (ArrayBuffer):", exportedMeshData);
+                // You could then convert this ArrayBuffer to a Blob if needed later,
+                // or send it over a network.
+                // const tempBlob = new Blob([exportedMeshData], { type: 'model/gltf-binary' });
+            } else {
+                console.log("GLTF data (JSON object):", exportedMeshData);
+                // You could then stringify this JSON object if needed for storage
+                // const jsonString = JSON.stringify(exportedMeshData, null, 2);
+                // console.log("GLTF JSON string:", jsonString);
+            }
+
+            // At this point, the data is in `exportedMeshData` and not downloaded.
+            // You can now use `exportedMeshData` for other purposes, e.g.:
+            // - Sending it via an API to a server
+            // - Storing it in localStorage/sessionStorage (if small enough and you stringify JSON)
+            // - Storing it in IndexedDB (for larger data, like ArrayBuffer)
+            // - Loading it back into a Three.js scene later
+        },
+        function (error) {
+            console.error('An error happened during GLTF export:', error);
+        },
+        options
+    );
+}
+
+// *** Example of how you might retrieve and use it later (e.g., in another function) ***
+function loadMeshFromMemory() {
+    if (!exportedMeshData) {
+        console.warn("No mesh data in memory to load.");
+        return;
+    }
+
+    // You would use GLTFLoader to load this data back
+    const loader = new THREE.GLTFLoader();
+
+    if (options.binary) { // If you saved it as binary (.glb)
+        loader.parse(exportedMeshData, function(gltf) {
+            console.log("Loaded GLB from memory:", gltf.scene);
+            // Example: Add it to the scene
+            // scene.add(gltf.scene);
+        });
+    } else { // If you saved it as JSON (.gltf)
+        const jsonString = JSON.stringify(exportedMeshData); // Stringify if you saved the object, then loader parses the string
+        loader.parse(jsonString, function(gltf) {
+            console.log("Loaded GLTF from memory:", gltf.scene);
+            // Example: Add it to the scene
+            // scene.add(gltf.scene);
+        });
+    }
 }
 
 let lastVideoTime = -1;
