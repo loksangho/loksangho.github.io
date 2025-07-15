@@ -13,7 +13,7 @@ import { FACEMESH_TESSELATION, UV_COORDS } from './face_mesh_data.js';
 //import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 //import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-
+let THREE = window.THREE;
 
 let scene, camera, renderer;
 let video, faceLandmarker, runningMode = "VIDEO";
