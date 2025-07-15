@@ -149,10 +149,14 @@ async function init() {
     meshBoxHelper.visible = false;
     console.log("Face mesh BoxHelper added (initially hidden).");
 
+     // *** ADD THE RESIZE LISTENER HERE ***
     window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        if (camera && renderer) { // Add a check to be extra safe, though it should be defined here
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            console.log("Window resized. Renderer and camera updated.");
+        }
     });
 
     // Start the animation loop
@@ -295,12 +299,6 @@ function drawFaceTexture(faceLandmarks, videoWidth, videoHeight) {
     );
     textureCanvasCtx.restore();
 }
-// Removed window.addEventListener('resize') from init() to ensure it's always active
-window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-});
 
 // Assuming init() is called via window.onload from index.html now.
 // Do NOT call init() directly here anymore.
