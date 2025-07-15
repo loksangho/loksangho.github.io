@@ -7,13 +7,14 @@ let scene, camera, renderer;
 let video, faceLandmarker, runningMode = "VIDEO";
 let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
 
-const NUM_LANDMARKS = UV_COORDS.length; // Ensure this is correct based on your UV_COORDS data
+const NUM_LANDMARKS = UV_COORDS.length;
 
 const VIDEO_WIDTH = 640;
 const VIDEO_HEIGHT = 480;
 
 async function init() {
-    // ... (rest of your init function remains the same) ...
+    // ... (rest of your init function remains the same, ensure outputFacialTransformationMatrixes: true) ...
+
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     renderer = new THREE.WebGLRenderer({ antialias: true, canvas: document.getElementById('outputCanvas') });
@@ -58,8 +59,7 @@ async function init() {
             delegate: "GPU"
         },
         outputFaceBlendshapes: true,
-        // *** IMPORTANT: Ensure this is true to get the transformation matrix! ***
-        outputFacialTransformationMatrixes: true,
+        outputFacialTransformationMatrixes: true, // Make sure this is true!
         runningMode: runningMode,
         numFaces: 1
     });
@@ -80,6 +80,8 @@ async function init() {
     const indices = new Uint16Array(FACEMESH_TESSELATION);
     geometry.setIndex(new THREE.BufferAttribute(indices, 1));
 
+    // For blendshapes, you'd typically load a GLTF model with morph targets
+    // rather than setting these empty arrays.
     geometry.morphAttributes.position = [];
     geometry.morphTargets = true;
 
@@ -115,13 +117,23 @@ async function animate() {
             lastVideoTime = video.currentTime;
             const results = await faceLandmarker.detectForVideo(video, performance.now());
 
-            // *** CRITICAL CHECK HERE ***
-            if (results.faceLandmarks && results.faceLandmarks.length > 0 &&
-                results.facialTransformationMatrixes && results.facialTransformationMatrixes.length > 0) {
+            // --- Enhanced Checks ---
+            if (results && results.faceLandmarks && results.faceLandmarks.length > 0 &&
+                results.facialTransformationMatrixes && results.facialTransformationMatrixes.length > 0 &&
+                results.facialTransformationMatrixes[0] && results.facialTransformationMatrixes[0].matrix) {
+
+                faceMesh.visible = true; // Ensure mesh is visible if a face is detected
 
                 const faceLandmarks = results.faceLandmarks[0];
                 const blendshapes = results.faceBlendshapes && results.faceBlendshapes.length > 0 ? results.faceBlendshapes[0] : null;
                 const transformMatrix = results.facialTransformationMatrixes[0].matrix;
+
+                // --- DEBUGGING: Add these logs to verify `transformMatrix` ---
+                // console.log("transformMatrix:", transformMatrix);
+                // console.log("transformMatrix length:", transformMatrix ? transformMatrix.length : 'N/A');
+                // console.log("transformMatrix elements (first few):", transformMatrix ? transformMatrix.slice(0, 4) : 'N/A');
+                // --- END DEBUGGING ---
+
 
                 // 1. Update Mesh Positions using normalized landmarks
                 const positions = faceMesh.geometry.attributes.position.array;
@@ -129,7 +141,6 @@ async function animate() {
                     const landmark = faceLandmarks[i];
                     // MediaPipe landmarks are normalized (0-1).
                     // Convert them to a more suitable world coordinate scale for Three.js.
-                    // (x - 0.5) * width/height adjusts for centering and aspect ratio.
                     // Scale factor 200 (adjust as needed, depending on your scene/camera setup)
                     positions[i * 3 + 0] = (landmark.x - 0.5) * VIDEO_WIDTH / 100;
                     positions[i * 3 + 1] = -(landmark.y - 0.5) * VIDEO_HEIGHT / 100; // Invert Y
@@ -139,8 +150,6 @@ async function animate() {
                 faceMesh.geometry.computeVertexNormals();
 
                 // 2. Apply Blendshapes (if you had a loaded GLTF model with morph targets)
-                // This part remains mostly a placeholder for models with morph targets.
-                // The `blendshapes` check is added to prevent errors if blendshapes aren't always present.
                 if (blendshapes && faceMesh.morphTargetInfluences) {
                      for (const blendshape of blendshapes.categories) {
                          const { categoryName, score } = blendshape;
@@ -151,11 +160,9 @@ async function animate() {
                 }
 
                 // 3. Apply Transformation Matrix for global pose
-                // Important: Adjust scale factor here to control the size of the mesh.
-                // MediaPipe's matrix is in a relatively small scale.
                 const scaleFactor = 150; // Experiment with this value (e.g., 50, 100, 200)
 
-                const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix);
+                const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix); // This is line 158 if no prior changes
 
                 // Apply additional scale. Multiply from the right.
                 threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
@@ -169,9 +176,8 @@ async function animate() {
                 faceTexture.needsUpdate = true;
 
             } else {
-                // No face detected, or matrices not available.
-                // Optionally hide the mesh or display a message.
-                faceMesh.visible = false;
+                // No face detected, or matrices/landmarks not available.
+                faceMesh.visible = false; // Hide the mesh
             }
         }
     }
@@ -205,8 +211,6 @@ function drawFaceTexture(faceLandmarks, videoWidth, videoHeight) {
     const cropHeight = maxY - minY;
 
     if (cropWidth <= 0 || cropHeight <= 0) {
-        // If crop area is invalid, don't draw and potentially clear texture
-        // textureCanvasCtx.clearRect(0, 0, textureCanvas.width, textureCanvas.height);
         return;
     }
 
