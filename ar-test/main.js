@@ -12,7 +12,6 @@ let video, faceLandmarker, runningMode = "VIDEO";
 let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
 let debugCube;
 let meshBoxHelper;
-let saveButton;
 let exportedMeshData = null;
 
 // WebXR specific variables
@@ -44,7 +43,7 @@ async function init() {
     camera.position.z = 50;
     console.log("Camera created. Position Z:", camera.position.z);
 
-    saveButton = document.getElementById('saveButton');
+    const saveButton = document.getElementById('saveButton');
     if (saveButton) {
         saveButton.style.display = 'block'; // Show the button once app is loaded
         saveButton.addEventListener('click', saveMesh); // Attach click listener
