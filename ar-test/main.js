@@ -35,7 +35,7 @@ const VIDEO_HEIGHT = 480;
 window.init = init;
 
 async function init() {
-    alert("init() started.");
+    console.log("init() started.");
 
     // 1. Setup Three.js Scene
     scene = new THREE.Scene();
@@ -341,7 +341,7 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
         
 
         
-        alert("AR Mode: Presenting."); // Confirm AR session is active
+        console.log("AR Mode: Presenting."); // Confirm AR session is active
 
         // Hide front-camera elements
         video.style.display = 'none';
@@ -510,13 +510,12 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
 }
 
 function initWebARRocks(){
-  alert("Got to here");
   WEBARROCKSOBJECT.init({
     canvasId: 'outputCanvas',
     video: DOMVIDEO,
     callbackReady: function(errLabel){
       if (errLabel){
-        alert('An error happens bro: ',errLabel);
+        console.log('An error happens bro: ',errLabel);
       } else {
         load_neuralNet();
       }
