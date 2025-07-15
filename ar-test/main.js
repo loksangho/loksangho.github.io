@@ -6,9 +6,10 @@ import { FACEMESH_TESSELATION, UV_COORDS } from './face_mesh_data.js';
 let scene, camera, renderer;
 let video, faceLandmarker, runningMode = "VIDEO";
 let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
-let debugCube; // Declare debugCube
+let debugCube;
+let meshBoxHelper; // For visualizing the mesh's bounding box
 
-const NUM_LANDMARKS = UV_COORDS.length;
+const NUM_LANDMARKS = UV_LANDMARKS_COUNT; // Ensure this is correct and matches your UV_COORDS length
 
 const VIDEO_WIDTH = 640;
 const VIDEO_HEIGHT = 480;
@@ -18,11 +19,11 @@ async function init() {
 
     // 1. Setup Three.js Scene
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xAAAAAA); // Set a visible background color for debugging
+    scene.background = new THREE.Color(0x333333); // Darker background to distinguish from potential black mesh
     console.log("Scene created.");
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 100; // Keep this consistent for now
+    camera.position.z = 100; // Keep this consistent for now. Will adjust dynamically.
     console.log("Camera created. Position Z:", camera.position.z);
 
     const outputCanvasElement = document.getElementById('outputCanvas');
@@ -34,32 +35,31 @@ async function init() {
     renderer = new THREE.WebGLRenderer({ antialias: true, canvas: outputCanvasElement });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
-    document.body.appendChild(renderer.domElement); // This is already present, ensures it's in the DOM
+    document.body.appendChild(renderer.domElement);
     console.log("Renderer created and attached to canvas.");
 
     // Add ambient light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // Slightly brighter ambient
     scene.add(ambientLight);
     console.log("Ambient light added.");
 
     // Add directional light for better shading
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    directionalLight.position.set(0, 0, 1).normalize();
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7); // Slightly brighter directional
+    directionalLight.position.set(0, 0, 1).normalize(); // Light coming from front
     scene.add(directionalLight);
     console.log("Directional light added.");
 
-    // *** RE-ADD THE DEBUG CUBE HERE ***
-    const debugGeometry = new THREE.BoxGeometry(20, 20, 20); // Make it slightly larger to ensure visibility
+    // Debug Cube
+    const debugGeometry = new THREE.BoxGeometry(20, 20, 20);
     const debugMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
     debugCube = new THREE.Mesh(debugGeometry, debugMaterial);
-    debugCube.position.set(0, 0, 0); // Place it at the center of the scene
+    debugCube.position.set(0, 0, 0);
     scene.add(debugCube);
     console.log("Debug cube added to scene at (0,0,0).");
-    // **********************************
 
     // 2. Setup Webcam Video
     video = document.getElementById('webcamVideo');
-    console.log("Webcam video element:", video); // Check if video element is found
+    console.log("Webcam video element:", video);
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = stream;
@@ -102,7 +102,6 @@ async function init() {
     document.getElementById('loading').style.display = 'none';
 
     // 4. Create Three.js Face Mesh (Geometry)
-    // ... (rest of mesh setup - positions, uvs, indices, material) ...
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(NUM_LANDMARKS * 3);
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -127,17 +126,34 @@ async function init() {
     faceTexture.magFilter = THREE.LinearFilter;
     faceTexture.encoding = THREE.sRGBEncoding;
 
-    const material = new THREE.MeshStandardMaterial({
-        map: faceTexture,
+    // *** TEST MATERIAL: Use BasicMaterial with a color for debugging mesh visibility ***
+    // If you see a solid color, it's a texture/lighting issue.
+    // If you don't, it's a position/scale issue.
+    const material = new THREE.MeshBasicMaterial({
+        color: 0x0000FF, // Blue color for testing
         side: THREE.DoubleSide,
         transparent: true,
-        alphaTest: 0.1
+        alphaTest: 0.1,
+        // wireframe: true // Uncomment to see the mesh wireframe
     });
+    // **********************************************************************************
 
     faceMesh = new THREE.Mesh(geometry, material);
-    faceMesh.visible = false; // Start hidden until face detected
+    faceMesh.visible = false;
     scene.add(faceMesh);
     console.log("Face mesh created and added to scene (initially hidden).");
+
+    // Add a BoxHelper for the face mesh to visualize its bounding box
+    meshBoxHelper = new THREE.BoxHelper(faceMesh, 0xFF0000); // Red box
+    scene.add(meshBoxHelper);
+    meshBoxHelper.visible = false; // Initially hidden
+    console.log("Face mesh BoxHelper added (initially hidden).");
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
 
     // Start the animation loop
     animate();
@@ -148,7 +164,7 @@ let lastVideoTime = -1;
 async function animate() {
     requestAnimationFrame(animate);
 
-    // Optional: Rotate the debug cube to confirm render loop is active
+    // Keep debug cube rotating even if face is not found
     if (debugCube) {
         debugCube.rotation.x += 0.005;
         debugCube.rotation.y += 0.005;
@@ -163,27 +179,35 @@ async function animate() {
                 results.facialTransformationMatrixes && results.facialTransformationMatrixes.length > 0 &&
                 results.facialTransformationMatrixes[0] && results.facialTransformationMatrixes[0].matrix) {
 
-                faceMesh.visible = true; // Make face mesh visible when a face is found
-                if (debugCube) debugCube.visible = false; // Hide debug cube once face is found
+                // Hide debug cube, show face mesh and its helper
+                if (debugCube) debugCube.visible = false;
+                faceMesh.visible = true;
+                if (meshBoxHelper) meshBoxHelper.visible = true;
 
                 const faceLandmarks = results.faceLandmarks[0];
                 const blendshapes = results.faceBlendshapes && results.faceBlendshapes.length > 0 ? results.faceBlendshapes[0] : null;
                 const transformMatrix = results.facialTransformationMatrixes[0].matrix;
 
-                // console.log("Face detected. Transform Matrix:", transformMatrix); // Uncomment for matrix debug
-
                 // 1. Update Mesh Positions using normalized landmarks
                 const positions = faceMesh.geometry.attributes.position.array;
                 for (let i = 0; i < NUM_LANDMARKS; i++) {
                     const landmark = faceLandmarks[i];
-                    positions[i * 3 + 0] = (landmark.x - 0.5) * VIDEO_WIDTH / 100;
-                    positions[i * 3 + 1] = -(landmark.y - 0.5) * VIDEO_HEIGHT / 100;
-                    positions[i * 3 + 2] = landmark.z * VIDEO_WIDTH / 100;
+                    // These normalized coordinates (0-1) are relative to the video frame.
+                    // The 'z' is relative depth.
+                    // When applying the transformMatrix later, it scales these into a world space.
+                    // For now, these raw positions might be small (0-1 range).
+                    positions[i * 3 + 0] = landmark.x;
+                    positions[i * 3 + 1] = landmark.y;
+                    positions[i * 3 + 2] = landmark.z;
                 }
                 faceMesh.geometry.attributes.position.needsUpdate = true;
                 faceMesh.geometry.computeVertexNormals();
+                // After updating positions, compute bounding box for the helper
+                faceMesh.geometry.computeBoundingBox();
+                faceMesh.geometry.computeBoundingSphere();
 
-                // 2. Apply Blendshapes (if applicable, currently placeholder for procedural mesh)
+
+                // 2. Apply Blendshapes (placeholder)
                 if (blendshapes && faceMesh.morphTargetInfluences) {
                      for (const blendshape of blendshapes.categories) {
                          const { categoryName, score } = blendshape;
@@ -194,20 +218,48 @@ async function animate() {
                 }
 
                 // 3. Apply Transformation Matrix for global pose
-                const scaleFactor = 150;
+                // Important: The scaleFactor here is CRITICAL.
+                // MediaPipe's matrix often assumes a normalized object size.
+                // We're applying it directly to the mesh.
+                const scaleFactor = 300; // Increased scale factor - EXPERIMENT with this!
+                                        // Typical values are between 100 and 500 depending on camera.position.z
+
                 const threeMatrix = new THREE.Matrix4().fromArray(transformMatrix);
+
+                // Apply additional scale *after* the MediaPipe matrix.
+                // Multiply from the right to apply after initial transform.
                 threeMatrix.multiply(new THREE.Matrix4().makeScale(scaleFactor, scaleFactor, scaleFactor));
+
+                // Adjust for Y-axis inversion and Z-axis direction if necessary (common with MediaPipe)
+                // If the face is upside down or inside out, tweak these.
+                // threeMatrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1)); // Flip Y
+                // threeMatrix.multiply(new THREE.Matrix4().makeScale(1, 1, -1)); // Flip Z
+
                 faceMesh.matrix.copy(threeMatrix);
                 faceMesh.matrixAutoUpdate = false;
-                faceMesh.matrixWorldNeedsUpdate = true;
+                faceMesh.matrixWorldNeedsUpdate = true; // Tell Three.js to recompute world matrix
+
+                // Update the BoxHelper to reflect the mesh's new position and scale
+                if (meshBoxHelper) {
+                    meshBoxHelper.update();
+                }
 
                 // Generate Face Texture
                 drawFaceTexture(faceLandmarks, video.videoWidth, video.videoHeight);
                 faceTexture.needsUpdate = true;
 
+                // --- Live Debugging Logs ---
+                // console.log("Face Mesh Position:", faceMesh.position); // Will show (0,0,0) due to matrixAutoUpdate=false
+                // console.log("Face Mesh World Position:", new THREE.Vector3().setFromMatrixPosition(faceMesh.matrixWorld));
+                // if (faceMesh.geometry.boundingBox) {
+                //     console.log("Face Mesh Bounding Box:", faceMesh.geometry.boundingBox);
+                // }
+                // ---------------------------
+
             } else {
                 // No face detected, or data not available.
-                faceMesh.visible = false; // Hide face mesh
+                faceMesh.visible = false;
+                if (meshBoxHelper) meshBoxHelper.visible = false;
                 if (debugCube) debugCube.visible = true; // Show debug cube if no face
             }
         }
