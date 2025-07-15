@@ -169,8 +169,6 @@ async function animate() {
         debugCube.rotation.y += 0.005;
     }
 
-
-    console.log("Video state for MediaPipe:", video.videoWidth, video.videoHeight, video.currentTime);
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
         if (lastVideoTime !== video.currentTime) {
             lastVideoTime = video.currentTime;
