@@ -48,10 +48,23 @@
                 "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
                 "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/",
                 "@mediapipe/tasks-vision": "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/vision_bundle.mjs"
-
             }
         }
     </script>
     <script type="module" src="main.js"></script>
-</body>
+
+    <script>
+        // Use window.onload to ensure all elements are ready.
+        // This script runs AFTER main.js (as it's below it)
+        // and init() should be globally accessible via the module.
+        window.onload = () => {
+            console.log("window.onload fired. Attempting to call init().");
+            if (typeof init === 'function') {
+                init();
+            } else {
+                console.error("Error: init() function not found. Module scope issue?");
+            }
+        };
+    </script>
+    </body>
 </html>
