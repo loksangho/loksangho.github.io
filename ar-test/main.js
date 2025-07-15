@@ -245,6 +245,12 @@ async function init() {
     console.log("init() finished, animation loop started.");
 }
 
+function log(text) {
+    var div = document.getElementById('error');
+
+    div.innerHTML += text;
+}
+
 function saveMesh() {
     if (!faceMesh) {
         console.warn("No face mesh to save yet.");
@@ -341,7 +347,7 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
         
 
         
-        console.log("AR Mode: Presenting."); // Confirm AR session is active
+        log("AR Mode: Presenting."); // Confirm AR session is active
 
         // Hide front-camera elements
         video.style.display = 'none';
@@ -352,7 +358,7 @@ function render(time, frame) { // 'time' and 'frame' are provided by setAnimatio
 
 
         WebARRocksMediaStreamAPIHelper.get(DOMVIDEO, initWebARRocks, function(){
-          console.log('Cannot get video bro :(');
+          log('Cannot get video bro :(');
         }, {
           video: true, //mediaConstraints
           audio: false
@@ -515,7 +521,7 @@ function initWebARRocks(){
     video: DOMVIDEO,
     callbackReady: function(errLabel){
       if (errLabel){
-        console.log('An error happens bro: ',errLabel);
+        log('An error happens bro: ',errLabel);
       } else {
         load_neuralNet();
       }
@@ -526,7 +532,7 @@ function initWebARRocks(){
 function load_neuralNet(){
   WEBARROCKSOBJECT.set_NN('./neuralNets/NN_OBJ4_0.json', function(errLabel){
     if (errLabel){
-      console.log('ERROR: cannot load the neural net', errLabel);
+      log('ERROR: cannot load the neural net', errLabel);
     } else {
       start();
     }
@@ -534,7 +540,7 @@ function load_neuralNet(){
 }
 
 function start(){
-  console.log('INFO in demo.js: start()');
+  log('INFO in demo.js: start()');
 
   // scale the canvas with CSS to have the same aspectRatio than the video:
   let sx = 1, sy = 1;
@@ -555,7 +561,7 @@ function start(){
 function iterate(){ // detect loop
   const detectState = WEBARROCKSOBJECT.detect(3);
   if (detectState.label){
-    console.log('INFO in demo.js: ', detectState.label, 'IS CONFIRMED YEAH!!!');
+    log('INFO in demo.js: ', detectState.label, 'IS CONFIRMED YEAH!!!');
   }
   window.requestAnimationFrame(iterate);
 }
