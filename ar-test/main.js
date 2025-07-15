@@ -38,12 +38,12 @@
 })();
 // --- END ON-SCREEN CONSOLE OVERRIDE ---
 
-import * as THREE from 'three';
+//import * as THREE from 'three';
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 
 import { FACEMESH_TESSELATION, UV_COORDS } from './face_mesh_data.js';
-import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+//import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+//import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // --- (WebXR variables removed) ---
 
