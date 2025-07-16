@@ -27,6 +27,7 @@ let exportedMeshData = null;
 let ARRocksInitialised = false;
 const runningMode = "VIDEO";
 let animationFrameId;
+let markerRoot; 
 
 const _settings = {
   nDetectsPerLoop: 0, // 0 -> adaptative
@@ -177,7 +178,7 @@ function initializeArJs(video, three) {
     });
 
     // Create a group for the AR.js marker
-    const markerRoot = new THREE.Group();
+    markerRoot = new THREE.Group();
     // ⬇️ CRITICAL CHANGE HERE ⬇️
     three.scene.add(markerRoot); // Add to the WebAR.rocks scene
 
@@ -386,6 +387,10 @@ function startWebARRocks(err, three) {
             window.arToolkitContext.update(window.arToolkitSource.domElement);
             three.camera.projectionMatrix.copy(window.arToolkitContext.getProjectionMatrix());
             scene.visible = camera.visible; // Sync scene visibility with AR.js camera
+        }
+
+        if (markerRoot) {
+            console.log('AR.js Marker Detected:', markerRoot.visible);
         }
         
         // Update WebAR.rocks (if initialized)
