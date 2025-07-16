@@ -121,15 +121,21 @@ function render() {
 
                 const landmarks = results.faceLandmarks[0];
                 const positions = faceMesh.geometry.attributes.position.array;
-                
-                // Update vertex positions based on landmarks
+                const uvs = faceMesh.geometry.attributes.uv.array; // Get the UV buffer
+
+                // Update vertex positions and UVs based on landmarks
                 for (let i = 0; i < landmarks.length; i++) {
                     positions[i * 3]     = (landmarks[i].x - 0.5) * 2;
                     positions[i * 3 + 1] = -(landmarks[i].y - 0.5) * 2;
                     positions[i * 3 + 2] = -landmarks[i].z;
+                    
+                    // --- ADDED: Update UV coordinates ---
+                    uvs[i * 2]     = landmarks[i].x;
+                    uvs[i * 2 + 1] = 1.0 - landmarks[i].y; // Flip Y for correct mapping
                 }
                 
                 faceMesh.geometry.attributes.position.needsUpdate = true;
+                faceMesh.geometry.attributes.uv.needsUpdate = true; // Flag the UV buffer for update
                 faceMesh.geometry.computeVertexNormals();
 
                 // Update the texture to show the camera feed on the mesh
