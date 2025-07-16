@@ -11,7 +11,8 @@ import { WebARRocksMediaStreamAPIHelper } from './helpers/WebARRocksMediaStreamA
 window.THREE = THREE;
 
 
-import 'threex'; // Importing THREEx for AR.js
+import "https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js";
+ // Importing THREEx for AR.js
 
 
 
