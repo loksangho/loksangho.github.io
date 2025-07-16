@@ -164,12 +164,20 @@ let _DOMVideo;
 function mainWebARRocks() {
 
    // --- CRUCIAL CLEANUP STEP ---
-    cancelAnimationFrame(animationFrameId); // Stop the first animation loop
-    if (renderer) renderer.dispose(); // Dispose of the first renderer
-    if (scene) scene.clear(); // Clear the old scene
+    cancelAnimationFrame(animationFrameId);
+    if (renderer) {
+        renderer.dispose();
+        console.log("Renderer disposed.");
+    }
+    if (scene) {
+        scene.clear();
+        console.log("Scene cleared.");
+    }
     document.getElementById('outputCanvas').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'none';
     // --- END CLEANUP ---
+
+    console.log("Cleanup finished. Starting AR."); // <-- Add this
   
     ARRocksInitialised = true;
     renderer.setAnimationLoop(null); // Stop the old render loop
