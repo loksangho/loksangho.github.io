@@ -7,6 +7,8 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 
 window.THREE = THREE;
+window.WebARRocksObjectThreeHelper = WebARRocksObjectThreeHelper;
+window.WebARRocksMediaStreamAPIHelper = WebARRocksMediaStreamAPIHelper;
 
 // These are global, loaded from face_mesh_data.js classic script
 import { FACEMESH_TESSELATION, UV_COORDS } from './face_mesh_data.js';
