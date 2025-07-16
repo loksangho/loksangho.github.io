@@ -165,6 +165,12 @@ function initializeArJs(video, three) {
     });
     //... (rest of arToolkitSource init)
 
+    window.arToolkitSource.init(function onReady() {
+        window.arToolkitSource.onResizeElement();
+        // Use the passed-in renderer
+        window.arToolkitSource.copySizeTo(three.renderer.domElement); 
+    });
+
     // Setup AR.js context
     window.arToolkitContext = new window.THREEx.ArToolkitContext({
         cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
@@ -308,7 +314,7 @@ function mainWebARRocks() {
     
     // Access classic script helpers via the 'window' object
 
-    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
+    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, startAROnlyTest, function(err){
       throw new Error('Cannot get video feed ' + err);
     }, {
       video: {
@@ -318,6 +324,42 @@ function mainWebARRocks() {
       },
       audio: false
    });
+}
+
+// This function will set up a clean scene just for the AR.js test.
+function startAROnlyTest(videoElement) {
+    console.log("Starting AR.js in isolated test mode.");
+
+    // Create a new, clean scene for the test
+    const arScene = new THREE.Scene();
+    const arCamera = new THREE.Camera();
+    arScene.add(arCamera);
+    
+    const arRenderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true
+    });
+    arRenderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(arRenderer.domElement);
+    
+    // Pass the new scene/camera to the AR.js initializer
+    initializeArJs(videoElement, { scene: arScene, camera: arCamera, renderer: arRenderer });
+
+    // A simple, clean animation loop just for AR.js
+    function animateTest() {
+        requestAnimationFrame(animateTest);
+
+        if (window.arToolkitSource && window.arToolkitSource.ready) {
+            window.arToolkitContext.update(window.arToolkitSource.domElement);
+        }
+
+        if (markerRoot) {
+            console.log('AR.js Marker Detected in Test:', markerRoot.visible);
+        }
+
+        arRenderer.render(arScene, arCamera);
+    }
+    animateTest();
 }
 
 
