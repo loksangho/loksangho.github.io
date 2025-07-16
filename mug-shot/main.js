@@ -157,50 +157,59 @@ function saveArrayBuffer(buffer, filename) {
 // AR.JS INITIALIZATION
 //-----------------------------------------------------------------
 // Pass the 'three' object from the WebAR.rocks helper
-function initializeArJs(video, three) { 
-    // Setup AR.js source
-    window.arToolkitSource = new window.THREEx.ArToolkitSource({
-        sourceType: 'video',
-        sourceElement: video,
-    });
-    //... (rest of arToolkitSource init)
+// This function now handles waiting for the video to be ready.
+function initializeArJs(video, three) {
+    const { scene, camera, renderer } = three;
 
-    window.arToolkitSource.init(function onReady() {
-        window.arToolkitSource.onResizeElement();
-        // Use the passed-in renderer
-        window.arToolkitSource.copySizeTo(three.renderer.domElement); 
-    });
+    const onPlaying = () => {
+        // The video is now actively playing. Clean up the listener.
+        video.removeEventListener('playing', onPlaying);
+        
+        console.log("Video is playing. Initializing AR.js source...");
+        console.log("Video dimensions:", video.videoWidth, video.videoHeight);
 
-    // Setup AR.js context
-    window.arToolkitContext = new window.THREEx.ArToolkitContext({
-        cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
-        detectionMode: 'mono',
-    });
+        // 1. Initialize ArToolkitSource
+        window.arToolkitSource = new window.THREEx.ArToolkitSource({
+            sourceType: 'video',
+            sourceElement: video
+        });
 
-    window.arToolkitContext.init(function onCompleted(){
-        // IMPORTANT: Let the helper camera be the main one.
-        // We only copy the projection matrix.
-        three.camera.projectionMatrix.copy(window.arToolkitContext.getProjectionMatrix());
-    });
+        window.arToolkitSource.init(() => {
+            // This is a critical step to ensure the AR.js processor
+            // knows the video's size.
+            window.arToolkitSource.onResizeElement();
+            window.arToolkitSource.copySizeTo(renderer.domElement);
+        });
 
-    // Create a group for the AR.js marker
-    markerRoot = new THREE.Group();
-    // ⬇️ CRITICAL CHANGE HERE ⬇️
-    three.scene.add(markerRoot); // Add to the WebAR.rocks scene
+        // 2. Initialize ArToolkitContext
+        window.arToolkitContext = new window.THREEx.ArToolkitContext({
+            cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
+            detectionMode: 'mono',
+        });
 
-    // Setup marker controls to update the markerRoot
-    new window.THREEx.ArMarkerControls(window.arToolkitContext, markerRoot, {
-        type: 'pattern',
-        patternUrl: './pattern-marker.patt', // Use your own marker pattern
-    });
+        window.arToolkitContext.init(() => {
+            camera.projectionMatrix.copy(window.arToolkitContext.getProjectionMatrix());
+        });
+
+        // 3. Initialize Marker Controls
+        markerRoot = new THREE.Group();
+        scene.add(markerRoot);
+        
+        new window.THREEx.ArMarkerControls(window.arToolkitContext, markerRoot, {
+            type: 'pattern',
+            patternUrl: './pattern-marker.patt' 
+        });
+
+        const arjsMesh = new THREE.Mesh(
+            new THREE.BoxGeometry(1, 1, 1), // Using a simple cube for testing
+            new THREE.MeshNormalMaterial({ transparent: true, opacity: 0.8 })
+        );
+        arjsMesh.position.y = 0.5;
+        markerRoot.add(arjsMesh);
+    };
     
-    // Add an object to be displayed on the marker
-    const arjsMesh = new THREE.Mesh(
-        new THREE.TorusKnotGeometry(0.3, 0.1, 64, 16),
-        new THREE.MeshStandardMaterial({ color: 0x0077ff, roughness: 0.4 })
-    );
-    arjsMesh.position.y = 0.5;
-    markerRoot.add(arjsMesh);
+    // Add the event listener. The callback will only run when the video starts playing.
+    video.addEventListener('playing', onPlaying);
 }
 
 function saveMesh() {
@@ -330,26 +339,26 @@ function mainWebARRocks() {
 function startAROnlyTest(videoElement) {
     console.log("Starting AR.js in isolated test mode.");
 
-    // Create a new, clean scene for the test
     const arScene = new THREE.Scene();
     const arCamera = new THREE.Camera();
     arScene.add(arCamera);
     
     const arRenderer = new THREE.WebGLRenderer({
         antialias: true,
-        alpha: true
+        alpha: true,
+        canvas: document.getElementById('threeCanvas') // Make sure to use your canvas
     });
     arRenderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(arRenderer.domElement);
     
-    // Pass the new scene/camera to the AR.js initializer
+    // Call the updated initializer
     initializeArJs(videoElement, { scene: arScene, camera: arCamera, renderer: arRenderer });
 
-    // A simple, clean animation loop just for AR.js
     function animateTest() {
         requestAnimationFrame(animateTest);
 
-        if (window.arToolkitSource && window.arToolkitSource.ready) {
+        // Check if the context has been initialized yet by the 'onplaying' event
+        if (window.arToolkitContext && window.arToolkitSource.ready) {
             window.arToolkitContext.update(window.arToolkitSource.domElement);
         }
 
