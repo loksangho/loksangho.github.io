@@ -137,8 +137,8 @@ async function init() {
     document.getElementById('uiContainer').style.display = 'flex';
     document.getElementById('saveButton').addEventListener('click', saveMesh);
     document.getElementById('arButton').addEventListener('click', function() {
-        mainWebARRocks();
-        
+       // mainWebARRocks();
+        startMarkerTrackingMode(); // Start AR.js marker tracking mode
     });
 
     animate();
@@ -211,6 +211,76 @@ function initializeArJs(video, three) {
     
     // Add the event listener. The callback will only run when the video starts playing.
     video.addEventListener('playing', onPlaying);
+}
+
+
+// arButton from your UI will now call this
+function startObjectTrackingMode() {
+    cleanupARSystems(); // Clean up first
+    mainWebARRocks(); // Your existing function to start WebAR.rocks
+}
+
+// A new button, e.g., 'markerButton', will call this
+function startMarkerTrackingMode() {
+    cleanupARSystems(); // Clean up first
+    
+    // This is essentially the code from our successful isolation test
+    _DOMVideo = document.getElementById('webcamVideo');
+    if (_DOMVideo.srcObject) { 
+        _DOMVideo.srcObject.getTracks().forEach(track => track.stop()); 
+    }
+
+    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, (videoElement) => {
+        const arScene = new THREE.Scene();
+        const arCamera = new THREE.Camera();
+        arScene.add(arCamera);
+        
+        const arRenderer = new THREE.WebGLRenderer({
+            antialias: true,
+            alpha: true,
+            canvas: document.getElementById('threeCanvas') 
+        });
+        arRenderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(arRenderer.domElement);
+        
+        initializeArJs(videoElement, { scene: arScene, camera: arCamera, renderer: arRenderer });
+
+        function animateARjs() {
+            animationFrameId = requestAnimationFrame(animateARjs);
+            if (window.arToolkitSource && window.arToolkitSource.ready) {
+                window.arToolkitContext.update(window.arToolkitSource.domElement);
+            }
+            arRenderer.render(arScene, arCamera);
+        }
+        animateARjs();
+
+    }, (err) => {
+      console.error("Failed to get camera for AR.js mode:", err);
+    }, { /* ... your camera constraints ... */ });
+}
+
+// In main.js
+function cleanupARSystems() {
+    // Stop any existing animation loop
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+    }
+    
+    // Dispose of WebAR.rocks if it's running
+    if (WebARRocksObjectThreeHelper.isInitialized()) {
+        WebARRocksObjectThreeHelper.destroy();
+        console.log("WebAR.rocks destroyed.");
+    }
+
+    // Dispose of AR.js context if it exists
+    if (window.arToolkitContext) {
+        window.arToolkitContext = null;
+        console.log("AR.js context destroyed.");
+    }
+    
+    // You might need to remove and re-add your canvas elements here
+    // to ensure a clean state, but start with this.
 }
 
 function saveMesh() {
