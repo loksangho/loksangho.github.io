@@ -184,7 +184,7 @@ function initializeArJs(video, three) {
     // Setup marker controls to update the markerRoot
     new window.THREEx.ArMarkerControls(window.arToolkitContext, markerRoot, {
         type: 'pattern',
-        patternUrl: './pattern-marker.patt',
+        patternUrl: './pattern-marker.patt', // Use your own marker pattern
     });
     
     // Add an object to be displayed on the marker
@@ -384,6 +384,7 @@ function startWebARRocks(err, three) {
 
         if (window.arToolkitContext && window.arToolkitSource && window.arToolkitSource.ready) {
             window.arToolkitContext.update(window.arToolkitSource.domElement);
+            three.camera.projectionMatrix.copy(window.arToolkitContext.getProjectionMatrix());
             scene.visible = camera.visible; // Sync scene visibility with AR.js camera
         }
         
