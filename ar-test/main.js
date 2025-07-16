@@ -18,6 +18,7 @@ let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
 let exportedMeshData = null;
 let ARRocksInitialised = false;
 const runningMode = "VIDEO";
+let animationFrameId;
 
 const _settings = {
   NNPath: './neuralNets/NN_KEYBOARD_5.json'
@@ -107,7 +108,7 @@ function animate() {
         // Stop this loop once AR starts; the AR helper has its own loop
         return;
     }
-    requestAnimationFrame(animate);
+    animationFrameId = requestAnimationFrame(animate);
     render();
 }
 
