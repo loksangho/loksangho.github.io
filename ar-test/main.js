@@ -193,13 +193,18 @@ function mainWebARRocks(){
 }
 
 function initWebARRocks(){
-  // ...
+  const ARCanvas = document.getElementById('ARCanvas');
+  const threeCanvas = document.getElementById('threeCanvas');
+  ARCanvas.style.display = 'block';
+  threeCanvas.style.display = 'block';
+
   WebARRocksObjectThreeHelper.init({
     video: _DOMVideo,
-    ARCanvas: document.getElementById('ARCanvas'),
-    threeCanvas: document.getElementById('threeCanvas'),
+    ARCanvas: ARCanvas,
+    threeCanvas: threeCanvas,
+    NNPath: _settings.NNPath, // <-- ADD THIS LINE
     callbackReady: function(){
-        ARRocksInitialised = true; // <-- ADD THIS LINE HERE
+        ARRocksInitialised = true;
         startWebARRocks();
     }
   });
