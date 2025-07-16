@@ -151,6 +151,7 @@ function animate() {
         WebARRocksObjectThreeHelper.animate();
     }
     render();
+}
 
 function render() {
     faceMesh.visible = !ARRocksInitialised;
@@ -181,7 +182,8 @@ function render() {
                 textureCanvasCtx.drawImage(video, 0, 0, textureCanvas.width, textureCanvas.height);
                 faceTexture.needsUpdate = true; // Tell Three.js to update the texture from the canvas
             }
-    } 
+        }
+    }
 }
 
 let _DOMVideo = null;
