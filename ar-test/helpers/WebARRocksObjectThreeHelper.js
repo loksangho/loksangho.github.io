@@ -28,7 +28,7 @@
   - <boolean> isFullScreen
   - <float> zOffset - 0.5 by default, relative
  */
-const WebARRocksObjectThreeHelper = (function(){
+const WebARRocksObjectThreeHelper_Module = (function(){
   
   const _defaultSpec = {
     video: null,
@@ -383,9 +383,14 @@ const WebARRocksObjectThreeHelper = (function(){
   return that;
 })();
 
+
+export const WebARRocksObjectThreeHelper = WebARRocksObjectThreeHelper_Module;
+
+/*
 // Export ES6 module:
 try {
   module.exports = WebARRocksObjectThreeHelper;
 } catch(e){
   console.log('ES6 Module not exported');
 }
+*/
