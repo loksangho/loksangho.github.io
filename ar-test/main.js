@@ -1,4 +1,25 @@
 // main.js - Final Classic Script Version
+(function() {
+    // --- ON-SCREEN CONSOLE OVERRIDE ---
+    const originalLog = console.log;
+    function appendToConsole(message, type = 'log') {
+        const consoleDiv = document.getElementById('onScreenConsole');
+        if (!consoleDiv) return;
+        const p = document.createElement('p');
+        p.textContent = `[${type.toUpperCase()}] ${message}`;
+        p.style.margin = '0';
+        p.style.lineHeight = '1.2em';
+        if (type === 'warn') p.style.color = 'yellow';
+        if (type === 'error') p.style.color = 'red';
+        consoleDiv.appendChild(p);
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+    }
+    console.log = function(...args) {
+        originalLog.apply(console, args);
+        appendToConsole(args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(' '), 'log');
+    };
+})();
+
 
 // Use the global 'vision' object from MediaPipe
 import * as THREE from 'three';
