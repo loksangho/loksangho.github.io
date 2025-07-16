@@ -267,7 +267,7 @@ function initWebARRocks(){
     const threeCanvas = document.getElementById('threeCanvas');
     
     WebARRocksObjectThreeHelper.init({
-    video: _DOMvideo,
+    video: _DOMVideo,
     ARCanvas: ARCanvas,
     threeCanvas: threeCanvas,
     NNPath: _settings.NNPath,
@@ -309,8 +309,9 @@ function startWebARRocks(err, three) {
              WebARRocksObjectThreeHelper.set_callback('CUP', 'ondetect', function(){
                 three.scene.add(loadedMesh);
             });
-            WebARRocksObjectThreeHelper.set_callback('CUP', 'onloose', function(){
+            WebARRocksObjectThreeHelper.set_callback('CUP', 'onloose', function() {
                 three.scene.remove(loadedMesh);
+            });
         }, function (error) {
             console.error('An error happened during GLTF parsing:', error);
         });
