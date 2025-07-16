@@ -15,9 +15,9 @@ const FACEMESH_FACE_OVAL_JS_STRUCTURE = [
 
 // Option 1: Using Array.prototype.flat() (most common and simplest for modern JS)
 // The default depth for flat() is 1, which is exactly what we need here.
-export const FACEMESH_FACE_OVAL = FACEMESH_FACE_OVAL_JS_STRUCTURE.flat();
+const FACEMESH_FACE_OVAL = FACEMESH_FACE_OVAL_JS_STRUCTURE.flat();
 
-export const FACEMESH_TESSELATION = [
+const FACEMESH_TESSELATION = [
     127, 34, 139, 11, 0, 37, 232, 231, 120, 72, 37, 39, 128, 121, 47, 232, 121,
     128, 104, 69, 67, 175, 171, 148, 157, 154, 155, 118, 50, 101, 73, 39, 40, 9,
     151, 108, 48, 115, 131, 194, 204, 211, 74, 40, 185, 80, 42, 183, 40, 92,
@@ -187,7 +187,7 @@ export const FACEMESH_TESSELATION = [
     453, 465, 343, 357, 412, 437, 343, 399, 344, 360, 440, 420, 437, 456, 360,
     420, 363, 361, 401, 288, 265, 372, 353, 390, 339, 249, 339, 448, 255];
 
-export const UV_COORDS = [
+const UV_COORDS = [
   { x: 0.499976992607117, y: 0.652534008026123, z: 0 },
   { x: 0.500025987625122, y: 0.547487020492554, z: 0 },
   { x: 0.499974012374878, y: 0.602371990680695, z: 0 },
