@@ -69,7 +69,7 @@ async function init() {
     console.log("init() started.");
 
     // Setup Scene for MediaPipe phase
-    /*scene = new THREE.Scene();
+    scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 2;
     const canvas = document.getElementById('outputCanvas');
@@ -79,9 +79,9 @@ async function init() {
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
     dirLight.position.set(0, 1, 1);
     scene.add(dirLight);
-*/
+
     // Setup MediaPipe
-/*    video = document.getElementById('webcamVideo');
+    video = document.getElementById('webcamVideo');
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
     video.srcObject = stream;
     await new Promise(resolve => video.onloadedmetadata = () => { video.play(); resolve(); });
@@ -105,8 +105,8 @@ async function init() {
     faceTexture = new THREE.CanvasTexture(textureCanvas);
     const material = new THREE.MeshStandardMaterial({ map: faceTexture, side: THREE.DoubleSide });
     faceMesh = new THREE.Mesh(geometry, material);
-    //scene.add(faceMesh);
-*/
+    scene.add(faceMesh);
+
     // Setup UI
     document.getElementById('loading').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'flex';
@@ -210,7 +210,7 @@ function mainWebARRocks() {
         scene.clear();
         console.log("Scene cleared.");
     }
-    //document.getElementById('outputCanvas').style.display = 'none';
+    document.getElementById('outputCanvas').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'none';
     // --- END CLEANUP ---
 
@@ -222,7 +222,7 @@ function mainWebARRocks() {
     //document.getElementById('outputCanvas').style.display = 'none'; // <-- ADD THIS LINE
 
     _DOMVideo = document.getElementById('webcamVideo');
-    //if (video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); }
+    if (video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); }
     
     // Access classic script helpers via the 'window' object
     //WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, (err) => console.error(err), { video: { facingMode: { ideal: 'environment' } } });
@@ -297,10 +297,10 @@ function startWebARRocks(err, three) {
     }
 
     // Add lighting to the AR Scene
-    //three.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    three.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     const arDirLight = new THREE.DirectionalLight(0xffffff, 0.7);
     arDirLight.position.set(0, 1, 1);
-    //three.scene.add(arDirLight);
+    three.scene.add(arDirLight);
 
     if (exportedMeshData) {
         const loader = new GLTFLoader();
