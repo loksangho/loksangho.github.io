@@ -94,7 +94,11 @@ async function init() {
     geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(UV_COORDS.flatMap(coord => [coord.x, 1 - coord.y])), 2));
     geometry.setIndex(FACEMESH_TESSELATION.flat());
 
-    faceTexture = new THREE.Texture(document.createElement('canvas'));
+    textureCanvas = document.createElement('canvas');
+    textureCanvas.width = 512;
+    textureCanvas.height = 512;
+    textureCanvasCtx = textureCanvas.getContext('2d');
+    faceTexture = new THREE.CanvasTexture(textureCanvas); // Use CanvasTexture
     const material = new THREE.MeshStandardMaterial({ map: faceTexture, side: THREE.DoubleSide });
     faceMesh = new THREE.Mesh(geometry, material);
     scene.add(faceMesh);
@@ -170,8 +174,9 @@ function render() {
                 faceMesh.geometry.attributes.position.needsUpdate = true;
                 faceMesh.geometry.attributes.uv.needsUpdate = true;
                 faceMesh.geometry.computeVertexNormals();
-                faceTexture.image = video;
-                faceTexture.needsUpdate = true;
+                textureCanvasCtx.clearRect(0, 0, textureCanvas.width, textureCanvas.height);
+                textureCanvasCtx.drawImage(video, 0, 0, textureCanvas.width, textureCanvas.height);
+                faceTexture.needsUpdate = true; // Tell Three.js to update the texture from the canvas
             }
         }
     }
