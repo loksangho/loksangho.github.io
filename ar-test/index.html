@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AR.js Basic Hiro Marker Example</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <script src='https://unpkg.com/three@0.133.0/build/three.min.js'></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js"></script>
+</head>
+
+<body style='margin: 0; overflow: hidden;'>
+    <script>
+        //////////////////////////////////////////////////////////////////////////////////
+        //		Initial Setup
+        //////////////////////////////////////////////////////////////////////////////////
+
+        // Initialize the THREE.js Scene, Camera, and Renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.Camera();
+        scene.add(camera);
+
+        const renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            alpha: true // Use alpha for a transparent background
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        //////////////////////////////////////////////////////////////////////////////////
+        //		AR.js Setup
+        //////////////////////////////////////////////////////////////////////////////////
+
+        // Create AR.js Source (for camera access)
+        const arToolkitSource = new THREEx.ArToolkitSource({
+            sourceType: 'webcam',
+        });
+
+        // Handle window resize
+        arToolkitSource.init(function onReady() {
+            // A small delay to ensure the video element is sized correctly
+            setTimeout(() => {
+                arToolkitSource.onResizeElement();
+                arToolkitSource.copyElementSizeTo(renderer.domElement);
+            }, 500);
+        });
+
+        // Create AR.js Context (handles the marker detection and tracking)
+        const arToolkitContext = new THREEx.ArToolkitContext({
+            cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
+            detectionMode: 'mono',
+        });
+
+        arToolkitContext.init(function onCompleted() {
+            // Copy the AR projection matrix to the THREE.js camera
+            camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+        });
+
+        //////////////////////////////////////////////////////////////////////////////////
+        //		Marker Setup
+        //////////////////////////////////////////////////////////////////////////////////
+
+        // Create a root group to hold the 3D object for the Hiro marker
+        const markerRoot = new THREE.Group();
+        scene.add(markerRoot);
+
+        // Create AR.js Marker Controls to link the marker to our root group
+        const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+            type: 'pattern',
+            // URL to the Hiro pattern file
+            patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro',
+        });
+
+        //////////////////////////////////////////////////////////////////////////////////
+        //		Add 3D Object to the Marker
+        //////////////////////////////////////////////////////////////////////////////////
+
+        // Create a simple box geometry
+        const geometry = new THREE.BoxGeometry(1, 1, 1); // Size 1x1x1 AR units
+        
+        // Use MeshNormalMaterial for simple visualization without needing lights
+        const material = new THREE.MeshNormalMaterial({
+            transparent: true,
+            opacity: 0.85,
+        });
+
+        const cube = new THREE.Mesh(geometry, material);
+        // Position the cube slightly above the marker (0.5 units on the Y axis)
+        cube.position.y = 0.5;
+        // Add the cube to our marker's root group
+        markerRoot.add(cube);
+
+        //////////////////////////////////////////////////////////////////////////////////
+        //		Render Loop
+        //////////////////////////////////////////////////////////////////////////////////
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // If the source isn't ready, skip the update
+            if (arToolkitSource.ready === false) {
+                return;
+            }
+
+            // Update the AR context with the latest camera image
+            arToolkitContext.update(arToolkitSource.domElement);
+            // Hide/show the scene based on whether the camera has detected a marker
+            scene.visible = camera.visible;
+
+            // Render the scene
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
