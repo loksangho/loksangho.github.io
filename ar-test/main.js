@@ -113,7 +113,7 @@ async function init() {
     document.getElementById('saveButton').addEventListener('click', saveMesh);
     document.getElementById('arButton').addEventListener('click', mainWebARRocks);
 
-    //animate();
+    animate();
 }
 
 function saveMesh() {
