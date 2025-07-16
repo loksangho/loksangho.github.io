@@ -27,10 +27,9 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
 
-// Use the global 'vision' object from MediaPipe's vision_bundle.js
-import { vision } from '@mediapipe/tasks-vision';
-const { FaceLandmarker, FilesetResolver } = vision;
-
+// Correctly import the specific classes you need from MediaPipe
+import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
+const { FACEMESH_TESSELATION, UV_COORDS } = window;
 
 let scene, camera, renderer;
 let video, faceLandmarker, runningMode = "VIDEO";
