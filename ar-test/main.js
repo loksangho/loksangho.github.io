@@ -210,7 +210,7 @@ function mainWebARRocks() {
         scene.clear();
         console.log("Scene cleared.");
     }
-    document.getElementById('outputCanvas').style.display = 'none';
+    //document.getElementById('outputCanvas').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'none';
     // --- END CLEANUP ---
 
