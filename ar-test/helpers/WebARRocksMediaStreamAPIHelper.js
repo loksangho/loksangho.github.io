@@ -23,7 +23,7 @@
 */
 
 
-const WebARRocksMediaStreamAPIHelper = {
+const WebARRocksMediaStreamAPIHelper_Module = {
   get_videoElement: function() {
     if (!WebARRocksMediaStreamAPIHelper.compat()) return false;
     const vid = document.createElement("video");
@@ -719,4 +719,6 @@ const WebARRocksMediaStreamAPIHelper = {
     });
   }
 };
+
+export const WebARRocksMediaStreamAPIHelper = WebARRocksMediaStreamAPIHelper_Module;
 
