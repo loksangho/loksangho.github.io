@@ -31,7 +31,7 @@ const _settings = {
     notHereFactor: 0.0,
     paramsPerLabel: {
       CUP: {
-        thresholdDetect: 0.82
+        thresholdDetect: 0.52
       }
     }
   },
@@ -305,7 +305,7 @@ function startWebARRocks(err, three) {
             const loadedMesh = gltf.scene;
             loadedMesh.scale.set(1, 1, 1);
 
-            loadedMesh.position.set(-0.05, 0.21, 0); 
+            
             // Access classic script helper via the 'window' object
             WebARRocksObjectThreeHelper.add('CUP', loadedMesh);
              
