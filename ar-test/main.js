@@ -164,7 +164,7 @@ function mainWebARRocks() {
     if (video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); }
     
     // Access classic script helpers via the 'window' object
-    window.WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, (err) => console.error(err), { video: { facingMode: { ideal: 'environment' } } });
+    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, (err) => console.error(err), { video: { facingMode: { ideal: 'environment' } } });
 }
 
 function initWebARRocks() {
