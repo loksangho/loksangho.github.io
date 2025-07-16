@@ -28,6 +28,7 @@ let ARRocksInitialised = false;
 const runningMode = "VIDEO";
 let animationFrameId;
 let markerRoot; 
+let isWebARRocksRunning = false
 
 const _settings = {
   nDetectsPerLoop: 0, // 0 -> adaptative
@@ -270,6 +271,7 @@ function cleanupARSystems() {
     // Dispose of WebAR.rocks if it's running
     if (WebARRocksObjectThreeHelper.isInitialized()) {
         WebARRocksObjectThreeHelper.destroy();
+        isWebARRocksRunning = false; // <-- RESET THE FLAG
         console.log("WebAR.rocks destroyed.");
     }
 
@@ -470,6 +472,8 @@ function startWebARRocks(err, three) {
         console.error("Error in WebAR.rocks initialization:", err);
         return;
     }
+    isWebARRocksRunning = true;
+    console.log("WebAR.rocks has initialized successfully.");
     initializeArJs(_DOMVideo, three);
     // Add lighting to the AR Scene
     three.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
