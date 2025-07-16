@@ -7,7 +7,7 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 
 // These are global, loaded from face_mesh_data.js classic script
-const { FACEMESH_TESSELATION, UV_COORDS } = window;
+import { FACEMESH_TESSELATION, UV_COORDS } from './face_mesh_data.js';
 const NUM_LANDMARKS = UV_COORDS.length;
 
 // Global variables for the app
