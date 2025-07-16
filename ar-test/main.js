@@ -225,10 +225,21 @@ function mainWebARRocks() {
     //if (video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); }
     
     // Access classic script helpers via the 'window' object
-    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, (err) => console.error(err), { video: { facingMode: { ideal: 'environment' } } });
+    //WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, (err) => console.error(err), { video: { facingMode: { ideal: 'environment' } } });
+
+  WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
+      throw new Error('Cannot get video feed ' + err);
+    }, {
+      video: {
+        width:  {min: 640, max: 1920, ideal: 1280},
+        height: {min: 640, max: 1920, ideal: 720},
+        facingMode: {ideal: 'environment'}
+      },
+      audio: false
+   });
 }
 
-function initWebARRocks() {
+/*function initWebARRocks() {
     document.getElementById('ARCanvas').style.display = 'block';
     document.getElementById('threeCanvas').style.display = 'block';
 
@@ -241,6 +252,42 @@ function initWebARRocks() {
         NNPath: _settings.NNPath,
         callbackReady: startWebARRocks
     });
+}*/
+
+
+  function initWebARRocks(){
+    const ARCanvas = document.getElementById('ARCanvas');
+    const threeCanvas = document.getElementById('threeCanvas');
+    
+    WebARRocksObjectThreeHelper.init({
+      video: _DOMVideo,
+      ARCanvas: ARCanvas,    
+      threeCanvas: threeCanvas,
+      isFullScreen: true,
+    
+      NNPath: _settings.NNPath,
+      
+      callbackReady: function(){
+        startWebARRocks();
+    
+        // fix a weird bug noticed on Chrome 98:
+        threeCanvas.style.position = 'fixed';
+        ARCanvas.style.position = 'fixed';
+      },
+    
+      isUseDeviceOrientation: _settings.isUseDeviceOrientation,
+      deviceOrientationKeepRotYOnly: true,
+    
+      loadNNOptions: _settings.loadNNOptions,
+      nDetectsPerLoop: _settings.nDetectsPerLoop,
+      detectOptions: _settings.detectOptions,
+    
+      cameraFov: _settings.cameraFov,
+      followZRot: _settings.followZRot,
+      scanSettings: _settings.scanSettings,
+      stabilizerOptions: {}
+    });
+}
 }
 
 function startWebARRocks(err, three) {
