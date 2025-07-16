@@ -257,7 +257,13 @@ function startMarkerTrackingMode() {
 
     }, (err) => {
       console.error("Failed to get camera for AR.js mode:", err);
-    }, { /* ... your camera constraints ... */ });
+    }, {
+        video: {
+        width:  { ideal: 1280 },
+        height: { ideal: 720 },
+        facingMode: { ideal: 'environment' } // This requires a rear camera
+        },
+    });
 }
 
 // In main.js
