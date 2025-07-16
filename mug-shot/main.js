@@ -137,13 +137,16 @@ async function init() {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'flex';
     document.getElementById('saveButton').addEventListener('click', saveMesh);
-    document.getElementById('arButton').addEventListener('click', function() {
-       // mainWebARRocks();
-        startObjectTrackingMode(); // Start AR.js marker tracking mode
+    document.getElementById('arButton').addEventListener('click', mainWebARRocks);
+
+    // These listeners control the mode once AR has started
+    document.getElementById('objectModeBtn').addEventListener('click', () => {
+        // _DOMVideo is the global variable holding the video element
+        startObjectTrackingMode(_DOMVideo);
     });
-    document.getElementById('markerButton').addEventListener('click', function() {
-       // mainWebARRocks();
-        startMarkerTrackingMode(); // Start AR.js marker tracking mode
+
+    document.getElementById('markerModeBtn').addEventListener('click', () => {
+        startMarkerTrackingMode(_DOMVideo);
     });
 
     animate();
@@ -220,54 +223,16 @@ function initializeArJs(video, three) {
 
 
 // arButton from your UI will now call this
-function startObjectTrackingMode() {
-    cleanupARSystems(); // Clean up first
-    mainWebARRocks(); // Your existing function to start WebAR.rocks
+function startObjectTrackingMode(videoElement) {
+    cleanupARSystems(); // Clears any previous AR setup
+    // Call your function that initializes WebARRocksObjectThreeHelper...
+    initWebARRocks(videoElement);
 }
 
-// A new button, e.g., 'markerButton', will call this
-function startMarkerTrackingMode() {
-    cleanupARSystems(); // Clean up first
-    
-    // This is essentially the code from our successful isolation test
-    _DOMVideo = document.getElementById('webcamVideo');
-    if (_DOMVideo.srcObject) { 
-        _DOMVideo.srcObject.getTracks().forEach(track => track.stop()); 
-    }
-
-    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, (videoElement) => {
-        const arScene = new THREE.Scene();
-        const arCamera = new THREE.Camera();
-        arScene.add(arCamera);
-        
-        const arRenderer = new THREE.WebGLRenderer({
-            antialias: true,
-            alpha: true,
-            canvas: document.getElementById('threeCanvas') 
-        });
-        arRenderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(arRenderer.domElement);
-        
-        initializeArJs(videoElement, { scene: arScene, camera: arCamera, renderer: arRenderer });
-
-        function animateARjs() {
-            animationFrameId = requestAnimationFrame(animateARjs);
-            if (window.arToolkitSource && window.arToolkitSource.ready) {
-                window.arToolkitContext.update(window.arToolkitSource.domElement);
-            }
-            arRenderer.render(arScene, arCamera);
-        }
-        animateARjs();
-
-    }, (err) => {
-      console.error("Failed to get camera for AR.js mode:", err);
-    }, {
-        video: {
-        width:  { ideal: 1280 },
-        height: { ideal: 720 },
-        facingMode: { ideal: 'environment' } // This requires a rear camera
-        },
-    });
+function startMarkerTrackingMode(videoElement) {
+    cleanupARSystems(); // Clears any previous AR setup
+    // Call your function that initializes AR.js...
+    startAROnlyTest(videoElement);
 }
 
 // In main.js
@@ -380,7 +345,7 @@ function render() {
 }
 
 let _DOMVideo;
-function mainWebARRocks() {
+/*function mainWebARRocks() {
 
    // --- CRUCIAL CLEANUP STEP ---
     cancelAnimationFrame(animationFrameId);
@@ -410,6 +375,41 @@ function mainWebARRocks() {
     WebARRocksMediaStreamAPIHelper.get(_DOMVideo, startAROnlyTest, function(err){
       throw new Error('Cannot get video feed ' + err);
     }, {
+      video: {
+        width:  {min: 640, max: 1920, ideal: 1280},
+        height: {min: 640, max: 1920, ideal: 720},
+        facingMode: {ideal: 'environment'}
+      },
+      audio: false
+   });
+}*/
+
+// This function is called when the user wants to start AR
+function mainWebARRocks() {
+    // ... your cleanup code (canceling animation frame, etc.) ...
+
+    _DOMVideo = document.getElementById('webcamVideo');
+    if (_DOMVideo.srcObject) { 
+        _DOMVideo.srcObject.getTracks().forEach(track => track.stop()); 
+    }
+
+    const successCallback = (videoElement) => {
+        // SUCCESS! The rear camera is now on.
+        console.log("Rear camera is active.");
+        
+        // --- Make the mode-switching buttons visible ---
+        document.getElementById('arModeButtons').style.display = 'block';
+
+        // Optionally, start one of the modes by default
+        startObjectTrackingMode(videoElement); 
+    };
+
+    const errorCallback = (err) => {
+        console.error("Could not get camera for AR mode:", err);
+    };
+    
+    // Use the constraints array from the previous step
+    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, successCallback, errorCallback, {
       video: {
         width:  {min: 640, max: 1920, ideal: 1280},
         height: {min: 640, max: 1920, ideal: 720},
