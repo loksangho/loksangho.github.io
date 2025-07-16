@@ -180,9 +180,9 @@ function mainWebARRocks() {
     console.log("Cleanup finished. Starting AR."); // <-- Add this
   
     ARRocksInitialised = true;
-    renderer.setAnimationLoop(null); // Stop the old render loop
-    document.getElementById('uiContainer').style.display = 'none';
-    document.getElementById('outputCanvas').style.display = 'none'; // <-- ADD THIS LINE
+    //renderer.setAnimationLoop(null); // Stop the old render loop
+    //document.getElementById('uiContainer').style.display = 'none';
+    //document.getElementById('outputCanvas').style.display = 'none'; // <-- ADD THIS LINE
 
     _DOMVideo = document.getElementById('webcamVideo');
     if (video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); }
