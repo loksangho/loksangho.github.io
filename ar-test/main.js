@@ -176,7 +176,7 @@ function mainWebARRocks() {
     if (video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); }
     
     // Access classic script helpers via the 'window' object
-    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, (err) => console.error(err), { video: { facingMode: { ideal: 'environment' } } });
+    window.WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, (err) => console.error(err), { video: { facingMode: { ideal: 'environment' } } });
 }
 
 function initWebARRocks() {
@@ -185,7 +185,7 @@ function initWebARRocks() {
 
 
     // Access classic script helper via the 'window' object
-    WebARRocksObjectThreeHelper.init({
+    window.WebARRocksObjectThreeHelper.init({
         video: _DOMVideo,
         ARCanvas: document.getElementById('ARCanvas'),
         threeCanvas: document.getElementById('threeCanvas'),
@@ -215,7 +215,7 @@ function startWebARRocks(err, three) {
             const loadedMesh = gltf.scene;
             loadedMesh.scale.set(0.2, 0.2, 0.2);
             // Access classic script helper via the 'window' object
-            WebARRocksObjectThreeHelper.add('KEYBOARD', loadedMesh);
+            window.WebARRocksObjectThreeHelper.add('KEYBOARD', loadedMesh);
         }, function (error) {
             console.error('An error happened during GLTF parsing:', error);
         });
@@ -223,13 +223,13 @@ function startWebARRocks(err, three) {
     } else {
         // Fallback to a cube if no mesh was saved
         const arCube = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshNormalMaterial());
-        WebARRocksObjectThreeHelper.add('KEYBOARD', arCube);
+        window.WebARRocksObjectThreeHelper.add('KEYBOARD', arCube);
         alert("No mesh data found, showing a debug cube instead.");
     }
 
     // Start the new AR animation loop
     function animateAR() {
-        WebARRocksObjectThreeHelper.animate();
+        window.WebARRocksObjectThreeHelper.animate();
         requestAnimationFrame(animateAR);
     }
     animateAR();
