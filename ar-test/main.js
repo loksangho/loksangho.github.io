@@ -1,51 +1,30 @@
-// main.js - Final Classic Script Version
-(function() {
-    // --- ON-SCREEN CONSOLE OVERRIDE ---
-    const originalLog = console.log;
-    function appendToConsole(message, type = 'log') {
-        const consoleDiv = document.getElementById('onScreenConsole');
-        if (!consoleDiv) return;
-        const p = document.createElement('p');
-        p.textContent = `[${type.toUpperCase()}] ${message}`;
-        p.style.margin = '0';
-        p.style.lineHeight = '1.2em';
-        if (type === 'warn') p.style.color = 'yellow';
-        if (type === 'error') p.style.color = 'red';
-        consoleDiv.appendChild(p);
-        consoleDiv.scrollTop = consoleDiv.scrollHeight;
-    }
-    console.log = function(...args) {
-        originalLog.apply(console, args);
-        appendToConsole(args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(' '), 'log');
-    };
-})();
+// main.js - Hybrid Module Version
 
-// NO IMPORTS - These libraries are now global
+// Use import for module-based libraries
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 
-// Use the global 'vision' object from MediaPipe's script
-const { FaceLandmarker, FilesetResolver } = vision;
-// Use the global 'THREE' object from Three.js's script
-// Use the global 'WebARRocksObjectThreeHelper' and other helpers
-
-// These are now global, loaded from face_mesh_data.js
+// These are global, loaded from face_mesh_data.js classic script
+const { FACEMESH_TESSELATION, UV_COORDS } = window;
 const NUM_LANDMARKS = UV_COORDS.length;
 
 // Global variables for the app
 let scene, camera, renderer, video, faceLandmarker;
 let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
-let debugCube, exportedMeshData = null, ARRocksInitialised = false;
+let exportedMeshData = null;
+let ARRocksInitialised = false;
 const runningMode = "VIDEO";
-const VIDEO_WIDTH = 640;
-const VIDEO_HEIGHT = 480;
 
 const _settings = {
-    NNPath: './neuralNets/NN_KEYBOARD_5.json'
+  NNPath: './neuralNets/NN_KEYBOARD_5.json'
 };
 
 async function init() {
     console.log("init() started.");
 
-    // Setup Scene
+    // Setup Scene for MediaPipe phase
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 2;
@@ -56,25 +35,21 @@ async function init() {
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
     dirLight.position.set(0, 1, 1);
     scene.add(dirLight);
-    debugCube = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true}));
-    scene.add(debugCube);
 
     // Setup MediaPipe
     video = document.getElementById('webcamVideo');
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
     video.srcObject = stream;
     await new Promise(resolve => video.onloadedmetadata = () => { video.play(); resolve(); });
-    video.width = VIDEO_WIDTH;
-    video.height = VIDEO_HEIGHT;
 
     const visionResolver = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/wasm");
     faceLandmarker = await FaceLandmarker.createFromOptions(visionResolver, {
         baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task` },
-        runningMode: runningMode,
+        runningMode,
         numFaces: 1
     });
 
-    // Setup Face Mesh
+    // Setup Face Mesh object
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(NUM_LANDMARKS * 3), 3));
     geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(NUM_LANDMARKS * 2), 2));
@@ -89,105 +64,110 @@ async function init() {
     scene.add(faceMesh);
 
     // Setup UI
-    document.getElementById('saveButton').style.display = 'block';
-    document.getElementById('saveButton').addEventListener('click', saveMesh);
-    const arButton = document.createElement('button');
-    arButton.textContent = 'START AR';
-    Object.assign(arButton.style, {
-        position: 'absolute', bottom: '24px', left: '50%', transform: 'translateX(-50%)', zIndex: '100',
-        padding: '12px 24px', border: '1px solid white', borderRadius: '4px', background: 'rgba(0,0,0,0.5)',
-        color: 'white', cursor: 'pointer', fontSize: '16px'
-    });
-    arButton.onclick = () => { arButton.style.display = 'none'; mainWebARRocks(); };
-    document.getElementById('arButtonPlaceholder').appendChild(arButton);
     document.getElementById('loading').style.display = 'none';
+    document.getElementById('uiContainer').style.display = 'flex';
+    document.getElementById('saveButton').addEventListener('click', saveMesh);
+    document.getElementById('arButton').addEventListener('click', mainWebARRocks);
 
     animate();
 }
 
 function saveMesh() {
-    if (!faceMesh.visible) { console.warn("No visible face to save."); return; }
-    const exporter = new THREE.GLTFExporter();
+    const results = faceLandmarker.detectForVideo(video, performance.now());
+    if (results.faceLandmarks.length === 0) {
+        alert("No face detected. Please try again.");
+        return;
+    }
+
+    const landmarks = results.faceLandmarks[0];
+    const positions = faceMesh.geometry.attributes.position.array;
+    for (let i = 0; i < landmarks.length; i++) {
+        positions[i * 3]     = (landmarks[i].x - 0.5) * 2;
+        positions[i * 3 + 1] = -(landmarks[i].y - 0.5) * 2;
+        positions[i * 3 + 2] = -landmarks[i].z;
+    }
+    faceMesh.geometry.attributes.position.needsUpdate = true;
+    faceMesh.geometry.computeVertexNormals();
+
+    const exporter = new GLTFExporter();
     exporter.parse(faceMesh, (gltf) => {
         exportedMeshData = gltf;
-        alert("Face mesh saved to memory!");
-    }, (error) => console.error("GLTF Export Error:", error), { binary: true });
+        alert("Face mesh saved! You can now start AR.");
+        document.getElementById('arButton').style.display = 'block';
+    }, (error) => console.error(error), { binary: true });
 }
 
-let lastVideoTime = -1;
 function animate() {
-    requestAnimationFrame(animate);
-    if (ARRocksInitialised) {
-        WebARRocksObjectThreeHelper.animate();
+    if (!ARRocksInitialised) {
+        // Only run the pre-AR animation loop if not in AR
+        requestAnimationFrame(animate);
     }
     render();
 }
 
 function render() {
-    faceMesh.visible = !ARRocksInitialised;
-    debugCube.visible = !ARRocksInitialised && !faceMesh.visible;
     if (ARRocksInitialised) {
-        scene.background = null;
-        renderer.setClearAlpha(0);
-    } else {
-        scene.background = new THREE.Color(0x333333);
-        if (video.readyState === video.HAVE_ENOUGH_DATA && video.currentTime !== lastVideoTime) {
-            lastVideoTime = video.currentTime;
-            const results = faceLandmarker.detectForVideo(video, performance.now());
-            if (results.faceLandmarks.length > 0) {
-                const landmarks = results.faceLandmarks[0];
-                const positions = faceMesh.geometry.attributes.position.array;
-                for (let i = 0; i < landmarks.length; i++) {
-                    positions[i * 3] = (landmarks[i].x - 0.5) * 2;
-                    positions[i * 3 + 1] = -(landmarks[i].y - 0.5) * 2;
-                    positions[i * 3 + 2] = -landmarks[i].z;
-                }
-                faceMesh.geometry.attributes.position.needsUpdate = true;
-                faceMesh.geometry.computeVertexNormals();
-
-                textureCanvasCtx.clearRect(0, 0, 512, 512);
-                textureCanvasCtx.drawImage(video, 0, 0, 512, 512);
-                faceTexture.needsUpdate = true;
-            }
-        }
+        // The AR helper will manage its own rendering loop
+        return;
     }
+    // Pre-AR rendering logic
     renderer.render(scene, camera);
 }
 
 let _DOMVideo;
 function mainWebARRocks() {
+    ARRocksInitialised = true;
+    renderer.setAnimationLoop(null); // Stop the old render loop
+    document.getElementById('outputCanvas').style.display = 'none';
+    document.getElementById('uiContainer').style.display = 'none';
+
     _DOMVideo = document.getElementById('webcamVideo');
     if (video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); }
-    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, (err) => console.error(err), { video: { facingMode: { ideal: 'environment' } } });
+    
+    // Access classic script helpers via the 'window' object
+    window.WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, (err) => console.error(err), { video: { facingMode: { ideal: 'environment' } } });
 }
 
 function initWebARRocks() {
     document.getElementById('ARCanvas').style.display = 'block';
     document.getElementById('threeCanvas').style.display = 'block';
-    WebARRocksObjectThreeHelper.init({
+
+    // Access classic script helper via the 'window' object
+    window.WebARRocksObjectThreeHelper.init({
         video: _DOMVideo,
         ARCanvas: document.getElementById('ARCanvas'),
         threeCanvas: document.getElementById('threeCanvas'),
-        NNPath: _settings.NNPath, // Pass the NNPath
-        callbackReady: function() {
-            ARRocksInitialised = true; // Set flag only when ready
-            startWebARRocks();
-        }
+        NNPath: _settings.NNPath,
+        callbackReady: startWebARRocks
     });
 }
 
-function startWebARRocks() {
+function startWebARRocks(err, three) {
+    if (err) { console.error(err); return; }
+
+    three.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const arDirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+    arDirLight.position.set(0, 1, 1);
+    three.scene.add(arDirLight);
+
     if (exportedMeshData) {
-        const loader = new THREE.GLTFLoader();
+        const loader = new GLTFLoader();
         loader.parse(exportedMeshData, (gltf) => {
             const loadedMesh = gltf.scene;
             loadedMesh.scale.set(0.2, 0.2, 0.2);
-            WebARRocksObjectThreeHelper.add('KEYBOARD', loadedMesh);
+            window.WebARRocksObjectThreeHelper.add('KEYBOARD', loadedMesh);
         });
     } else {
         const arCube = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshNormalMaterial());
-        WebARRocksObjectThreeHelper.add('KEYBOARD', arCube);
+        window.WebARRocksObjectThreeHelper.add('KEYBOARD', arCube);
     }
+
+    // Start the new AR animation loop
+    function animateAR() {
+        window.WebARRocksObjectThreeHelper.animate();
+        requestAnimationFrame(animateAR);
+    }
+    animateAR();
 }
 
 // Start the application
