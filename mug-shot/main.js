@@ -106,7 +106,10 @@ async function init() {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'flex';
     document.getElementById('saveButton').addEventListener('click', saveMesh);
-    document.getElementById('arButton').addEventListener('click', mainWebARRocks);
+    document.getElementById('arButton').addEventListener('click', function() {
+        mainWebARRocks();
+        initializeArJs(video, scene, camera, renderer);
+    });
 
     animate();
 }
@@ -118,6 +121,51 @@ function saveArrayBuffer(buffer, filename) {
   link.download = filename;
   link.click();
   URL.revokeObjectURL(link.href);
+}
+
+//-----------------------------------------------------------------
+// AR.JS INITIALIZATION
+//-----------------------------------------------------------------
+function initializeArJs(video, scene, camera, renderer) {
+    // Setup AR.js source
+    window.arToolkitSource = new THREEx.ArToolkitSource({
+        sourceType: 'video',
+        sourceElement: video,
+    });
+
+    arToolkitSource.init(function onReady() {
+        arToolkitSource.onResizeElement();
+        arToolkitSource.copySizeTo(renderer.domElement);
+    });
+    
+    // Setup AR.js context
+    window.arToolkitContext = new THREEx.ArToolkitContext({
+        cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
+        detectionMode: 'mono',
+    });
+
+    arToolkitContext.init(function onCompleted(){
+        // Copy projection matrix to our main camera
+        camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+    });
+
+    // Create a group for the AR.js marker
+    const markerRoot = new THREE.Group();
+    scene.add(markerRoot);
+    
+    // Setup marker controls
+    const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+        type: 'pattern',
+        patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro', // Default HIRO marker
+    });
+    
+    // Add an object to be displayed on the marker
+    const arjsMesh = new THREE.Mesh(
+        new THREE.TorusKnotBufferGeometry(0.3, 0.1, 64, 16),
+        new THREE.MeshStandardMaterial({ color: 0x0077ff, roughness: 0.4 })
+    );
+    arjsMesh.position.y = 0.5;
+    markerRoot.add(arjsMesh); // Add to the marker-controlled group
 }
 
 function saveMesh() {
@@ -224,17 +272,14 @@ function mainWebARRocks() {
     console.log("Cleanup finished. Starting AR."); // <-- Add this
   
     ARRocksInitialised = true;
-    //renderer.setAnimationLoop(null); // Stop the old render loop
-    //document.getElementById('uiContainer').style.display = 'none';
-    //document.getElementById('outputCanvas').style.display = 'none'; // <-- ADD THIS LINE
+    
 
     _DOMVideo = document.getElementById('webcamVideo');
     if (video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); }
     
     // Access classic script helpers via the 'window' object
-    //WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, (err) => console.error(err), { video: { facingMode: { ideal: 'environment' } } });
 
-  WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
+    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
       throw new Error('Cannot get video feed ' + err);
     }, {
       video: {
@@ -245,21 +290,6 @@ function mainWebARRocks() {
       audio: false
    });
 }
-
-/*function initWebARRocks() {
-    document.getElementById('ARCanvas').style.display = 'block';
-    document.getElementById('threeCanvas').style.display = 'block';
-
-
-    // Access classic script helper via the 'window' object
-    WebARRocksObjectThreeHelper.init({
-        video: _DOMVideo,
-        ARCanvas: document.getElementById('ARCanvas'),
-        threeCanvas: document.getElementById('threeCanvas'),
-        NNPath: _settings.NNPath,
-        callbackReady: startWebARRocks
-    });
-}*/
 
 
 function initWebARRocks(){
@@ -322,8 +352,22 @@ function startWebARRocks(err, three) {
 
     // Start the new AR animation loop
     function animateAR() {
-        WebARRocksObjectThreeHelper.animate();
         requestAnimationFrame(animateAR);
+
+        if (arToolkitContext && arToolkitSource && arToolkitSource.ready) {
+            arToolkitContext.update(arToolkitSource.domElement);
+            scene.visible = camera.visible; // Sync scene visibility with AR.js camera
+        }
+        
+        // Update WebAR.rocks (if initialized)
+        if (WebARRocksObjectThreeHelper) {
+            WebARRocksObjectThreeHelper.animate();
+        }
+
+        // Render the single, shared scene
+        renderer.render(scene, camera);
+        //WebARRocksObjectThreeHelper.animate();
+        ;
     }
     animateAR();
 }
