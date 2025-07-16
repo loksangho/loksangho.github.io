@@ -44,7 +44,7 @@ async function init() {
     scene.add(dirLight);
 */
     // Setup MediaPipe
-    video = document.getElementById('webcamVideo');
+/*    video = document.getElementById('webcamVideo');
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
     video.srcObject = stream;
     await new Promise(resolve => video.onloadedmetadata = () => { video.play(); resolve(); });
@@ -69,14 +69,14 @@ async function init() {
     const material = new THREE.MeshStandardMaterial({ map: faceTexture, side: THREE.DoubleSide });
     faceMesh = new THREE.Mesh(geometry, material);
     //scene.add(faceMesh);
-
+*/
     // Setup UI
     document.getElementById('loading').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'flex';
     document.getElementById('saveButton').addEventListener('click', saveMesh);
     document.getElementById('arButton').addEventListener('click', mainWebARRocks);
 
-    animate();
+    //animate();
 }
 
 function saveMesh() {
