@@ -4,7 +4,7 @@
  */
 
 // STEP 1: Import THREE.js as a module.
-import * as THREE from 'three';
+
 
 // STEP 2: Remove the IIFE wrapper. The object is now a top-level const.
 const _defaultSpec = {
