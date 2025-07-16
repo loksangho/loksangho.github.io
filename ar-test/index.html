@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AR.js Basic Hiro Marker Example</title>
+    <title>AR.js SMOOTHED Tracking Example</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <script src='https://unpkg.com/three@0.133.0/build/three.min.js'></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/artoolkit.smoother.js"></script>
 </head>
 
 <body style='margin: 0; overflow: hidden;'>
@@ -12,15 +13,12 @@
         //////////////////////////////////////////////////////////////////////////////////
         //		Initial Setup
         //////////////////////////////////////////////////////////////////////////////////
-
-        // Initialize the THREE.js Scene, Camera, and Renderer
         const scene = new THREE.Scene();
         const camera = new THREE.Camera();
         scene.add(camera);
-
         const renderer = new THREE.WebGLRenderer({
             antialias: true,
-            alpha: true // Use alpha for a transparent background
+            alpha: true
         });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
@@ -28,85 +26,80 @@
         //////////////////////////////////////////////////////////////////////////////////
         //		AR.js Setup
         //////////////////////////////////////////////////////////////////////////////////
-
-        // Create AR.js Source (for camera access)
-        const arToolkitSource = new THREEx.ArToolkitSource({
-            sourceType: 'webcam',
-        });
-
-        // Handle window resize
-        arToolkitSource.init(function onReady() {
-            // A small delay to ensure the video element is sized correctly
+        const arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
+        arToolkitSource.init(() => {
             setTimeout(() => {
                 arToolkitSource.onResizeElement();
                 arToolkitSource.copyElementSizeTo(renderer.domElement);
             }, 500);
         });
-
-        // Create AR.js Context (handles the marker detection and tracking)
         const arToolkitContext = new THREEx.ArToolkitContext({
             cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
             detectionMode: 'mono',
         });
-
-        arToolkitContext.init(function onCompleted() {
-            // Copy the AR projection matrix to the THREE.js camera
+        arToolkitContext.init(() => {
             camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
         });
 
         //////////////////////////////////////////////////////////////////////////////////
-        //		Marker Setup
+        //		Marker Setup (the "Jittery" one)
         //////////////////////////////////////////////////////////////////////////////////
-
-        // Create a root group to hold the 3D object for the Hiro marker
+        
+        // Create a root group for the raw marker tracking
         const markerRoot = new THREE.Group();
-        scene.add(markerRoot);
-
-        // Create AR.js Marker Controls to link the marker to our root group
+        // NOTE: We do NOT add markerRoot to the scene.
         const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
             type: 'pattern',
-            // URL to the Hiro pattern file
-            //patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro',
-            patternUrl: './pattern-marker.patt',
+            patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro',
         });
 
         //////////////////////////////////////////////////////////////////////////////////
-        //		Add 3D Object to the Marker
+        //      Setup a Smoothed Entity
         //////////////////////////////////////////////////////////////////////////////////
 
-        // Create a simple box geometry
-        const geometry = new THREE.BoxGeometry(1, 1, 1); // Size 1x1x1 AR units
-        
-        // Use MeshNormalMaterial for simple visualization without needing lights
+        // Create a root group for the smoothed object
+        const smoothedRoot = new THREE.Group();
+        scene.add(smoothedRoot); // Add the SMOOTHED group to the scene
+
+        // Initialize the SmoothedControls
+        const smoothedControls = new THREEx.ArSmoothedControls(smoothedRoot, {
+            // Adjust these values to change the amount of smoothing
+            lerpPosition: 0.4, // Lower value = slower, smoother movement
+            lerpQuaternion: 0.3, // Lower value = slower, smoother rotation
+            lerpScale: 1,
+        });
+
+        //////////////////////////////////////////////////////////////////////////////////
+        //		Add 3D Object to the SMOOTHED group
+        //////////////////////////////////////////////////////////////////////////////////
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
         const material = new THREE.MeshNormalMaterial({
             transparent: true,
-            opacity: 0.85,
+            opacity: 0.85
         });
-
         const cube = new THREE.Mesh(geometry, material);
-        // Position the cube slightly above the marker (0.5 units on the Y axis)
         cube.position.y = 0.5;
-        // Add the cube to our marker's root group
-        markerRoot.add(cube);
+        
+        // Add the cube to the SMOOTHED root, not the raw markerRoot
+        smoothedRoot.add(cube);
 
         //////////////////////////////////////////////////////////////////////////////////
         //		Render Loop
         //////////////////////////////////////////////////////////////////////////////////
-
         function animate() {
             requestAnimationFrame(animate);
 
-            // If the source isn't ready, skip the update
-            if (arToolkitSource.ready === false) {
-                return;
-            }
+            if (arToolkitSource.ready === false) return;
 
-            // Update the AR context with the latest camera image
             arToolkitContext.update(arToolkitSource.domElement);
-            // Hide/show the scene based on whether the camera has detected a marker
+
+            // This is the magic! Update the smoothed controls with the raw marker data.
+            // It will handle the smoothing of position, rotation, and scale.
+            smoothedControls.update(markerRoot);
+
+            // The `scene.visible` is still controlled by the raw camera visibility
             scene.visible = camera.visible;
 
-            // Render the scene
             renderer.render(scene, camera);
         }
 
