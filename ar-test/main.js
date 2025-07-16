@@ -310,7 +310,7 @@ function startWebARRocks(err, three) {
         // so your callback is the 3rd argument (onLoad).
         loader.parse(exportedMeshData, '', function (gltf) {
             const loadedMesh = gltf.scene;
-            loadedMesh.scale.set(0.2, 0.2, 0.2);
+            loadedMesh.scale.set(1, 1, 1);
             // Access classic script helper via the 'window' object
             WebARRocksObjectThreeHelper.add('KEYBOARD', loadedMesh);
         }, function (error) {
