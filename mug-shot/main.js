@@ -7,7 +7,7 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
 import { WebARRocksMediaStreamAPIHelper } from './helpers/WebARRocksMediaStreamAPIHelper.js';
-import { THREEx } from 'threex'; // Importing THREEx for AR.js
+import 'https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js'; // Importing THREEx for AR.js
 
 window.THREE = THREE;
 
@@ -128,7 +128,7 @@ function saveArrayBuffer(buffer, filename) {
 //-----------------------------------------------------------------
 function initializeArJs(video, scene, camera, renderer) {
     // Setup AR.js source
-    window.arToolkitSource = new THREEx.ArToolkitSource({
+    window.arToolkitSource = new window.THREEx.ArToolkitSource({
         sourceType: 'video',
         sourceElement: video,
     });
@@ -139,7 +139,7 @@ function initializeArJs(video, scene, camera, renderer) {
     });
     
     // Setup AR.js context
-    window.arToolkitContext = new THREEx.ArToolkitContext({
+    window.arToolkitContext = new window.THREEx.ArToolkitContext({
         cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
         detectionMode: 'mono',
     });
@@ -154,7 +154,7 @@ function initializeArJs(video, scene, camera, renderer) {
     scene.add(markerRoot);
     
     // Setup marker controls
-    const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+    const markerControls = new window.THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
         type: 'pattern',
         patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro', // Default HIRO marker
     });
