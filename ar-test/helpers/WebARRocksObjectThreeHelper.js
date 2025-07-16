@@ -28,7 +28,7 @@
   - <boolean> isFullScreen
   - <float> zOffset - 0.5 by default, relative
  */
-
+import * as THREE from 'three';
 
 const WebARRocksObjectThreeHelper = (function(){
   
