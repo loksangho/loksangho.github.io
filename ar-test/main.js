@@ -97,13 +97,6 @@ function saveMesh() {
     }, (error) => console.error(error), { binary: true });
 }
 
-function animate() {
-    if (!ARRocksInitialised) {
-        // Only run the pre-AR animation loop if not in AR
-        requestAnimationFrame(animate);
-    }
-    render();
-}
 
 let lastVideoTime = -1;
 
