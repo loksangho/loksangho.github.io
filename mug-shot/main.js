@@ -184,7 +184,7 @@ function initializeArJs(video, three) {
     // Setup marker controls to update the markerRoot
     new window.THREEx.ArMarkerControls(window.arToolkitContext, markerRoot, {
         type: 'pattern',
-        patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro',
+        patternUrl: './pattern-marker.patt',
     });
     
     // Add an object to be displayed on the marker
