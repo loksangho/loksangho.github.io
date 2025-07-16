@@ -395,7 +395,7 @@ function mainWebARRocks() {
     if (_DOMVideo.srcObject) { 
         _DOMVideo.srcObject.getTracks().forEach(track => track.stop()); 
     }
-
+    _DOMVideo.style.display = 'block'; // Ensure the video element is visible
     const successCallback = (videoElement) => {
         // SUCCESS! The rear camera is now on.
         console.log("Rear camera is active.");
