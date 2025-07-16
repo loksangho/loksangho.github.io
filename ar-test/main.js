@@ -185,7 +185,7 @@ function mainWebARRocks() {
     //document.getElementById('outputCanvas').style.display = 'none'; // <-- ADD THIS LINE
 
     _DOMVideo = document.getElementById('webcamVideo');
-    if (video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); }
+    //if (video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); }
     
     // Access classic script helpers via the 'window' object
     WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, (err) => console.error(err), { video: { facingMode: { ideal: 'environment' } } });
