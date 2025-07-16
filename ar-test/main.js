@@ -326,7 +326,6 @@ function startWebARRocks(err, three) {
     // Start the new AR animation loop
     function animateAR() {
         WebARRocksObjectThreeHelper.animate();
-        console.log("animateAR ran");
         requestAnimationFrame(animateAR);
     }
     animateAR();
