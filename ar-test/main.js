@@ -30,8 +30,8 @@ const _settings = {
   loadNNOptions: {
     notHereFactor: 0.0,
     paramsPerLabel: {
-      KEYBOARD: {
-        thresholdDetect: 0.9
+      CUP: {
+        thresholdDetect: 0.92
       }
     }
   },
@@ -40,30 +40,25 @@ const _settings = {
     isKeepTracking: true,
     isSkipConfirmation: false,
     thresholdDetectFactor: 1,
-    //cutShader: 'median',
+    cutShader: 'median',
     thresholdDetectFactorUnstitch: 0.2,
-    trackingFactors: [0.2, 0.2, 0.2]
+    trackingFactors: [0.5, 0.4, 1.5]
   },
 
-  NNPath: './neuralNets/NN_KEYBOARD_5.json', //BEST
-  //NNPath: '../../../../../../../neuralNets/raw/objectTrackingKeyboards/ARKeyboard0_2020-10-05_5_5.json',
+  NNPath: './neuralNets/NN_COFFEE_2.json',
 
-  cameraFov: 0,//WebARRocksMediaStreamAPIHelper.evaluate_verticalFoV(),  // vertical field of View of the 3D camera in degrees. set 75 for mobile, 55 for desktop
+  cameraFov: 0, // In degrees, camera vertical FoV. 0 -> auto mode
   scanSettings:{
     nScaleLevels: 2,
     scale0Factor: 0.8,
-    overlapFactors: [2, 2, 3],
-    scanCenterFirst: true,
-    scaleXRange: [1/15, 1.2]
-    //,lockStabilizeEnabled: false
+    overlapFactors: [2, 2, 2], // between 0 (max overlap) and 1 (no overlap). Along X,Y,S
+    scanCenterFirst: true    
   },
 
-  followZRot: false,
+  followZRot: true,
 
-  isUseDeviceOrientation: true,
-
-  //,videoURL: '../../../../../testVideos/keyboard_1.mov' // use a video from a file instead of the camera video
-}
+  displayDebugCylinder: false
+};
 
 async function init() {
     console.log("init() started.");
@@ -272,33 +267,20 @@ function initWebARRocks(){
     const threeCanvas = document.getElementById('threeCanvas');
     
     WebARRocksObjectThreeHelper.init({
-      video: _DOMVideo,
-      ARCanvas: ARCanvas,    
-      threeCanvas: threeCanvas,
-      isFullScreen: true,
-    
-      NNPath: _settings.NNPath,
-      
-      callbackReady: function(){
-        startWebARRocks();
-    
-        // fix a weird bug noticed on Chrome 98:
-        threeCanvas.style.position = 'fixed';
-        ARCanvas.style.position = 'fixed';
-      },
-    
-      isUseDeviceOrientation: _settings.isUseDeviceOrientation,
-      deviceOrientationKeepRotYOnly: true,
-    
-      loadNNOptions: _settings.loadNNOptions,
-      nDetectsPerLoop: _settings.nDetectsPerLoop,
-      detectOptions: _settings.detectOptions,
-    
-      cameraFov: _settings.cameraFov,
-      followZRot: _settings.followZRot,
-      scanSettings: _settings.scanSettings,
-      stabilizerOptions: {}
-    });
+    video: _DOMvideo,
+    ARCanvas: ARCanvas,
+    threeCanvas: threeCanvas,
+    NNPath: _settings.NNPath,
+    callbackReady: start,
+    loadNNOptions: _settings.loadNNOptions,
+    nDetectsPerLoop: _settings.nDetectsPerLoop,
+    detectOptions: _settings.detectOptions,
+    cameraFov: _settings.cameraFov,
+    followZRot: _settings.followZRot,
+    scanSettings: _settings.scanSettings,
+    isFullScreen: true,
+    stabilizerOptions: {}
+  });
 }
 
 
@@ -323,7 +305,7 @@ function startWebARRocks(err, three) {
             const loadedMesh = gltf.scene;
             loadedMesh.scale.set(1, 1, 1);
             // Access classic script helper via the 'window' object
-            WebARRocksObjectThreeHelper.add('KEYBOARD', loadedMesh);
+            WebARRocksObjectThreeHelper.add('CUP', loadedMesh);
         }, function (error) {
             console.error('An error happened during GLTF parsing:', error);
         });
@@ -331,7 +313,7 @@ function startWebARRocks(err, three) {
     } else {
         // Fallback to a cube if no mesh was saved
         const arCube = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshNormalMaterial());
-        WebARRocksObjectThreeHelper.add('KEYBOARD', arCube);
+        WebARRocksObjectThreeHelper.add('CUP', arCube);
         alert("No mesh data found, showing a debug cube instead.");
     }
 
