@@ -173,6 +173,8 @@ function initWebARRocks() {
     document.getElementById('ARCanvas').style.display = 'block';
     document.getElementById('threeCanvas').style.display = 'block';
 
+    ARCanvas.style.backgroundColor = 'lime';
+
     // Access classic script helper via the 'window' object
     WebARRocksObjectThreeHelper.init({
         video: _DOMVideo,
