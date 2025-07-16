@@ -305,12 +305,7 @@ function startWebARRocks(err, three) {
             const loadedMesh = gltf.scene;
             loadedMesh.scale.set(1, 1, 1);
 
-            // Add a visible debug cube as a child of the loaded model
-            const debugCube = new THREE.Mesh(
-                new THREE.BoxGeometry(0.1, 0.1, 0.1), // A small, known size
-                new THREE.MeshBasicMaterial({ color: 0xff00ff }) // Bright pink, no light needed
-            );
-            loadedMesh.add(debugCube); // Attach it to your model
+            
             // Access classic script helper via the 'window' object
             WebARRocksObjectThreeHelper.add('CUP', loadedMesh);
              
