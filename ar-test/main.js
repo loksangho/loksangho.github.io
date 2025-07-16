@@ -25,8 +25,45 @@ const runningMode = "VIDEO";
 let animationFrameId;
 
 const _settings = {
-  NNPath: './neuralNets/NN_KEYBOARD_5.json'
-};
+  nDetectsPerLoop: 0, // 0 -> adaptative
+
+  loadNNOptions: {
+    notHereFactor: 0.0,
+    paramsPerLabel: {
+      KEYBOARD: {
+        thresholdDetect: 0.9
+      }
+    }
+  },
+
+  detectOptions: {
+    isKeepTracking: true,
+    isSkipConfirmation: false,
+    thresholdDetectFactor: 1,
+    //cutShader: 'median',
+    thresholdDetectFactorUnstitch: 0.2,
+    trackingFactors: [0.2, 0.2, 0.2]
+  },
+
+  NNPath: './neuralNets/NN_KEYBOARD_5.json', //BEST
+  //NNPath: '../../../../../../../neuralNets/raw/objectTrackingKeyboards/ARKeyboard0_2020-10-05_5_5.json',
+
+  cameraFov: 0,//WebARRocksMediaStreamAPIHelper.evaluate_verticalFoV(),  // vertical field of View of the 3D camera in degrees. set 75 for mobile, 55 for desktop
+  scanSettings:{
+    nScaleLevels: 2,
+    scale0Factor: 0.8,
+    overlapFactors: [2, 2, 3],
+    scanCenterFirst: true,
+    scaleXRange: [1/15, 1.2]
+    //,lockStabilizeEnabled: false
+  },
+
+  followZRot: false,
+
+  isUseDeviceOrientation: true,
+
+  //,videoURL: '../../../../../testVideos/keyboard_1.mov' // use a video from a file instead of the camera video
+}
 
 async function init() {
     console.log("init() started.");
