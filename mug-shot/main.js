@@ -556,15 +556,15 @@ function startWebARRocks(err, three) {
     function animateAR() {
         requestAnimationFrame(animateAR);
 
-        if (window.arToolkitContext && window.arToolkitSource && window.arToolkitSource.ready) {
+        /*if (window.arToolkitContext && window.arToolkitSource && window.arToolkitSource.ready) {
             window.arToolkitContext.update(window.arToolkitSource.domElement);
             three.camera.projectionMatrix.copy(window.arToolkitContext.getProjectionMatrix());
             scene.visible = camera.visible; // Sync scene visibility with AR.js camera
-        }
+        }*/
 
-        if (markerRoot) {
-            console.log('AR.js Marker Detected:', markerRoot.visible);
-        }
+        //if (markerRoot) {
+        //    console.log('AR.js Marker Detected:', markerRoot.visible);
+        //}
         
         // Update WebAR.rocks (if initialized)
         if (WebARRocksObjectThreeHelper) {
@@ -574,7 +574,7 @@ function startWebARRocks(err, three) {
         // Render the single, shared scene
         renderer.render(scene, camera);
         //WebARRocksObjectThreeHelper.animate();
-        ;
+        
     }
     animateAR();
 }
