@@ -304,16 +304,16 @@ function startWebARRocks(err, three) {
         loader.parse(exportedMeshData, '', function (gltf) {
             const loadedMesh = gltf.scene;
             loadedMesh.scale.set(1, 1, 1);
+
+            // Add a visible debug cube as a child of the loaded model
+            const debugCube = new THREE.Mesh(
+                new THREE.BoxGeometry(0.1, 0.1, 0.1), // A small, known size
+                new THREE.MeshBasicMaterial({ color: 0xff00ff }) // Bright pink, no light needed
+            );
+            loadedMesh.add(debugCube); // Attach it to your model
             // Access classic script helper via the 'window' object
             WebARRocksObjectThreeHelper.add('CUP', loadedMesh);
-             WebARRocksObjectThreeHelper.set_callback('CUP', 'ondetect', function(){
-                three.scene.add(loadedMesh);
-                console.log("CUP detected, mesh added to scene.");
-            });
-            WebARRocksObjectThreeHelper.set_callback('CUP', 'onloose', function() {
-                three.scene.remove(loadedMesh);
-                console.log("CUP lost, mesh removed from scene.");
-            });
+             
         }, function (error) {
             console.error('An error happened during GLTF parsing:', error);
         });
