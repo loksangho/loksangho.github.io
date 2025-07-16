@@ -245,7 +245,7 @@ function cleanupARSystems() {
     
     // Dispose of WebAR.rocks if it's running
     if (isWebARRocksRunning) {
-        WebARRocksObjectThreeHelper.stop(); 
+        //WebARRocksObjectThreeHelper.stop(); 
         isWebARRocksRunning = false;
         console.log("WebAR.rocks destroyed.");
     }
@@ -258,6 +258,9 @@ function cleanupARSystems() {
     
     // You might need to remove and re-add your canvas elements here
     // to ensure a clean state, but start with this.
+    if (_DOMVideo && _DOMVideo.srcObject) {
+      _DOMVideo.srcObject.getTracks().forEach(track => track.stop());
+    }
 }
 
 function saveMesh() {
