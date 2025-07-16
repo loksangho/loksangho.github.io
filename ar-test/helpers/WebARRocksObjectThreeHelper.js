@@ -28,9 +28,7 @@
   - <boolean> isFullScreen
   - <float> zOffset - 0.5 by default, relative
  */
-import * as THREE from 'three';
-
-export const WebARRocksObjectThreeHelper = (function(){
+const WebARRocksObjectThreeHelper = (function(){
   
   const _defaultSpec = {
     video: null,
