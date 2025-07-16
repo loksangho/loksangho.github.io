@@ -30,10 +30,12 @@ import {FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { FACEMESH_TESSELATION, UV_COORDS } from './face_mesh_data.js';
 import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
 
+let scene, camera, renderer;
+let video, faceLandmarker, runningMode = "VIDEO";
+let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
+let debugCube;
 
 // Global variables for the app
-let video, faceLandmarker;
-let faceGeometry, faceMaterial;
 let exportedMeshData = null;
 let ARRocksInitialised = false;
 
