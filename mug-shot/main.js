@@ -137,7 +137,7 @@ async function init() {
     document.getElementById('saveButton').addEventListener('click', saveMesh);
     document.getElementById('arButton').addEventListener('click', function() {
         mainWebARRocks();
-        initializeArJs(video, scene, camera, renderer);
+        
     });
 
     animate();
@@ -155,18 +155,15 @@ function saveArrayBuffer(buffer, filename) {
 //-----------------------------------------------------------------
 // AR.JS INITIALIZATION
 //-----------------------------------------------------------------
-function initializeArJs(video, scene, camera, renderer) {
+// Pass the 'three' object from the WebAR.rocks helper
+function initializeArJs(video, three) { 
     // Setup AR.js source
     window.arToolkitSource = new window.THREEx.ArToolkitSource({
         sourceType: 'video',
         sourceElement: video,
     });
+    //... (rest of arToolkitSource init)
 
-    window.arToolkitSource.init(function onReady() {
-        window.arToolkitSource.onResizeElement();
-        window.arToolkitSource.copySizeTo(renderer.domElement);
-    });
-    
     // Setup AR.js context
     window.arToolkitContext = new window.THREEx.ArToolkitContext({
         cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
@@ -174,18 +171,20 @@ function initializeArJs(video, scene, camera, renderer) {
     });
 
     window.arToolkitContext.init(function onCompleted(){
-        // Copy projection matrix to our main camera
-        camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+        // IMPORTANT: Let the helper camera be the main one.
+        // We only copy the projection matrix.
+        three.camera.projectionMatrix.copy(window.arToolkitContext.getProjectionMatrix());
     });
 
     // Create a group for the AR.js marker
     const markerRoot = new THREE.Group();
-    scene.add(markerRoot);
-    
-    // Setup marker controls
-    const markerControls = new window.THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+    // ⬇️ CRITICAL CHANGE HERE ⬇️
+    three.scene.add(markerRoot); // Add to the WebAR.rocks scene
+
+    // Setup marker controls to update the markerRoot
+    new window.THREEx.ArMarkerControls(window.arToolkitContext, markerRoot, {
         type: 'pattern',
-        patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro', // Default HIRO marker
+        patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro',
     });
     
     // Add an object to be displayed on the marker
@@ -194,7 +193,7 @@ function initializeArJs(video, scene, camera, renderer) {
         new THREE.MeshStandardMaterial({ color: 0x0077ff, roughness: 0.4 })
     );
     arjsMesh.position.y = 0.5;
-    markerRoot.add(arjsMesh); // Add to the marker-controlled group
+    markerRoot.add(arjsMesh);
 }
 
 function saveMesh() {
@@ -348,7 +347,7 @@ function startWebARRocks(err, three) {
         console.error("Error in WebAR.rocks initialization:", err);
         return;
     }
-
+    initializeArJs(_DOMVideo, three);
     // Add lighting to the AR Scene
     three.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     const arDirLight = new THREE.DirectionalLight(0xffffff, 0.7);
