@@ -7,9 +7,12 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
 import { WebARRocksMediaStreamAPIHelper } from './helpers/WebARRocksMediaStreamAPIHelper.js';
-import 'https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js'; // Importing THREEx for AR.js
 
 window.THREE = THREE;
+
+
+import 'https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js'; // Importing THREEx for AR.js
+
 
 
 // These are global, loaded from face_mesh_data.js classic script
