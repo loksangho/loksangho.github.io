@@ -197,7 +197,8 @@ function initializeArJs(video, three) {
         
         new window.THREEx.ArMarkerControls(window.arToolkitContext, markerRoot, {
             type: 'pattern',
-            patternUrl: './pattern-marker.patt' 
+            // ⬇️ CHANGE THIS LINE FOR THE TEST ⬇️
+            patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro',
         });
 
         const arjsMesh = new THREE.Mesh(
