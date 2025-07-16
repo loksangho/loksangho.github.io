@@ -412,7 +412,7 @@ function mainWebARRocks() {
     };
     
     // Use the constraints array from the previous step
-    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, successCallback, errorCallback, {
+    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, errorCallback, {
       video: {
         width:  {min: 640, max: 1920, ideal: 1280},
         height: {min: 640, max: 1920, ideal: 720},

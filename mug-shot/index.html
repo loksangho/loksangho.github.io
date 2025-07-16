@@ -31,9 +31,8 @@
         }
         #loading, #uiContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white; font-family: sans-serif; text-align: center; }
         #uiContainer { background-color: rgba(0,0,0,0.5); }
-        #saveButton, #arButton, #markerButton { padding: 12px 24px; font-size: 1.2em; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 10px; }
+        #saveButton, #arButton { padding: 12px 24px; font-size: 1.2em; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 10px; }
         #arButton { background-color: #28a745; }
-        #markerButton { background-color: #28a745; }
     </style>
 </head>
 <body>
@@ -47,10 +46,10 @@
         <p>Position your face in the camera and click "Save Mesh".</p>
         <button id="saveButton">Save Face Mesh</button>
         <button id="arButton" style="display:none;">START AR</button>
-        <div id="arModeButtons" style="display: none; position: absolute; top: 10px; left: 10px; z-index: 10;">
+        <!--<div id="arModeButtons" style="display: none; position: absolute; top: 10px; left: 10px; z-index: 10;">
             <button id="objectModeBtn">Object Tracking</button>
             <button id="markerModeBtn">Marker Tracking</button>
-        </div>    
+        </div>    -->
       </div>
 
      <script type="importmap">
