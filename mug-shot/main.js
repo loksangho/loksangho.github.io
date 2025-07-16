@@ -139,6 +139,10 @@ async function init() {
     document.getElementById('saveButton').addEventListener('click', saveMesh);
     document.getElementById('arButton').addEventListener('click', function() {
        // mainWebARRocks();
+        startObjectTrackingMode(); // Start AR.js marker tracking mode
+    });
+    document.getElementById('markerButton').addEventListener('click', function() {
+       // mainWebARRocks();
         startMarkerTrackingMode(); // Start AR.js marker tracking mode
     });
 
@@ -313,6 +317,7 @@ function saveMesh() {
         exportedMeshData = gltf;
         alert("Face mesh saved! You can now start AR.");
         document.getElementById('arButton').style.display = 'block';
+        document.getElementById('markerButton').style.display = 'block';
 
       //saveArrayBuffer(exportedMeshData, 'myFaceMesh.glb');
     }, (error) => console.error(error), { binary: true });
@@ -424,27 +429,60 @@ function startAROnlyTest(videoElement) {
     
     const arRenderer = new THREE.WebGLRenderer({
         antialias: true,
-        alpha: true,
-        canvas: document.getElementById('threeCanvas') // Make sure to use your canvas
+        alpha: true
     });
+    
+    // --- FIX #1: Tell the renderer not to clear the background ---
+    arRenderer.autoClear = false;
+    
     arRenderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(arRenderer.domElement);
     
-    // Call the updated initializer
-    initializeArJs(videoElement, { scene: arScene, camera: arCamera, renderer: arRenderer });
+    // Initialize AR.js (This part is fine)
+    window.arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'video', sourceElement: videoElement });
+    window.arToolkitContext = new THREEx.ArToolkitContext({
+        cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
+        detectionMode: 'mono',
+    });
 
+    // We'll handle resizing in the animation loop instead of here
+    arToolkitSource.init(() => {});
+    
+    arToolkitContext.init(() => {
+        arCamera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+    });
+
+    // Marker Controls Setup (This part is fine)
+    markerRoot = new THREE.Group();
+    arScene.add(markerRoot);
+    new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+        type: 'pattern',
+        patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro',
+    });
+    const arjsMesh = new THREE.Mesh( new THREE.BoxGeometry(1,1,1), new THREE.MeshNormalMaterial() );
+    arjsMesh.position.y = 0.5;
+    markerRoot.add(arjsMesh);
+
+    // --- FIX #2: Update the Animation Loop ---
     function animateTest() {
         requestAnimationFrame(animateTest);
 
-        // Check if the context has been initialized yet by the 'onplaying' event
-        if (window.arToolkitContext && window.arToolkitSource.ready) {
-            window.arToolkitContext.update(window.arToolkitSource.domElement);
-        }
+        if (arToolkitSource.ready === false) return;
 
-        if (markerRoot) {
-            console.log('AR.js Marker Detected in Test:', markerRoot.visible);
+        // Ensure the renderer and AR source sizes are always in sync
+        arToolkitSource.onResizeElement();
+        arToolkitSource.copySizeTo(arRenderer.domElement);
+        if (arToolkitContext.arController !== null) {
+            arToolkitSource.copySizeTo(arToolkitContext.arController.canvas);
         }
+        
+        // This clears the depth buffer, but not the color, so the video remains
+        arRenderer.clear();
 
+        // Update AR.js, which also draws the video to the background
+        arToolkitContext.update(arToolkitSource.domElement);
+
+        // Render our 3D scene on top of the video
         arRenderer.render(arScene, arCamera);
     }
     animateTest();
