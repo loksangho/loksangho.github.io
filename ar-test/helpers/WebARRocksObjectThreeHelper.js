@@ -30,7 +30,7 @@
  */
 import * as THREE from 'three';
 
-const WebARRocksObjectThreeHelper = (function(){
+export const WebARRocksObjectThreeHelper = (function(){
   
   const _defaultSpec = {
     video: null,
