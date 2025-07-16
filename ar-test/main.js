@@ -271,7 +271,7 @@ function initWebARRocks(){
     ARCanvas: ARCanvas,
     threeCanvas: threeCanvas,
     NNPath: _settings.NNPath,
-    callbackReady: start,
+    callbackReady: startWebARRocks,
     loadNNOptions: _settings.loadNNOptions,
     nDetectsPerLoop: _settings.nDetectsPerLoop,
     detectOptions: _settings.detectOptions,
