@@ -255,7 +255,7 @@ function mainWebARRocks() {
 }*/
 
 
-  function initWebARRocks(){
+function initWebARRocks(){
     const ARCanvas = document.getElementById('ARCanvas');
     const threeCanvas = document.getElementById('threeCanvas');
     
@@ -288,7 +288,7 @@ function mainWebARRocks() {
       stabilizerOptions: {}
     });
 }
-}
+
 
 function startWebARRocks(err, three) {
     if (err) {
