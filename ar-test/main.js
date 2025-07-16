@@ -32,7 +32,7 @@ async function init() {
     console.log("init() started.");
 
     // Setup Scene for MediaPipe phase
-    scene = new THREE.Scene();
+    /*scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 2;
     const canvas = document.getElementById('outputCanvas');
@@ -42,13 +42,13 @@ async function init() {
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
     dirLight.position.set(0, 1, 1);
     scene.add(dirLight);
-
+*/
     // Setup MediaPipe
     video = document.getElementById('webcamVideo');
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
     video.srcObject = stream;
     await new Promise(resolve => video.onloadedmetadata = () => { video.play(); resolve(); });
-
+*=
     const visionResolver = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/wasm");
     faceLandmarker = await FaceLandmarker.createFromOptions(visionResolver, {
         baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task` },
@@ -68,7 +68,7 @@ async function init() {
     faceTexture = new THREE.CanvasTexture(textureCanvas);
     const material = new THREE.MeshStandardMaterial({ map: faceTexture, side: THREE.DoubleSide });
     faceMesh = new THREE.Mesh(geometry, material);
-    scene.add(faceMesh);
+    //scene.add(faceMesh);
 
     // Setup UI
     document.getElementById('loading').style.display = 'none';
