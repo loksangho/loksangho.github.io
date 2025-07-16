@@ -140,14 +140,14 @@ async function init() {
     document.getElementById('arButton').addEventListener('click', mainWebARRocks);
 
     // These listeners control the mode once AR has started
-    document.getElementById('objectModeBtn').addEventListener('click', () => {
+    /*document.getElementById('objectModeBtn').addEventListener('click', () => {
         // _DOMVideo is the global variable holding the video element
         startObjectTrackingMode(_DOMVideo);
     });
 
     document.getElementById('markerModeBtn').addEventListener('click', () => {
         startMarkerTrackingMode(_DOMVideo);
-    });
+    });*/
 
     animate();
 }
