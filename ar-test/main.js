@@ -21,14 +21,15 @@
     };
 })();
 
-// Use the global 'vision' object from MediaPipe's vision_bundle.js
-const { FaceLandmarker, FilesetResolver } = vision;
 
 import * as THREE from 'three';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
 
+// Use the global 'vision' object from MediaPipe's vision_bundle.js
+import { vision } from '@mediapipe/tasks-vision';
+const { FaceLandmarker, FilesetResolver } = vision;
 
 
 let scene, camera, renderer;
