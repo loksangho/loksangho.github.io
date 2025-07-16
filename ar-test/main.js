@@ -212,6 +212,7 @@ function mainWebARRocks() {
     }
     document.getElementById('outputCanvas').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'none';
+    document.getElementById('webcamVideo').style.display = 'block';
     // --- END CLEANUP ---
 
     console.log("Cleanup finished. Starting AR."); // <-- Add this
