@@ -354,8 +354,8 @@ function startWebARRocks(err, three) {
     function animateAR() {
         requestAnimationFrame(animateAR);
 
-        if (arToolkitContext && arToolkitSource && arToolkitSource.ready) {
-            arToolkitContext.update(arToolkitSource.domElement);
+        if (window.arToolkitContext && window.arToolkitSource && window.arToolkitSource.ready) {
+            window.arToolkitContext.update(window.arToolkitSource.domElement);
             scene.visible = camera.visible; // Sync scene visibility with AR.js camera
         }
         
