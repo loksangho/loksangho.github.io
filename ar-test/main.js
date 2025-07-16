@@ -185,7 +185,6 @@ function render() {
 
 let _DOMVideo = null;
 function mainWebARRocks(){
-    ARRocksInitialised = true;
     _DOMVideo = document.getElementById('webcamVideo');
     if (video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); }
     WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, (err) => {
@@ -194,14 +193,16 @@ function mainWebARRocks(){
 }
 
 function initWebARRocks(){
-    const ARCanvas = document.getElementById('ARCanvas');
-    const threeCanvas = document.getElementById('threeCanvas');
-    ARCanvas.style.display = 'block';
-    threeCanvas.style.display = 'block';
-    WebARRocksObjectThreeHelper.init({
-        video: _DOMVideo, ARCanvas, threeCanvas,
-        callbackReady: startWebARRocks
-    });
+  // ...
+  WebARRocksObjectThreeHelper.init({
+    video: _DOMVideo,
+    ARCanvas: document.getElementById('ARCanvas'),
+    threeCanvas: document.getElementById('threeCanvas'),
+    callbackReady: function(){
+        ARRocksInitialised = true; // <-- ADD THIS LINE HERE
+        startWebARRocks();
+    }
+  });
 }
 
 function startWebARRocks(){
