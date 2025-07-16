@@ -25,7 +25,6 @@
 import * as THREE from 'three';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
 
 // Correctly import the specific classes you need from MediaPipe
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
