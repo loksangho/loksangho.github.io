@@ -269,7 +269,7 @@ function cleanupARSystems() {
     }
     
     // Dispose of WebAR.rocks if it's running
-    if (WebARRocksObjectThreeHelper.isInitialized()) {
+    if (isWebARRocksRunning) {
         WebARRocksObjectThreeHelper.destroy();
         isWebARRocksRunning = false; // <-- RESET THE FLAG
         console.log("WebAR.rocks destroyed.");
