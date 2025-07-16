@@ -306,6 +306,11 @@ function startWebARRocks(err, three) {
             loadedMesh.scale.set(1, 1, 1);
             // Access classic script helper via the 'window' object
             WebARRocksObjectThreeHelper.add('CUP', loadedMesh);
+             WebARRocksObjectThreeHelper.set_callback('CUP', 'ondetect', function(){
+                three.scene.add(loadedMesh);
+            });
+            WebARRocksObjectThreeHelper.set_callback('CUP', 'onloose', function(){
+                three.scene.remove(loadedMesh);
         }, function (error) {
             console.error('An error happened during GLTF parsing:', error);
         });
