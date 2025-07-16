@@ -143,7 +143,7 @@ function saveMesh() {
         alert("Face mesh saved! You can now start AR.");
         document.getElementById('arButton').style.display = 'block';
 
-      saveArrayBuffer(exportedMeshData, 'myFaceMesh.glb');
+      //saveArrayBuffer(exportedMeshData, 'myFaceMesh.glb');
     }, (error) => console.error(error), { binary: true });
 }
 
