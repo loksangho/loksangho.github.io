@@ -116,6 +116,15 @@ async function init() {
     animate();
 }
 
+function saveArrayBuffer(buffer, filename) {
+  const blob = new Blob([buffer], { type: 'application/octet-stream' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
 function saveMesh() {
     const results = faceLandmarker.detectForVideo(video, performance.now());
     if (results.faceLandmarks.length === 0) {
@@ -138,6 +147,8 @@ function saveMesh() {
         exportedMeshData = gltf;
         alert("Face mesh saved! You can now start AR.");
         document.getElementById('arButton').style.display = 'block';
+
+      saveArrayBuffer(exportedMeshData, 'myFaceMesh.glb');
     }, (error) => console.error(error), { binary: true });
 }
 
