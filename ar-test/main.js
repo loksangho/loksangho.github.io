@@ -172,7 +172,7 @@ function initWebARRocks() {
     document.getElementById('threeCanvas').style.display = 'block';
 
     // Access classic script helper via the 'window' object
-    window.WebARRocksObjectThreeHelper.init({
+    WebARRocksObjectThreeHelper.init({
         video: _DOMVideo,
         ARCanvas: document.getElementById('ARCanvas'),
         threeCanvas: document.getElementById('threeCanvas'),
@@ -194,16 +194,16 @@ function startWebARRocks(err, three) {
         loader.parse(exportedMeshData, (gltf) => {
             const loadedMesh = gltf.scene;
             loadedMesh.scale.set(0.2, 0.2, 0.2);
-            window.WebARRocksObjectThreeHelper.add('KEYBOARD', loadedMesh);
+            WebARRocksObjectThreeHelper.add('KEYBOARD', loadedMesh);
         });
     } else {
         const arCube = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshNormalMaterial());
-        window.WebARRocksObjectThreeHelper.add('KEYBOARD', arCube);
+        WebARRocksObjectThreeHelper.add('KEYBOARD', arCube);
     }
 
     // Start the new AR animation loop
     function animateAR() {
-        window.WebARRocksObjectThreeHelper.animate();
+        WebARRocksObjectThreeHelper.animate();
         requestAnimationFrame(animateAR);
     }
     animateAR();
