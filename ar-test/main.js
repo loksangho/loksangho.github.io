@@ -297,10 +297,10 @@ function startWebARRocks(err, three) {
     }
 
     // Add lighting to the AR Scene
-    three.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    //three.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     const arDirLight = new THREE.DirectionalLight(0xffffff, 0.7);
     arDirLight.position.set(0, 1, 1);
-    three.scene.add(arDirLight);
+    //three.scene.add(arDirLight);
 
     if (exportedMeshData) {
         const loader = new GLTFLoader();
