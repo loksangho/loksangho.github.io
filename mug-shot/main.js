@@ -285,7 +285,7 @@ function saveMesh() {
         exportedMeshData = gltf;
         alert("Face mesh saved! You can now start AR.");
         document.getElementById('arButton').style.display = 'block';
-        document.getElementById('markerButton').style.display = 'block';
+        //document.getElementById('markerButton').style.display = 'block';
 
       //saveArrayBuffer(exportedMeshData, 'myFaceMesh.glb');
     }, (error) => console.error(error), { binary: true });
