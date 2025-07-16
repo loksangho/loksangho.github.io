@@ -8,10 +8,10 @@ import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
 import { WebARRocksMediaStreamAPIHelper } from './helpers/WebARRocksMediaStreamAPIHelper.js';
 
-window.THREE = THREE;
+//window.THREE = THREE;
 
 
-import "https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js";
+//import "https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js";
  // Importing THREEx for AR.js
 
 
@@ -64,9 +64,34 @@ const _settings = {
   displayDebugCylinder: false
 };
 
+// Helper function to load a legacy script and return a promise
+function loadLegacyScript(url) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = url;
+        script.onload = resolve; // Resolve the promise when the script is loaded
+        script.onerror = reject; // Reject on error
+        document.head.appendChild(script);
+    });
+}
+
+async function main() {
+    window.THREE = THREE;
+    try {
+        await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js');
+        console.log("ar-threex.js loaded successfully. THREEx is now available.");
+        init();
+    } catch (error) {
+        console.error("Error loading ar-threex.js:", error);
+    }
+}
+
 async function init() {
     console.log("init() started.");
 
+    
+        
+    
     // Setup Scene for MediaPipe phase
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -377,4 +402,4 @@ function startWebARRocks(err, three) {
 }
 
 // Start the application
-init();
+main();
