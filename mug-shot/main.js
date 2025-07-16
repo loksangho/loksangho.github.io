@@ -190,7 +190,7 @@ function initializeArJs(video, scene, camera, renderer) {
     
     // Add an object to be displayed on the marker
     const arjsMesh = new THREE.Mesh(
-        new THREE.TorusKnotBufferGeometry(0.3, 0.1, 64, 16),
+        new THREE.TorusKnotGeometry(0.3, 0.1, 64, 16),
         new THREE.MeshStandardMaterial({ color: 0x0077ff, roughness: 0.4 })
     );
     arjsMesh.position.y = 0.5;
