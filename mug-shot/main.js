@@ -128,23 +128,23 @@ function saveArrayBuffer(buffer, filename) {
 //-----------------------------------------------------------------
 function initializeArJs(video, scene, camera, renderer) {
     // Setup AR.js source
-    window.arToolkitSource = new THREEx.ArToolkitSource({
+    window.arToolkitSource = new window.THREEx.ArToolkitSource({
         sourceType: 'video',
         sourceElement: video,
     });
 
-    arToolkitSource.init(function onReady() {
-        arToolkitSource.onResizeElement();
-        arToolkitSource.copySizeTo(renderer.domElement);
+    window.arToolkitSource.init(function onReady() {
+        window.arToolkitSource.onResizeElement();
+        window.arToolkitSource.copySizeTo(renderer.domElement);
     });
     
     // Setup AR.js context
-    window.arToolkitContext = new THREEx.ArToolkitContext({
+    window.arToolkitContext = new window.THREEx.ArToolkitContext({
         cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
         detectionMode: 'mono',
     });
 
-    arToolkitContext.init(function onCompleted(){
+    window.arToolkitContext.init(function onCompleted(){
         // Copy projection matrix to our main camera
         camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
     });
@@ -154,7 +154,7 @@ function initializeArJs(video, scene, camera, renderer) {
     scene.add(markerRoot);
     
     // Setup marker controls
-    const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+    const markerControls = new window.THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
         type: 'pattern',
         patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro', // Default HIRO marker
     });
