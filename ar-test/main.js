@@ -204,7 +204,7 @@ function startWebARRocks(err, three) {
             const loadedMesh = gltf.scene;
             loadedMesh.scale.set(0.2, 0.2, 0.2);
             // Access classic script helper via the 'window' object
-            window.WebARRocksObjectThreeHelper.add('KEYBOARD', loadedMesh);
+            WebARRocksObjectThreeHelper.add('KEYBOARD', loadedMesh);
         }, function (error) {
             console.error('An error happened during GLTF parsing:', error);
         });
@@ -212,13 +212,13 @@ function startWebARRocks(err, three) {
     } else {
         // Fallback to a cube if no mesh was saved
         const arCube = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshNormalMaterial());
-        window.WebARRocksObjectThreeHelper.add('KEYBOARD', arCube);
+        WebARRocksObjectThreeHelper.add('KEYBOARD', arCube);
         alert("No mesh data found, showing a debug cube instead.");
     }
 
     // Start the new AR animation loop
     function animateAR() {
-        window.WebARRocksObjectThreeHelper.animate();
+        WebARRocksObjectThreeHelper.animate();
         requestAnimationFrame(animateAR);
     }
     animateAR();
