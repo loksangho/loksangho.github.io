@@ -29,7 +29,7 @@ import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelp
 
 // Correctly import the specific classes you need from MediaPipe
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
-const { FACEMESH_TESSELATION, UV_COORDS } = window;
+import { FACEMESH_TESSELATION, UV_COORDS } from './face_mesh_data.js';
 
 let scene, camera, renderer;
 let video, faceLandmarker, runningMode = "VIDEO";
