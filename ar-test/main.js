@@ -29,6 +29,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 // Correctly import the specific classes you need from MediaPipe
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { FACEMESH_TESSELATION, UV_COORDS } from './face_mesh_data.js';
+import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
 
 let scene, camera, renderer;
 let video, faceLandmarker, runningMode = "VIDEO";
