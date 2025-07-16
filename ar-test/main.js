@@ -105,12 +105,52 @@ function animate() {
     render();
 }
 
-function render() {
+let lastVideoTime = -1;
+
+function animate() {
     if (ARRocksInitialised) {
-        // The AR helper will manage its own rendering loop
+        // Stop this loop once AR starts; the AR helper has its own loop
         return;
     }
-    // Pre-AR rendering logic
+    requestAnimationFrame(animate);
+    render();
+}
+
+function render() {
+    // This is the pre-AR rendering logic
+    if (video && faceLandmarker && video.readyState === video.HAVE_ENOUGH_DATA) {
+        if (video.currentTime !== lastVideoTime) {
+            lastVideoTime = video.currentTime;
+            const results = faceLandmarker.detectForVideo(video, performance.now());
+
+            if (results.faceLandmarks.length > 0) {
+                faceMesh.visible = true; // Make the mesh visible
+
+                const landmarks = results.faceLandmarks[0];
+                const positions = faceMesh.geometry.attributes.position.array;
+                
+                // Update vertex positions based on landmarks
+                for (let i = 0; i < landmarks.length; i++) {
+                    positions[i * 3]     = (landmarks[i].x - 0.5) * 2;
+                    positions[i * 3 + 1] = -(landmarks[i].y - 0.5) * 2;
+                    positions[i * 3 + 2] = -landmarks[i].z;
+                }
+                
+                faceMesh.geometry.attributes.position.needsUpdate = true;
+                faceMesh.geometry.computeVertexNormals();
+
+                // Update the texture to show the camera feed on the mesh
+                textureCanvasCtx.clearRect(0, 0, 512, 512);
+                textureCanvasCtx.drawImage(video, 0, 0, 512, 512);
+                faceTexture.needsUpdate = true;
+
+            } else {
+                faceMesh.visible = false; // Hide if no face is detected
+            }
+        }
+    }
+
+    // Render the scene in every frame
     renderer.render(scene, camera);
 }
 
