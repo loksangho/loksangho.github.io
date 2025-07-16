@@ -157,6 +157,15 @@ function render() {
 
 let _DOMVideo;
 function mainWebARRocks() {
+
+   // --- CRUCIAL CLEANUP STEP ---
+    cancelAnimationFrame(animationFrameId); // Stop the first animation loop
+    if (renderer) renderer.dispose(); // Dispose of the first renderer
+    if (scene) scene.clear(); // Clear the old scene
+    document.getElementById('outputCanvas').style.display = 'none';
+    document.getElementById('uiContainer').style.display = 'none';
+    // --- END CLEANUP ---
+  
     ARRocksInitialised = true;
     renderer.setAnimationLoop(null); // Stop the old render loop
     document.getElementById('uiContainer').style.display = 'none';
