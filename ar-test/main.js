@@ -308,9 +308,11 @@ function startWebARRocks(err, three) {
             WebARRocksObjectThreeHelper.add('CUP', loadedMesh);
              WebARRocksObjectThreeHelper.set_callback('CUP', 'ondetect', function(){
                 three.scene.add(loadedMesh);
+                console.log("CUP detected, mesh added to scene.");
             });
             WebARRocksObjectThreeHelper.set_callback('CUP', 'onloose', function() {
                 three.scene.remove(loadedMesh);
+                console.log("CUP lost, mesh removed from scene.");
             });
         }, function (error) {
             console.error('An error happened during GLTF parsing:', error);
