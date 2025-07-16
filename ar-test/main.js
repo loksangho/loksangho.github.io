@@ -26,7 +26,9 @@ const { FaceLandmarker, FilesetResolver } = vision;
 
 import * as THREE from 'three';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';    
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
+
 
 
 let scene, camera, renderer;
