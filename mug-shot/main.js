@@ -23,7 +23,7 @@ let exportedMeshData = null;
 let ARRocksInitialised = false;
 const runningMode = "VIDEO";
 let animationFrameId;
-let arToolkitSource, arToolkitContext, markerControls, smoothedControls, markerRoot, smoothedRoot;
+let arToolkitSource, arToolkitContext, smoothedControls, markerRoot, smoothedRoot;
 
 const _settings = {
   nDetectsPerLoop: 0, // 0 -> adaptative
@@ -319,7 +319,7 @@ function initMarkerAR() {
     // Create a root group for the raw marker tracking
     markerRoot = new THREE.Group();
     // NOTE: We do NOT add markerRoot to the scene.
-    markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+    new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
         type: 'pattern',
         patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro',
     });
