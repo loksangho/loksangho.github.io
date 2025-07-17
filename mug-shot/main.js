@@ -398,6 +398,8 @@ function startWebARRocks(err, three) {
 
     // Start the new AR animation loop
     function animateAR() {
+
+        requestAnimationFrame(animateAR);
         //WebARRocksObjectThreeHelper.animate();
 
 
@@ -417,7 +419,7 @@ function startWebARRocks(err, three) {
               renderer.render(scene, camera);
         }
       
-        requestAnimationFrame(animateAR);
+        
     }
     animateAR();
 }
