@@ -335,6 +335,7 @@ function initMarkerAR() {
     
     // Add the cube to the SMOOTHED root, not the raw markerRoot
     smoothedRoot.add(cube);
+    console.log("smoothedRoot added cube");
 }
 
 
@@ -406,7 +407,6 @@ function startWebARRocks(err, three) {
         if (arToolkitSource.ready === false) {
           return;
         } else {
-              console.log("Got to here");
               arToolkitContext.update(arToolkitSource.domElement);
   
               // This is the magic! Update the smoothed controls with the raw marker data.
