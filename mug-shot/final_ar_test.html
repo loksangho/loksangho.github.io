@@ -18,101 +18,129 @@
         //		Initial Setup
         //////////////////////////////////////////////////////////////////////////////////
         import * as THREE from 'three';
-       
-        const scene = new THREE.Scene();
-        const camera = new THREE.Camera();
-        scene.add(camera);
-        const renderer = new THREE.WebGLRenderer({
-            antialias: true,
-            alpha: true
-        });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
 
-        //////////////////////////////////////////////////////////////////////////////////
-        //		AR.js Setup
-        //////////////////////////////////////////////////////////////////////////////////
-        const arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
-        arToolkitSource.init(() => {
-            setTimeout(() => {
-                arToolkitSource.onResizeElement();
-                arToolkitSource.copyElementSizeTo(renderer.domElement);
-            }, 500);
-        });
-        const arToolkitContext = new THREEx.ArToolkitContext({
-            cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
-            detectionMode: 'mono',
-            canvasWidth: 800,
-            canvasHeight: 600,
-            maxDetectionRate: 30, // Throttle detection to 30 times per second
-        });
-        arToolkitContext.init(() => {
-            camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
-        });
 
-        //////////////////////////////////////////////////////////////////////////////////
-        //		Marker Setup (the "Jittery" one)
-        //////////////////////////////////////////////////////////////////////////////////
-        
-        // Create a root group for the raw marker tracking
-        const markerRoot = new THREE.Group();
-        // NOTE: We do NOT add markerRoot to the scene.
-        const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
-            type: 'pattern',
-            patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro',
-        });
-
-        //////////////////////////////////////////////////////////////////////////////////
-        //      Setup a Smoothed Entity
-        //////////////////////////////////////////////////////////////////////////////////
-
-        // Create a root group for the smoothed object
-        const smoothedRoot = new THREE.Group();
-        scene.add(smoothedRoot); // Add the SMOOTHED group to the scene
-
-        // Initialize the SmoothedControls
-        const smoothedControls = new THREEx.ArSmoothedControls(smoothedRoot, {
-            // Adjust these values to change the amount of smoothing
-            lerpPosition: 0.4, // Lower value = slower, smoother movement
-            lerpQuaternion: 0.3, // Lower value = slower, smoother rotation
-            lerpScale: 1,
-        });
-
-        //////////////////////////////////////////////////////////////////////////////////
-        //		Add 3D Object to the SMOOTHED group
-        //////////////////////////////////////////////////////////////////////////////////
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshNormalMaterial({
-            transparent: true,
-            opacity: 0.85
-        });
-        const cube = new THREE.Mesh(geometry, material);
-        cube.position.y = 0.5;
-        
-        // Add the cube to the SMOOTHED root, not the raw markerRoot
-        smoothedRoot.add(cube);
-
-        //////////////////////////////////////////////////////////////////////////////////
-        //		Render Loop
-        //////////////////////////////////////////////////////////////////////////////////
-        function animate() {
-            requestAnimationFrame(animate);
-
-            if (arToolkitSource.ready === false) return;
-
-            arToolkitContext.update(arToolkitSource.domElement);
-
-            // This is the magic! Update the smoothed controls with the raw marker data.
-            // It will handle the smoothing of position, rotation, and scale.
-            smoothedControls.update(markerRoot);
-
-            // The `scene.visible` is still controlled by the raw camera visibility
-            scene.visible = camera.visible;
-
-            renderer.render(scene, camera);
+        function loadLegacyScript(url) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = url;
+                script.onload = resolve; // Resolve the promise when the script is loaded
+                script.onerror = reject; // Reject on error
+                document.head.appendChild(script);
+            });
         }
 
-        animate();
+        window.THREE = THREE;
+        try {
+            await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
+            console.log("ar-threex.js loaded successfully. THREEx is now available.");
+            init();
+        } catch (error) {
+            console.error("Error loading ar-threex.js:", error);
+        }
+
+
+        function init() {
+          const scene = new THREE.Scene();
+          const camera = new THREE.Camera();
+          scene.add(camera);
+          const renderer = new THREE.WebGLRenderer({
+              antialias: true,
+              alpha: true
+          });
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          document.body.appendChild(renderer.domElement);
+  
+        
+  
+  
+         
+  
+          //////////////////////////////////////////////////////////////////////////////////
+          //		AR.js Setup
+          //////////////////////////////////////////////////////////////////////////////////
+          const arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
+          arToolkitSource.init(() => {
+              setTimeout(() => {
+                  arToolkitSource.onResizeElement();
+                  arToolkitSource.copyElementSizeTo(renderer.domElement);
+              }, 500);
+          });
+          const arToolkitContext = new THREEx.ArToolkitContext({
+              cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
+              detectionMode: 'mono',
+              canvasWidth: 800,
+              canvasHeight: 600,
+              maxDetectionRate: 30, // Throttle detection to 30 times per second
+          });
+          arToolkitContext.init(() => {
+              camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+          });
+  
+          //////////////////////////////////////////////////////////////////////////////////
+          //		Marker Setup (the "Jittery" one)
+          //////////////////////////////////////////////////////////////////////////////////
+          
+          // Create a root group for the raw marker tracking
+          const markerRoot = new THREE.Group();
+          // NOTE: We do NOT add markerRoot to the scene.
+          const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+              type: 'pattern',
+              patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro',
+          });
+  
+          //////////////////////////////////////////////////////////////////////////////////
+          //      Setup a Smoothed Entity
+          //////////////////////////////////////////////////////////////////////////////////
+  
+          // Create a root group for the smoothed object
+          const smoothedRoot = new THREE.Group();
+          scene.add(smoothedRoot); // Add the SMOOTHED group to the scene
+  
+          // Initialize the SmoothedControls
+          const smoothedControls = new THREEx.ArSmoothedControls(smoothedRoot, {
+              // Adjust these values to change the amount of smoothing
+              lerpPosition: 0.4, // Lower value = slower, smoother movement
+              lerpQuaternion: 0.3, // Lower value = slower, smoother rotation
+              lerpScale: 1,
+          });
+  
+          //////////////////////////////////////////////////////////////////////////////////
+          //		Add 3D Object to the SMOOTHED group
+          //////////////////////////////////////////////////////////////////////////////////
+          const geometry = new THREE.BoxGeometry(1, 1, 1);
+          const material = new THREE.MeshNormalMaterial({
+              transparent: true,
+              opacity: 0.85
+          });
+          const cube = new THREE.Mesh(geometry, material);
+          cube.position.y = 0.5;
+          
+          // Add the cube to the SMOOTHED root, not the raw markerRoot
+          smoothedRoot.add(cube);
+  
+          //////////////////////////////////////////////////////////////////////////////////
+          //		Render Loop
+          //////////////////////////////////////////////////////////////////////////////////
+          function animate() {
+              requestAnimationFrame(animate);
+  
+              if (arToolkitSource.ready === false) return;
+  
+              arToolkitContext.update(arToolkitSource.domElement);
+  
+              // This is the magic! Update the smoothed controls with the raw marker data.
+              // It will handle the smoothing of position, rotation, and scale.
+              smoothedControls.update(markerRoot);
+  
+              // The `scene.visible` is still controlled by the raw camera visibility
+              scene.visible = camera.visible;
+  
+              renderer.render(scene, camera);
+          }
+  
+          animate();
+        }
     </script>
   </body>
 </html>
