@@ -23,6 +23,7 @@ let exportedMeshData = null;
 let ARRocksInitialised = false;
 const runningMode = "VIDEO";
 let animationFrameId;
+let arToolkitSource;
 
 const _settings = {
   nDetectsPerLoop: 0, // 0 -> adaptative
@@ -272,7 +273,7 @@ function initMarkerAR() {
     //////////////////////////////////////////////////////////////////////////////////
     //		AR.js Setup
     //////////////////////////////////////////////////////////////////////////////////
-    const arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
+    arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
     arToolkitSource.init(() => {
         setTimeout(() => {
             arToolkitSource.onResizeElement();
