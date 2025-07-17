@@ -60,6 +60,28 @@ const _settings = {
   displayDebugCylinder: false
 };
 
+function loadLegacyScript(url) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = url;
+        script.onload = resolve; // Resolve the promise when the script is loaded
+        script.onerror = reject; // Reject on error
+        document.head.appendChild(script);
+    });
+}
+
+
+async function main() {
+  window.THREE = THREE;
+  try {
+      await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
+      console.log("ar-threex.js loaded successfully. THREEx is now available.");
+      init();
+  } catch (error) {
+      console.error("Error loading ar-threex.js:", error);
+  }
+}
+
 async function init() {
     console.log("init() started.");
 
@@ -397,4 +419,4 @@ function startWebARRocks(err, three) {
 }
 
 // Start the application
-init();
+main();
