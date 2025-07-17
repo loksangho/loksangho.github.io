@@ -414,7 +414,7 @@ function startWebARRocks(err, three) {
     function animateAR() {
 
         requestAnimationFrame(animateAR);
-        //WebARRocksObjectThreeHelper.animate();
+        WebARRocksObjectThreeHelper.animate();
 
 
         if (arToolkitSource.ready === false) {
