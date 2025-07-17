@@ -167,16 +167,16 @@ function cleanup() {
 }
 
 function initLearner() {
-    cleanup();
+    //cleanup();
     currentMode = 'learner';
 
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    //renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    //renderer.setSize(window.innerWidth, window.innerHeight);
+    //document.body.appendChild(renderer.domElement);
 
-    scene = new THREE.Scene();
-    camera = new THREE.Camera();
-    scene.add(camera);
+    //scene = new THREE.Scene();
+    //camera = new THREE.Camera();
+    //scene.add(camera);
     
     arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
     arToolkitSource.init(() => {
