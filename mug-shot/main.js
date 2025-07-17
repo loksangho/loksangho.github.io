@@ -293,7 +293,7 @@ function initMarkerAR() {
     arToolkitContext.init(() => {
         camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
     });
-    
+
     //////////////////////////////////////////////////////////////////////////////////
     //		Marker Setup (the "Jittery" one)
     //////////////////////////////////////////////////////////////////////////////////
@@ -301,19 +301,19 @@ function initMarkerAR() {
     // Create a root group for the raw marker tracking
     markerRoot = new THREE.Group();
     // NOTE: We do NOT add markerRoot to the scene.
-    const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+    markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
         type: 'pattern',
         patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro',
     });
-    
+
     //////////////////////////////////////////////////////////////////////////////////
     //      Setup a Smoothed Entity
     //////////////////////////////////////////////////////////////////////////////////
-    
+
     // Create a root group for the smoothed object
-    const smoothedRoot = new THREE.Group();
+    smoothedRoot = new THREE.Group();
     scene.add(smoothedRoot); // Add the SMOOTHED group to the scene
-    
+
     // Initialize the SmoothedControls
     smoothedControls = new THREEx.ArSmoothedControls(smoothedRoot, {
         // Adjust these values to change the amount of smoothing
@@ -321,7 +321,7 @@ function initMarkerAR() {
         lerpQuaternion: 0.3, // Lower value = slower, smoother rotation
         lerpScale: 1,
     });
-    
+
     //////////////////////////////////////////////////////////////////////////////////
     //		Add 3D Object to the SMOOTHED group
     //////////////////////////////////////////////////////////////////////////////////
@@ -335,7 +335,6 @@ function initMarkerAR() {
     
     // Add the cube to the SMOOTHED root, not the raw markerRoot
     smoothedRoot.add(cube);
-    console.log("smoothedRoot added cube");
 }
 
 
