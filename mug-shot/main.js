@@ -373,6 +373,24 @@ function startWebARRocks(err, three) {
     // Start the new AR animation loop
     function animateAR() {
         WebARRocksObjectThreeHelper.animate();
+
+
+        if (arToolkitSource.ready === false) {
+          return;
+        } else {
+  
+              arToolkitContext.update(arToolkitSource.domElement);
+  
+              // This is the magic! Update the smoothed controls with the raw marker data.
+              // It will handle the smoothing of position, rotation, and scale.
+              smoothedControls.update(markerRoot);
+  
+              // The `scene.visible` is still controlled by the raw camera visibility
+              scene.visible = camera.visible;
+  
+              renderer.render(scene, camera);
+        }
+      
         requestAnimationFrame(animateAR);
     }
     animateAR();
