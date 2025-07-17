@@ -101,7 +101,7 @@ async function init() {
 
     camera = new THREE.Camera();
     scene.add(camera);
-    const renderer = new THREE.WebGLRenderer({
+    renderer = new THREE.WebGLRenderer({
         antialias: true,
         alpha: true
     });
