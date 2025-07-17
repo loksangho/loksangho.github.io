@@ -87,7 +87,7 @@ async function init() {
     console.log("init() started.");
 
     // Setup Scene for MediaPipe phase
-    scene = new THREE.Scene();
+    /*scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 2;
     const canvas = document.getElementById('outputCanvas');
@@ -96,7 +96,7 @@ async function init() {
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
     dirLight.position.set(0, 1, 1);
-    scene.add(dirLight);
+    scene.add(dirLight);*/
 
     scene = new THREE.Scene();
     camera = new THREE.Camera();
@@ -106,6 +106,7 @@ async function init() {
         alpha: true
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     document.body.appendChild(renderer.domElement);
     
 
