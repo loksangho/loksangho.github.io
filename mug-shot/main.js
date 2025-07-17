@@ -23,7 +23,7 @@ let exportedMeshData = null;
 let ARRocksInitialised = false;
 const runningMode = "VIDEO";
 let animationFrameId;
-let arToolkitSource, arToolkitContext, smoothedControls, markerRoot;
+let arToolkitSource, arToolkitContext, markerControls, smoothedControls, markerRoot;
 
 const _settings = {
   nDetectsPerLoop: 0, // 0 -> adaptative
