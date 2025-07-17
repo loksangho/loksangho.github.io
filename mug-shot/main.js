@@ -129,7 +129,10 @@ async function init() {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'flex';
     document.getElementById('saveButton').addEventListener('click', saveMesh);
-    document.getElementById('arButton').addEventListener('click', mainWebARRocks);
+    document.getElementById('arButton').addEventListener('click', function() {
+      mainWebARRocks();
+      initMarkerAR();
+    });
 
     animate();
 }
