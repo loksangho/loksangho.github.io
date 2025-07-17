@@ -77,13 +77,13 @@ async function main() {
   try {
       await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
       console.log("ar-threex.js loaded successfully. THREEx is now available.");
-      init();
+      await init();
   } catch (error) {
       console.error("Error loading ar-threex.js:", error);
   }
 }
 
-function init() {
+async function init() {
     console.log("init() started.");
 
     // Setup Scene for MediaPipe phase
