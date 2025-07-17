@@ -98,17 +98,10 @@ async function init() {
     dirLight.position.set(0, 1, 1);
     scene.add(dirLight);
 
-    // Temporary Add
-    scene = new THREE.Scene();
-    camera = new THREE.Camera();
+
     scene.add(camera);
-    renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        alpha: true
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
-    //------------------------
+    
 
 
   
