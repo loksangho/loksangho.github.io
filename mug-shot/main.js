@@ -83,7 +83,7 @@ async function main() {
   }
 }
 
-async function init() {
+function init() {
     console.log("init() started.");
 
     // Setup Scene for MediaPipe phase
