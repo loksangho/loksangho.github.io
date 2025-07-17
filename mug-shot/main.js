@@ -398,7 +398,7 @@ function startWebARRocks(err, three) {
 
     // Start the new AR animation loop
     function animateAR() {
-        WebARRocksObjectThreeHelper.animate();
+        //WebARRocksObjectThreeHelper.animate();
 
 
         if (arToolkitSource.ready === false) {
