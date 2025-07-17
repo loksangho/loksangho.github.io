@@ -246,20 +246,70 @@ function mainWebARRocks() {
    });
 }
 
-/*function initWebARRocks() {
-    document.getElementById('ARCanvas').style.display = 'block';
-    document.getElementById('threeCanvas').style.display = 'block';
-
-
-    // Access classic script helper via the 'window' object
-    WebARRocksObjectThreeHelper.init({
-        video: _DOMVideo,
-        ARCanvas: document.getElementById('ARCanvas'),
-        threeCanvas: document.getElementById('threeCanvas'),
-        NNPath: _settings.NNPath,
-        callbackReady: startWebARRocks
+function initMarkerAR() {
+    //////////////////////////////////////////////////////////////////////////////////
+    //		AR.js Setup
+    //////////////////////////////////////////////////////////////////////////////////
+    const arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
+    arToolkitSource.init(() => {
+        setTimeout(() => {
+            arToolkitSource.onResizeElement();
+            arToolkitSource.copyElementSizeTo(renderer.domElement);
+        }, 500);
     });
-}*/
+    const arToolkitContext = new THREEx.ArToolkitContext({
+        cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
+        detectionMode: 'mono',
+        canvasWidth: 800,
+        canvasHeight: 600,
+        maxDetectionRate: 30, // Throttle detection to 30 times per second
+    });
+    arToolkitContext.init(() => {
+        camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+    });
+    
+    //////////////////////////////////////////////////////////////////////////////////
+    //		Marker Setup (the "Jittery" one)
+    //////////////////////////////////////////////////////////////////////////////////
+    
+    // Create a root group for the raw marker tracking
+    const markerRoot = new THREE.Group();
+    // NOTE: We do NOT add markerRoot to the scene.
+    const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+        type: 'pattern',
+        patternUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro',
+    });
+    
+    //////////////////////////////////////////////////////////////////////////////////
+    //      Setup a Smoothed Entity
+    //////////////////////////////////////////////////////////////////////////////////
+    
+    // Create a root group for the smoothed object
+    const smoothedRoot = new THREE.Group();
+    scene.add(smoothedRoot); // Add the SMOOTHED group to the scene
+    
+    // Initialize the SmoothedControls
+    const smoothedControls = new THREEx.ArSmoothedControls(smoothedRoot, {
+        // Adjust these values to change the amount of smoothing
+        lerpPosition: 0.4, // Lower value = slower, smoother movement
+        lerpQuaternion: 0.3, // Lower value = slower, smoother rotation
+        lerpScale: 1,
+    });
+    
+    //////////////////////////////////////////////////////////////////////////////////
+    //		Add 3D Object to the SMOOTHED group
+    //////////////////////////////////////////////////////////////////////////////////
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshNormalMaterial({
+        transparent: true,
+        opacity: 0.85
+    });
+    const cube = new THREE.Mesh(geometry, material);
+    cube.position.y = 0.5;
+    
+    // Add the cube to the SMOOTHED root, not the raw markerRoot
+    smoothedRoot.add(cube);
+}
 
 
 function initWebARRocks(){
