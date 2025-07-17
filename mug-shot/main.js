@@ -76,7 +76,6 @@ async function main() {
   window.THREE = THREE;
   try {
       await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
-      await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/artoolkit.smoother.js');
       console.log("ar-threex.js loaded successfully. THREEx is now available.");
       init();
   } catch (error) {
