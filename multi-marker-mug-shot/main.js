@@ -33,6 +33,7 @@ function loadLegacyScript(url) {
 }
 
 async function main() {
+    window.THREE = THREE;
     try {
         await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
         console.log("ar-threex.js loaded successfully.");
