@@ -404,7 +404,7 @@ function startWebARRocks(err, three) {
         if (arToolkitSource.ready === false) {
           return;
         } else {
-  
+              console.log("Got to here");
               arToolkitContext.update(arToolkitSource.domElement);
   
               // This is the magic! Update the smoothed controls with the raw marker data.
