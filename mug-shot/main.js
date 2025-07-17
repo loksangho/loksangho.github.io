@@ -23,7 +23,7 @@ let exportedMeshData = null;
 let ARRocksInitialised = false;
 const runningMode = "VIDEO";
 let animationFrameId;
-let arToolkitSource;
+let arToolkitSource, smoothedControls, markerRoot;
 
 const _settings = {
   nDetectsPerLoop: 0, // 0 -> adaptative
@@ -296,7 +296,7 @@ function initMarkerAR() {
     //////////////////////////////////////////////////////////////////////////////////
     
     // Create a root group for the raw marker tracking
-    const markerRoot = new THREE.Group();
+    markerRoot = new THREE.Group();
     // NOTE: We do NOT add markerRoot to the scene.
     const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
         type: 'pattern',
@@ -312,7 +312,7 @@ function initMarkerAR() {
     scene.add(smoothedRoot); // Add the SMOOTHED group to the scene
     
     // Initialize the SmoothedControls
-    const smoothedControls = new THREEx.ArSmoothedControls(smoothedRoot, {
+    smoothedControls = new THREEx.ArSmoothedControls(smoothedRoot, {
         // Adjust these values to change the amount of smoothing
         lerpPosition: 0.4, // Lower value = slower, smoother movement
         lerpQuaternion: 0.3, // Lower value = slower, smoother rotation
