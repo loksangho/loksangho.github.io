@@ -32,7 +32,7 @@ const _settings = {
     notHereFactor: 0.0,
     paramsPerLabel: {
       CUP: {
-        thresholdDetect: 0.52
+        thresholdDetect: 0.92
       }
     }
   },
@@ -46,7 +46,7 @@ const _settings = {
     trackingFactors: [0.5, 0.4, 1.5]
   },
 
-  NNPath: './neuralNets/NN_COFFEE_2.json',
+  NNPath: './neuralNets/NN_COFFEE_0.json',
 
   cameraFov: 0, // In degrees, camera vertical FoV. 0 -> auto mode
   scanSettings:{
@@ -108,7 +108,10 @@ async function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     document.body.appendChild(renderer.domElement);
-    
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+    dirLight.position.set(0, 1, 1);
+    scene.add(dirLight);
 
 
   
