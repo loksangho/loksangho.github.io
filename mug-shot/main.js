@@ -23,7 +23,7 @@ let exportedMeshData = null;
 let ARRocksInitialised = false;
 const runningMode = "VIDEO";
 let animationFrameId;
-let arToolkitSource, smoothedControls, markerRoot;
+let arToolkitSource, arToolkitContext, smoothedControls, markerRoot;
 
 const _settings = {
   nDetectsPerLoop: 0, // 0 -> adaptative
@@ -283,7 +283,7 @@ function initMarkerAR() {
             arToolkitSource.copyElementSizeTo(renderer.domElement);
         }, 500);
     });
-    const arToolkitContext = new THREEx.ArToolkitContext({
+    arToolkitContext = new THREEx.ArToolkitContext({
         cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
         detectionMode: 'mono',
         canvasWidth: 800,
