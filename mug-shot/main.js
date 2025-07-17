@@ -300,8 +300,9 @@ function initMarkerAR() {
     arToolkitContext = new THREEx.ArToolkitContext({
         cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
         detectionMode: 'mono',
-        canvasWidth: 800,
-        canvasHeight: 600,
+        // Use a lower resolution for mobile devices
+        canvasWidth: 640,
+        canvasHeight: 480,
         maxDetectionRate: 30, // Throttle detection to 30 times per second
     });
     arToolkitContext.init(() => {
