@@ -1,4 +1,4 @@
-// main.js - Combined Simultaneous AR.js Player and WebARRocks
+// main.js - Combined Simultaneous AR.js Player and WebARRocks (Corrected)
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -8,11 +8,12 @@ import { FACEMESH_TESSELATION } from './face_mesh_data.js';
 
 // Import WebARRocks helpers
 import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
-// We don't need the MediaStreamAPIHelper as we'll manage the stream manually
 
 // Global variables
 let scene, camera, renderer, video, faceLandmarker;
+let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
 let exportedMeshData = null;
+const runningMode = "VIDEO";
 let animationFrameId;
 let currentMode = null; // 'mediapipe', 'learner', 'player'
 
@@ -44,10 +45,57 @@ async function main() {
 // Phase 1: MediaPipe Face Capture
 async function initMediaPipe() {
     currentMode = 'mediapipe';
-    // ... This function is largely the same as the previous version ...
-    // It sets up the initial scene, camera, renderer, video, and FaceLandmarker.
+
+    // Setup Scene for MediaPipe
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 2.5;
+
+    const canvas = document.getElementById('outputCanvas');
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    canvas.style.display = 'block';
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+    dirLight.position.set(0, 1, 1);
+    scene.add(dirLight);
+
+    // Setup MediaPipe
+    video = document.getElementById('webcamVideo');
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+    video.srcObject = stream;
+    await new Promise(resolve => video.onloadedmetadata = () => { video.play(); resolve(); });
     
-    // --- UI Setup for new flow ---
+    video.style.display = 'none';
+
+    const visionResolver = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/wasm");
+    faceLandmarker = await FaceLandmarker.createFromOptions(visionResolver, {
+        baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task` },
+        runningMode,
+        numFaces: 1
+    });
+
+    // --- FULL FACE MESH IMPLEMENTATION (CORRECTED) ---
+    const geometry = new THREE.BufferGeometry();
+    const numLandmarks = 478;
+    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(numLandmarks * 3), 3));
+    geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(numLandmarks * 2), 2));
+    geometry.setIndex(FACEMESH_TESSELATION.flat());
+    
+    textureCanvas = document.createElement('canvas');
+    textureCanvas.width = 512;
+    textureCanvas.height = 512;
+    textureCanvasCtx = textureCanvas.getContext('2d');
+    faceTexture = new THREE.CanvasTexture(textureCanvas);
+    
+    const material = new THREE.MeshStandardMaterial({ map: faceTexture, side: THREE.DoubleSide });
+    faceMesh = new THREE.Mesh(geometry, material);
+    scene.add(faceMesh);
+    // --- END OF CORRECTION ---
+
+    // UI Setup for the new flow
     document.getElementById('loading').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'flex';
     document.getElementById('phase1').style.display = 'block';
@@ -73,8 +121,12 @@ async function initMediaPipe() {
 }
 
 function saveMesh() {
-    // ... same as before ...
-    // After saving, it now progresses the UI to the next phase.
+    if (currentMode !== 'mediapipe' || !faceLandmarker) return;
+    const results = faceLandmarker.detectForVideo(video, performance.now());
+    if (results.faceLandmarks.length === 0) {
+        alert("No face detected. Please look at the camera.");
+        return;
+    }
     const exporter = new GLTFExporter();
     exporter.parse(faceMesh, (gltf) => {
         exportedMeshData = gltf;
@@ -84,7 +136,6 @@ function saveMesh() {
     }, (error) => console.error(error), { binary: true });
 }
 
-// Universal cleanup function
 function cleanup() {
     cancelAnimationFrame(animationFrameId);
     
@@ -95,11 +146,14 @@ function cleanup() {
 
     if (renderer) {
         renderer.dispose();
-        renderer.domElement.remove();
+        const domElement = renderer.domElement;
+        if (domElement && domElement.parentElement) {
+            domElement.parentElement.removeChild(domElement);
+        }
         renderer = null;
     }
 
-    if (currentMode === 'player') { // Check if we are cleaning up from combined mode
+    if (currentMode === 'player') {
         WebARRocksObjectThreeHelper.destroy();
     }
     
@@ -108,16 +162,39 @@ function cleanup() {
 
     document.getElementById('outputCanvas').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'none';
+    const existingVideo = document.querySelector('video[playsinline]');
+    if (existingVideo) existingVideo.remove();
 }
 
-
-// Phase 2: AR.js Multi-Marker Learner
 function initLearner() {
     cleanup();
     currentMode = 'learner';
-    // ... This function is the same as the previous version ...
-    // It sets up the learner, and on download, we manually advance the UI
-    // Add a dynamic UI for this phase
+
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    scene = new THREE.Scene();
+    camera = new THREE.Camera();
+    scene.add(camera);
+    
+    arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
+    arToolkitSource.init(() => {
+        setTimeout(() => {
+            arToolkitSource.onResizeElement();
+            arToolkitSource.copyElementSizeTo(renderer.domElement);
+        }, 100);
+    });
+
+    arToolkitContext = new THREEx.ArToolkitContext({
+        cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
+        detectionMode: 'mono',
+    });
+    arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
+    
+    multiMarkerLearner = new THREEx.ArMultiMarkerLearner(arToolkitContext);
+    multiMarkerLearner.baseURL = "https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.";
+
     const controlsContainer = document.createElement('div');
     controlsContainer.id = 'dynamicUI';
     controlsContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px;';
@@ -138,7 +215,6 @@ function initLearner() {
             URL.revokeObjectURL(a.href);
             alert("Profile downloaded. Now please load it to start the combined AR.");
             
-            // Restart UI to final phase
             cleanup();
             document.getElementById('uiContainer').style.display = 'flex';
             document.getElementById('phase1').style.display = 'none';
@@ -147,11 +223,9 @@ function initLearner() {
         });
     };
     
-    animateAR(); // Starts the learner render loop
+    animateAR();
 }
 
-
-// Phase 3: Combined AR.js Player and WebARRocks
 async function initCombinedPlayer(profileData) {
     cleanup();
     currentMode = 'player';
@@ -161,13 +235,12 @@ async function initCombinedPlayer(profileData) {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
     scene = new THREE.Scene();
-    camera = new THREE.Camera(); // AR.js will manage this camera
+    camera = new THREE.Camera();
     scene.add(camera);
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
 
     // 2. --- Shared Video Stream ---
-    // We create ONE video element and get the camera stream ONCE.
     video = document.createElement('video');
     video.setAttribute('autoplay', '');
     video.setAttribute('muted', '');
@@ -178,17 +251,14 @@ async function initCombinedPlayer(profileData) {
     video.srcObject = stream;
     document.body.appendChild(video);
     video.style.position = 'absolute';
-    video.style.top = '0';
-    video.style.left = '0';
-    video.style.zIndex = '-1'; // Hide video behind canvas
+    video.style.top = '0px';
+    video.style.left = '0px';
+    video.style.zIndex = '-1';
     await new Promise(resolve => { video.onloadedmetadata = resolve; });
     video.play();
 
-
     // 3. --- Initialize AR.js (as master) ---
-    // It uses our shared video element.
     arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'video', sourceElement: video });
-    
     arToolkitSource.init(() => {
         arToolkitSource.onResizeElement();
         arToolkitSource.copyElementSizeTo(renderer.domElement);
@@ -200,36 +270,28 @@ async function initCombinedPlayer(profileData) {
     });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
     
-    // Setup multi-marker controls for AR.js
     const markerRoot = new THREE.Group();
     scene.add(markerRoot);
     multiMarkerControls = new THREEx.ArMultiMarkerControls(arToolkitContext, markerRoot, {
         multiMarkerFile: profileData
     });
-    // Add an object for AR.js to track (e.g., a red box)
     const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
     arjsObject.position.y = 0.5;
     markerRoot.add(arjsObject);
 
-
     // 4. --- Initialize WebARRocks (as slave) ---
-    // It ALSO uses the shared video element, and we tell it to use our main scene.
     WebARRocksObjectThreeHelper.init({
         video: video,
-        // We DON'T provide a separate canvas, letting it know it won't be managing rendering.
         NNPath: _settings.NNPath,
         callbackReady: (err, three) => {
             if (err) { console.error(err); return; }
-            // Add the saved face mesh to the WebARRocks tracker
             if (exportedMeshData) {
                 new GLTFLoader().parse(exportedMeshData, '', (gltf) => {
-                    WebARRocksObjectThreeHelper.add('CUP', gltf.scene); // Label must match your NN
+                    WebARRocksObjectThreeHelper.add('CUP', gltf.scene);
                 });
             } else {
                  WebARRocksObjectThreeHelper.add('CUP', new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5), new THREE.MeshNormalMaterial()));
             }
-            
-            // Get the container for WebARRocks objects and add it to our main scene
             const webARrocksObjectsGroup = WebARRocksObjectThreeHelper.get_threeObject();
             scene.add(webARrocksObjectsGroup);
         }
@@ -240,25 +302,15 @@ async function initCombinedPlayer(profileData) {
 }
 
 function animateCombined() {
-    if (currentMode !== 'player') return; // Ensure we only run in the correct mode
-
+    if (currentMode !== 'player') return;
     animationFrameId = requestAnimationFrame(animateCombined);
-
-    // Update AR.js - it processes the video and updates the markerRoot pose
     if (arToolkitSource && arToolkitSource.ready) {
         arToolkitContext.update(arToolkitSource.domElement);
     }
-    
-    // Update WebARRocks - it processes the video and updates its internal object poses
     WebARRocksObjectThreeHelper.animate();
-    
-    // Render the single, unified scene
     renderer.render(scene, camera);
 }
 
-
-// --- Other functions (animate, animateAR, renderMediaPipe) are needed for the first two phases ---
-// These are mostly unchanged.
 function animate() {
     if (currentMode !== 'mediapipe') return;
     animationFrameId = requestAnimationFrame(animate);
@@ -274,10 +326,42 @@ function animateAR() {
     renderer.render(scene, camera);
 }
 
-// Stubs for functions that are large and unchanged, to keep this example clean.
-// You should copy the full functions from the previous answer.
-function renderMediaPipe() { /* ... Full function from previous answer ... */ }
-// --- (End of stubs) ---
+// --- FULL RENDERMEDIAPIPE IMPLEMENTATION (CORRECTED) ---
+let lastVideoTime = -1;
+function renderMediaPipe() {
+    if (video && faceLandmarker && video.readyState === video.HAVE_ENOUGH_DATA && video.currentTime !== lastVideoTime) {
+        lastVideoTime = video.currentTime;
+        const results = faceLandmarker.detectForVideo(video, performance.now());
+
+        if (results.faceLandmarks.length > 0) {
+            faceMesh.visible = true;
+            const landmarks = results.faceLandmarks[0];
+            const positions = faceMesh.geometry.attributes.position.array;
+            const uvs = faceMesh.geometry.attributes.uv.array;
+
+            for (let i = 0; i < landmarks.length; i++) {
+                positions[i * 3]     = (landmarks[i].x - 0.5) * 2;
+                positions[i * 3 + 1] = -(landmarks[i].y - 0.5) * 2;
+                positions[i * 3 + 2] = -landmarks[i].z;
+                uvs[i * 2]           = landmarks[i].x;
+                uvs[i * 2 + 1]       = 1.0 - landmarks[i].y;
+            }
+            
+            faceMesh.geometry.attributes.position.needsUpdate = true;
+            faceMesh.geometry.attributes.uv.needsUpdate = true;
+            faceMesh.geometry.computeVertexNormals();
+            
+            textureCanvasCtx.clearRect(0, 0, 512, 512);
+            textureCanvasCtx.drawImage(video, 0, 0, 512, 512);
+            faceTexture.needsUpdate = true;
+
+        } else {
+            faceMesh.visible = false;
+        }
+    }
+    renderer.render(scene, camera);
+}
+// --- END OF CORRECTION ---
 
 // Start the application
 main();
