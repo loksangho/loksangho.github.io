@@ -282,7 +282,7 @@ async function initCombinedPlayer(profileData) {
             // and then immediately and manually fix its internal parameters to ensure
             // the sub-marker list is correctly configured.
             console.log("$$$",subMarkersControls);
-            multiMarkerControls = new THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, {"subMarkerControls":subMarkersControls}));
+            multiMarkerControls = new THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, {"subMarkersControls":subMarkersControls}));
             //multiMarkerControls.parameters.subMarkersControls = subMarkersControls;
 
             console.log("Step 2: Created base ArMultiMarkerControls and manually corrected parameters.");
