@@ -175,39 +175,31 @@ function initLearner() {
     document.body.appendChild(controlsContainer);
     document.getElementById('resetBtn').onclick = () => multiMarkerLearning.resetStats();
 
-    // --- CORRECTED DOWNLOAD LOGIC ---
+    // --- CORRECTED ASYNCHRONOUS DOWNLOAD LOGIC ---
     document.getElementById('downloadBtn').onclick = () => {
-       // 1. Get the profile data OBJECT
-        const profileData = multiMarkerLearning.toJSON();
-        
-        // Add this log to see the actual structure of the object
-        console.log("Inspecting profileData from toJSON():", profileData);
-        console.log(profileData.subMarkersControls);
-        
-        // 2. THIS IS THE CORRECTED CHECK
-        // It now safely checks if profileData and subMarkersControls exist before checking the length.
-        if (!profileData || !profileData.subMarkersControls || profileData.subMarkersControls.length < markerNames.length) {
-            alert(`Not all markers were learned! Please show all markers to the camera.`);
-            return;
-        }
-
-        // 3. Convert the OBJECT to a proper JSON STRING for the file
-        const jsonStringForFile = JSON.stringify(profileData, null, 2);
-
-        // 4. Create the downloadable file (Blob) from the STRING
-        const blob = new Blob([jsonStringForFile], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'multiMarkerProfile.json';
-        a.click();
-        URL.revokeObjectURL(a.href);
-        
-        alert("Profile downloaded. Now please load it to start the combined AR.");
-        cleanup();
-        document.getElementById('uiContainer').style.display = 'flex';
-        document.getElementById('phase1').style.display = 'none';
-        document.getElementById('phase2').style.display = 'none';
-        document.getElementById('phase3').style.display = 'block';
+        // Use the callback version of toJSON to wait for the data
+        multiMarkerLearning.toJSON(function(profileData) {
+            console.log("Profile data received from callback:", profileData);
+            if (!profileData || !profileData.subMarkersControls || profileData.subMarkersControls.length < markerNames.length) {
+                alert(`Not all markers were learned! Please show all markers and try again.`);
+                return;
+            }
+            
+            const jsonStringForFile = JSON.stringify(profileData, null, 2);
+            const blob = new Blob([jsonStringForFile], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'multiMarkerProfile.json';
+            a.click();
+            URL.revokeObjectURL(a.href);
+            
+            alert("Profile downloaded. Now please load it to start the combined AR.");
+            cleanup();
+            document.getElementById('uiContainer').style.display = 'flex';
+            document.getElementById('phase1').style.display = 'none';
+            document.getElementById('phase2').style.display = 'none';
+            document.getElementById('phase3').style.display = 'block';
+        });
     };
     
     animateAR();
