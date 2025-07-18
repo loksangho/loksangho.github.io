@@ -220,10 +220,6 @@ async function initCombinedPlayer(profileData) {
     // The library will now create the video element and get the camera stream by itself.
     arToolkitSource = new THREEx.ArToolkitSource({
         sourceType: 'webcam',
-        sourceWidth: window.innerWidth,
-        sourceHeight: window.innerHeight,
-        displayWidth: window.innerWidth,
-        displayHeight: window.innerHeight,
     });
 
     arToolkitSource.init(() => {
