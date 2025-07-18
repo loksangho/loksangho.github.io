@@ -6,6 +6,7 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { FACEMESH_TESSELATION } from './face_mesh_data.js';
 import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
+import { WebARRocksMediaStreamAPIHelper } from './helpers/WebARRocksMediaStreamAPIHelper.js';
 
 // Global variables
 let scene, camera, renderer, video, faceLandmarker;
