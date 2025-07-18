@@ -366,6 +366,12 @@ function initWebARRocks(){
     isFullScreen: true,
     stabilizerOptions: {}
   });
+
+  console.log("init config", {
+    video: renderer.domElement,
+    threeCanvas: renderer.domElement,
+    NNPath: _settings.NNPath
+    });
 }
 
 function startWebARRocks(err, three) {
@@ -418,7 +424,14 @@ function animateCombined() {
     }
 
     // Update WebARRocks - it processes the video and updates its internal object poses
-    WebARRocksObjectThreeHelper.animate();
+    if (isWebARRocksReady) {
+        try {
+            WebARRocksObjectThreeHelper.animate();
+        } catch (e) {
+            console.warn('WebARRocks animate error:', e);
+        }
+        }
+
 
     renderer.render(scene, camera);
 }
