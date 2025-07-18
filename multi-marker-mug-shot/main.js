@@ -1,4 +1,4 @@
-// main.js - Corrected with ArMultiMakersLearning implementation
+// main.js - With corrected canvas handling
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -16,7 +16,7 @@ let animationFrameId;
 let currentMode = null;
 
 // AR specific variables
-let arToolkitSource, arToolkitContext, multiMarkerControls, multiMarkerLearning; // Renamed to match example
+let arToolkitSource, arToolkitContext, multiMarkerControls, multiMarkerLearning;
 const _settings = { NNPath: './neuralNets/NN_COFFEE_0.json' };
 
 function loadLegacyScript(url) {
@@ -49,11 +49,13 @@ async function initMediaPipe() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 2.5;
+
+    // Use the existing canvas from the start
     const canvas = document.getElementById('outputCanvas');
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
     canvas.style.display = 'block';
+
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
     dirLight.position.set(0, 1, 1);
@@ -107,40 +109,53 @@ function saveMesh() {
         alert("Face mesh saved! Now, start the learner.");
         document.getElementById('phase1').style.display = 'none';
         document.getElementById('phase2').style.display = 'block';
+        document.getElementById('phase3').style.display = 'none';
     }, (error) => console.error(error), { binary: true });
 }
 
+// --- UPDATED CLEANUP FUNCTION ---
 function cleanup() {
     cancelAnimationFrame(animationFrameId);
-    if (video && video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); video.srcObject = null; }
-    if (renderer) {
-        const domElement = renderer.domElement;
-        if (domElement && domElement.parentElement) { domElement.parentElement.removeChild(domElement); }
-        renderer.dispose(); renderer = null;
+    
+    // Stop any active video streams
+    if (video && video.srcObject) {
+        video.srcObject.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
     }
-    if (currentMode === 'player') { WebARRocksObjectThreeHelper.destroy(); }
+
+    // Dispose of the renderer resources, but DO NOT remove the canvas element
+    if (renderer) {
+        renderer.dispose();
+        renderer = null;
+    }
+
+    if (currentMode === 'player') {
+        WebARRocksObjectThreeHelper.destroy();
+    }
+
+    // Clean up any UI elements created dynamically
     const dynamicUI = document.getElementById('dynamicUI');
-    if(dynamicUI) dynamicUI.remove();
-    document.getElementById('outputCanvas').style.display = 'none';
+    if (dynamicUI) dynamicUI.remove();
+    
+    // Hide UI
     document.getElementById('uiContainer').style.display = 'none';
-    const existingVideo = document.querySelector('video[playsinline]');
-    if (existingVideo) existingVideo.remove();
 }
 
-// --- REWRITTEN LEARNER FUNCTION ---
+// --- UPDATED LEARNER FUNCTION ---
 function initLearner() {
     cleanup();
     currentMode = 'learner';
 
-    // 1. Init renderer, scene, camera
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    // 1. Get the existing canvas and create the renderer with it
+    const canvas = document.getElementById('outputCanvas');
+    canvas.style.display = 'block';
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+
+    // 2. Init scene, camera, AR.js Source and Context
     scene = new THREE.Scene();
     camera = new THREE.Camera();
     scene.add(camera);
-    
-    // 2. Init AR.js Source and Context
     arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
     arToolkitSource.init(() => {
         setTimeout(() => {
@@ -148,14 +163,13 @@ function initLearner() {
             arToolkitSource.copyElementSizeTo(renderer.domElement);
         }, 100);
     });
-
     arToolkitContext = new THREEx.ArToolkitContext({
         cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
         detectionMode: 'mono',
     });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
     
-    // 3. Create the sub-marker controls FIRST
+    // 3. Create sub-marker controls
     const subMarkersControls = [];
     const markerNames = ['hiro', 'kanji'];
     markerNames.forEach(function(markerName){
@@ -165,16 +179,14 @@ function initLearner() {
             type: 'pattern',
             patternUrl: `https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.${markerName}`,
         });
-        // Add a helper to make the marker visible
         const markerHelper = new THREEx.ArMarkerHelper(markerControls);
         markerControls.object3d.add(markerHelper.object3d);
-
         subMarkersControls.push(markerControls);
     });
     
-    // 4. Init the learner with the context AND the pre-built controls array
+    // 4. Init the learner
     multiMarkerLearning = new THREEx.ArMultiMakersLearning(arToolkitContext, subMarkersControls);
-    multiMarkerLearning.enabled = true; // Start learning immediately
+    multiMarkerLearning.enabled = true;
 
     // 5. Setup UI
     const controlsContainer = document.createElement('div');
@@ -184,14 +196,12 @@ function initLearner() {
     document.body.appendChild(controlsContainer);
     document.getElementById('resetBtn').onclick = () => multiMarkerLearning.resetStats();
     document.getElementById('downloadBtn').onclick = () => {
-        const jsonString = multiMarkerLearning.toJSON(); // This is a synchronous call
+        const jsonString = multiMarkerLearning.toJSON();
         const profileData = JSON.parse(jsonString);
-
         if (profileData.subMarkersControls.length < markerNames.length) {
             alert(`Not all markers were learned! Found ${profileData.subMarkersControls.length}/${markerNames.length}. Please show all markers to the camera.`);
             return;
         }
-
         const blob = new Blob([jsonString], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -213,14 +223,19 @@ function initLearner() {
 async function initCombinedPlayer(profileData) {
     cleanup();
     currentMode = 'player';
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    
+    // Also use the existing canvas here for consistency
+    const canvas = document.getElementById('outputCanvas');
+    canvas.style.display = 'block';
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+
     scene = new THREE.Scene();
     camera = new THREE.Camera();
     scene.add(camera);
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
+    
     video = document.createElement('video');
     video.setAttribute('autoplay', ''); video.setAttribute('muted', ''); video.setAttribute('playsinline', '');
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: {ideal: 1280}, height: {ideal: 720} } });
@@ -229,16 +244,20 @@ async function initCombinedPlayer(profileData) {
     video.style.position = 'absolute'; video.style.top = '0px'; video.style.left = '0px'; video.style.zIndex = '-1';
     await new Promise(resolve => { video.onloadedmetadata = resolve; });
     video.play();
+    
     arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'video', sourceElement: video });
     arToolkitSource.init(() => { arToolkitSource.onResizeElement(); arToolkitSource.copyElementSizeTo(renderer.domElement); });
     arToolkitContext = new THREEx.ArToolkitContext({ cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat', detectionMode: 'mono' });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
+    
     const markerRoot = new THREE.Group();
     scene.add(markerRoot);
     multiMarkerControls = new THREEx.ArMultiMarkerControls(arToolkitContext, markerRoot, { multiMarkerFile: profileData });
+    
     const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
     arjsObject.position.y = 0.5;
     markerRoot.add(arjsObject);
+    
     WebARRocksObjectThreeHelper.init({
         video: video, NNPath: _settings.NNPath,
         callbackReady: (err, three) => {
@@ -250,9 +269,11 @@ async function initCombinedPlayer(profileData) {
             scene.add(webARrocksObjectsGroup);
         }
     });
+    
     animateCombined();
 }
 
+// Animation loops
 function animateCombined() {
     if (currentMode !== 'player') return;
     animationFrameId = requestAnimationFrame(animateCombined);
@@ -272,13 +293,10 @@ function animateAR() {
     animationFrameId = requestAnimationFrame(animateAR);
     if (!arToolkitSource || !arToolkitSource.ready) return;
     arToolkitContext.update(arToolkitSource.domElement);
-
-    // In this learner version, there's no specific update function for the learner object itself.
-    // The learning happens automatically when the context is updated.
-
     renderer.render(scene, camera);
 }
 
+// MediaPipe render function
 let lastVideoTime = -1;
 function renderMediaPipe() {
     if (video && faceLandmarker && video.readyState === video.HAVE_ENOUGH_DATA && video.currentTime !== lastVideoTime) {
