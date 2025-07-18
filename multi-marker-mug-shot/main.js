@@ -7,7 +7,6 @@ import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { FACEMESH_TESSELATION } from './face_mesh_data.js';
 import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
 
-
 // Global variables
 let scene, camera, renderer, video, faceLandmarker;
 let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
@@ -40,61 +39,6 @@ function loadLegacyScript(url) {
 async function main() {
     try {
         await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
-
-       
-        // 2. Apply the necessary patch to the ArMultiMarkerControls update function.
-        // This is required to correctly calculate the combined marker's transformation.
-        THREEx.ArMultiMarkerControls.prototype.update = function() {
-            const markerRoot = this.object3d;
-            const arToolkitContext = this.arToolkitContext;
-            const subMarkerControls = this.parameters.subMarkersControls;
-
-            subMarkerControls.forEach(function(markerControls) {
-                markerControls.update(arToolkitContext);
-            });
-
-            const visibleSubMarkers = subMarkerControls.filter(function(markerControls) {
-                return markerControls.object3d.visible === true && markerControls.parameters.matrix;
-            });
-
-            if (visibleSubMarkers.length === 0) {
-                markerRoot.visible = false;
-                return;
-            }
-
-            markerRoot.visible = true;
-            const center = new THREE.Vector3();
-            const matrices = [];
-
-            for (let i = 0; i < visibleSubMarkers.length; i++) {
-                const subMatrix = new THREE.Matrix4().getInverse(visibleSubMarkers[i].object3d.matrix);
-                const learnedMatrix = new THREE.Matrix4();
-                learnedMatrix.elements = visibleSubMarkers[i].parameters.matrix.elements;
-                const resultMatrix = new THREE.Matrix4().multiplyMatrices(subMatrix, learnedMatrix);
-                center.applyMatrix4(resultMatrix);
-                const finalMatrix = new THREE.Matrix4().getInverse(resultMatrix);
-                matrices.push(finalMatrix);
-            }
-
-            center.divideScalar(visibleSubMarkers.length);
-            const averageMatrix = matrices[0].clone();
-            for (let i = 1; i < matrices.length; i++) {
-                averageMatrix.multiply(matrices[i]);
-            }
-
-            const position = new THREE.Vector3();
-            const quaternion = new THREE.Quaternion();
-            const scale = new THREE.Vector3();
-            averageMatrix.decompose(position, quaternion, scale);
-
-            markerRoot.position.copy(position);
-            markerRoot.quaternion.copy(quaternion);
-            markerRoot.scale.copy(scale);
-            markerRoot.matrix.compose(markerRoot.position, markerRoot.quaternion, markerRoot.scale);
-            markerRoot.matrixWorldNeedsUpdate = true;
-        };
-        console.log("🔧 AR.js update function patched successfully.");
-        
         initMediaPipe();
     } catch (error) {
         console.error("Error loading ar-threex.js:", error);
@@ -196,14 +140,13 @@ function initLearner() {
     });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
     const subMarkersControls = [];
-    const markerNames = ['hiro', 'kanji', 'letterA'];
-
+    const markerNames = ['hiro', 'kanji'];
     markerNames.forEach(function(markerName){
         const markerRoot = new THREE.Group();
         scene.add(markerRoot);
         const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
             type: 'pattern',
-            patternUrl: `./patt/patt.${markerName}`,
+            patternUrl: `https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.${markerName}`,
         });
         const markerHelper = new THREEx.ArMarkerHelper(markerControls);
         markerControls.object3d.add(markerHelper.object3d);
@@ -221,120 +164,87 @@ function initLearner() {
         <button id="resetBtn">Reset Learning</button>
         <button id="saveAndPlayBtn">Save Profile & Start Player</button>
         <div style="margin-top: 10px;">Status: <span id="learningStatus" style="font-weight: bold; color: red;">In Progress...</span></div>
-        <div id="markerStatusContainer" style="margin-top: 10px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 3px; font-family: monospace;"></div>
     `;
     document.body.appendChild(controlsContainer);
     document.getElementById('resetBtn').onclick = () => multiMarkerLearning.resetStats();
     
     // --- MODIFIED BUTTON LOGIC TO SAVE TO MEMORY AND START PLAYER ---
     document.getElementById('saveAndPlayBtn').onclick = () => {
-        // First, ensure the learning results are fully computed
-        multiMarkerLearning.computeResult();
-
-        // 💡 Stricter Check: Verify that EVERY sub-marker has a learned matrix.
-        const isLearningComplete = multiMarkerLearning.subMarkersControls.every(function(controls) {
-            return controls.parameters.matrix !== undefined;
-        });
-
-        if (!isLearningComplete) {
-            alert("Learning is not complete! Please show all markers to the camera at the same time until the model is stable.");
+        const profileData = JSON.parse(multiMarkerLearning.toJSON());
+        
+        if (!profileData || !profileData.subMarkersControls || profileData.subMarkersControls.length < markerNames.length) {
+            alert(`Learning not complete! Please show all markers to the camera until the status is 'Ready'.`);
             return;
         }
         
-        const profileData = JSON.parse(multiMarkerLearning.toJSON());
-        
-        profileData.parameters = {
-            type: 'area'
-        };
-        
+        // 💡 Save data to memory variable instead of downloading a file
         savedProfileData = profileData;
         alert("Profile saved to memory. Starting the player...");
+        
+        // 💡 Directly initialize the player with the saved data
         initCombinedPlayer(savedProfileData);
     };
     
     animateAR();
 }
 
-// Make sure this is in the global scope so animateCombined can see it
-
 async function initCombinedPlayer(profileData) {
     cleanup();
     currentMode = 'player';
-
+    
+    // Hide all UI phases
     document.getElementById('uiContainer').style.display = 'none';
+    document.getElementById('phase1').style.display = 'none';
+    document.getElementById('phase2').style.display = 'none';
+    // Phase 3 is no longer used for uploading
+    const phase3 = document.getElementById('phase3');
+    if (phase3) phase3.style.display = 'none';
+
 
     const canvas = document.getElementById('outputCanvas');
     canvas.style.display = 'block';
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-
-    const gl = renderer.getContext();
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-
     scene = new THREE.Scene();
     camera = new THREE.Camera();
     scene.add(camera);
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
-
-    arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
-
-    arToolkitSource.init(() => {
-        arToolkitSource.onResizeElement();
-        arToolkitSource.copyElementSizeTo(renderer.domElement);
-
-        arToolkitContext = new THREEx.ArToolkitContext({
-            cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
-            detectionMode: 'mono'
-        });
-
-        arToolkitContext.init(() => {
-            camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
-
-            // 1. Create sub-marker controls from the profile data
-            const subMarkersControls = [];
-            if (profileData && profileData.subMarkersControls) {
-                profileData.subMarkersControls.forEach(function(markerParams) {
-                    const object3d = new THREE.Group();
-                    scene.add(object3d);
-                    const markerControls = new THREEx.ArMarkerControls(arToolkitContext, object3d, markerParams);
-
-                    if (markerParams.matrix && markerParams.matrix.elements) {
-                        const matrix = new THREE.Matrix4();
-                        matrix.fromArray(markerParams.matrix.elements);
-                        markerControls.parameters.matrix = matrix;
-                    }
-                    subMarkersControls.push(markerControls);
-                });
-            }
-
-            // 2. Create the main multi-marker controls object
-            const markerRoot = new THREE.Group();
-            scene.add(markerRoot);
-            
-            // 💡 Call the constructor the intended way, then add a safeguard
-            multiMarkerControls = new THREEx.ArMultiMarkerControls(arToolkitContext, markerRoot, subMarkersControls);
-
-            // Safeguard: If the buggy constructor failed, manually set the properties.
-            if (!multiMarkerControls.parameters || !multiMarkerControls.parameters.subMarkersControls) {
-                console.warn("ArMultiMarkerControls constructor failed. Manually setting parameters.");
-                multiMarkerControls.parameters = multiMarkerControls.parameters || {};
-                multiMarkerControls.parameters.subMarkersControls = subMarkersControls;
-            }
-            
-            // Add your 3D object to the markerRoot
-            const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
-            arjsObject.position.y = 0.5;
-            markerRoot.add(arjsObject);
-
-            console.log("AR setup complete. Starting animation loop.");
-            animateCombined();
-        });
-    });
+    video = document.createElement('video');
+    video.setAttribute('autoplay', ''); video.setAttribute('muted', ''); video.setAttribute('playsinline', '');
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    video.srcObject = stream;
+    document.body.appendChild(video);
+    video.style.position = 'absolute'; video.style.top = '0px'; video.style.left = '0px'; video.style.zIndex = '-1';
+    await new Promise(resolve => { video.oncanplay = resolve; });
+    video.play();
+    arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'video', sourceElement: video });
+    console.log("AR source created with video element:", arToolkitSource);
+    arToolkitSource.init(() => { arToolkitSource.onResizeElement(); arToolkitSource.copyElementSizeTo(renderer.domElement); console.log("AR source initialized"); });
+    arToolkitContext = new THREEx.ArToolkitContext({ cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat', detectionMode: 'mono' });
+    arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
+    
+    const markerRoot = new THREE.Group();
+    scene.add(markerRoot);
+    
+    // The profileData object is passed directly
+    multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
+    
+    console.log("Inspecting controls object after creation:");
+    console.log("Sub-marker controls found:", multiMarkerControls.subMarkersControls.length);
+    console.log(multiMarkerControls);
+    
+    const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
+    arjsObject.position.y = 0.5;
+    markerRoot.add(arjsObject);
+    
+    const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
+    markerRoot.add(markerHelper.object3d);
+    
+    console.log("currentMode:", currentMode);
+    animateCombined();
 }
 
-// Ensure your animation loop uses multiMarkerControls
 function animateCombined() {
     if (currentMode !== 'player') return;
     animationFrameId = requestAnimationFrame(animateCombined);
@@ -342,6 +252,7 @@ function animateCombined() {
     if (arToolkitSource && arToolkitSource.ready) { 
         arToolkitContext.update(arToolkitSource.domElement); 
         if (multiMarkerControls) {
+            console.log("Updating multiMarkerControls in player mode");
             multiMarkerControls.update();
         }
     }
@@ -356,50 +267,23 @@ function animate() {
 
 function animateAR() {
     if (currentMode !== 'learner') return;
-
     animationFrameId = requestAnimationFrame(animateAR);
-
-    if (!arToolkitSource || !arToolkitSource.ready) {
-        return;
-    }
-
+    if (!arToolkitSource || !arToolkitSource.ready) return;
     arToolkitContext.update(arToolkitSource.domElement);
-
+    
     if (multiMarkerLearning) {
-        // 💡 FIX: Update each sub-marker's status on every frame.
-        // This was the missing step. It updates the .visible property for each marker.
-        multiMarkerLearning.subMarkersControls.forEach(function(markerControls) {
-            markerControls.update(arToolkitContext);
-        });
-
-        // Now that visibilities are updated, compute the learning result.
         multiMarkerLearning.computeResult();
-
-
-        // --- UI update logic (this part remains the same) ---
         const statusElement = document.getElementById('learningStatus');
-        const markerStatusContainer = document.getElementById('markerStatusContainer');
-        
-        if (statusElement && markerStatusContainer) {
+        if (statusElement) {
             let nMarkersLearned = 0;
-            let markerStatusHTML = '<ul style="list-style: none; padding: 0; margin: 0;">';
-
             multiMarkerLearning.subMarkersControls.forEach(function(markerControls) {
-                const patternName = markerControls.parameters.patternUrl.split('.').pop();
-                
-                if (markerControls.parameters.matrix !== undefined) {
-                    nMarkersLearned++;
-                    markerStatusHTML += `<li style="color: lightgreen;">- ${patternName}: Learned ✔️</li>`;
-                } else {
-                    markerStatusHTML += `<li style="color: #FF8A8A;">- ${patternName}: Waiting... ❌</li>`;
-                }
+                if (markerControls.object3d.userData.result === undefined) return;
+                if (markerControls.object3d.userData.result.confidenceFactor < 1) return;
+                nMarkersLearned++;
             });
 
-            markerStatusHTML += '</ul>';
-            markerStatusContainer.innerHTML = markerStatusHTML;
-
             if (nMarkersLearned === multiMarkerLearning.subMarkersControls.length) {
-                statusElement.innerHTML = 'Ready to Save Profile!';
+                statusElement.innerHTML = 'Ready to Start Player!';
                 statusElement.style.color = 'lightgreen';
             } else {
                 statusElement.innerHTML = `In Progress... (${nMarkersLearned}/${multiMarkerLearning.subMarkersControls.length})`;
@@ -407,7 +291,6 @@ function animateAR() {
             }
         }
     }
-
     renderer.render(scene, camera);
 }
 
