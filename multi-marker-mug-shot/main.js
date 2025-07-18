@@ -176,11 +176,17 @@ function initLearner() {
             alert(`Learning not complete! Please show all markers to the camera until the status is 'Ready'.`);
             return;
         }
+
+        profileData.parameters = {
+            type: 'area'
+        };
         
         // 💡 Save data to memory variable instead of downloading a file
         savedProfileData = profileData;
         alert("Profile saved to memory. Starting the player...");
         
+        
+
         // 💡 Directly initialize the player with the saved data
         initCombinedPlayer(savedProfileData);
     };
