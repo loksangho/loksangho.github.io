@@ -201,21 +201,25 @@ function initLearner() {
     animateAR();
 }
 
-// 💡 NEW: A robust resize handler for all modes
+// --- CORRECTED STATE-AWARE RESIZE HANDLER ---
 function onResize() {
-    if (arToolkitSource) {
-        arToolkitSource.onResizeElement();
-        arToolkitSource.copyElementSizeTo(renderer.domElement);
-        if (arToolkitContext && arToolkitContext.arController !== null) {
-            arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
-        }
-    }
+    // This function is now smart enough to handle different modes.
+    if (!renderer) return;
 
-    if (renderer) {
-        const canvas = renderer.domElement;
-        camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    if (currentMode === 'mediapipe') {
+        // In MediaPipe mode, we control the perspective camera.
+        camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
-        renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    } else {
+        // In 'learner' or 'player' mode, AR.js handles resizing.
+        if (arToolkitSource && arToolkitSource.ready) {
+            arToolkitSource.onResizeElement();
+            arToolkitSource.copyElementSizeTo(renderer.domElement);
+            if (arToolkitContext && arToolkitContext.arController !== null) {
+                arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
+            }
+        }
     }
 }
 
