@@ -1,4 +1,4 @@
-// main.js - Fixed WebARRocks init call
+// main.js - Fixed WebARRocks object access
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -224,23 +224,24 @@ async function initCombinedPlayer(profileData) {
     const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
     arjsObject.position.y = 0.5;
     markerRoot.add(arjsObject);
-
-    // --- CORRECTED WebARRocks INIT ---
-    // Get references to both canvases
+    
     const outputCanvas = document.getElementById('outputCanvas');
     const arCanvas = document.getElementById('ARCanvas');
 
     WebARRocksObjectThreeHelper.init({
         video: video,
         NNPath: _settings.NNPath,
-        ARCanvas: arCanvas,         // The canvas for processing
-        threeCanvas: outputCanvas,  // The canvas for rendering
+        ARCanvas: arCanvas,
+        threeCanvas: outputCanvas,
         callbackReady: (err, three) => {
             if (err) { console.error(err); return; }
             if (exportedMeshData) {
                 new GLTFLoader().parse(exportedMeshData, '', (gltf) => { WebARRocksObjectThreeHelper.add('CUP', gltf.scene); });
             } else { WebARRocksObjectThreeHelper.add('CUP', new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5), new THREE.MeshNormalMaterial())); }
-            const webARrocksObjectsGroup = WebARRocksObjectThreeHelper.get_threeObject();
+            
+            // --- CORRECTED API USAGE ---
+            // Use the .object3D property to get the group of tracked objects
+            const webARrocksObjectsGroup = WebARRocksObjectThreeHelper.object3D;
             scene.add(webARrocksObjectsGroup);
         }
     });
