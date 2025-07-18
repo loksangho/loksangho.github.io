@@ -366,7 +366,7 @@ function initWebARRocks(){
         cameraFov: _settings.cameraFov,
         followZRot: _settings.followZRot,
         scanSettings: _settings.scanSettings,
-        //isFullScreen: true,
+        isFullScreen: true,
         stabilizerOptions: {}
     });
 
