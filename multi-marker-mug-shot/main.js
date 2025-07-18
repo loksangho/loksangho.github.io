@@ -277,8 +277,14 @@ async function initCombinedPlayer(profileData) {
             // 2. Create the main multi-marker controls object
             const markerRoot = new THREE.Group();
             scene.add(markerRoot);
-            multiMarkerControls = new THREEx.ArMultiMarkerControls(arToolkitContext, markerRoot, subMarkersControls);
-            console.log("Step 2: Successfully created base ArMultiMarkerControls object.");
+
+            // 💡 FIX: The ArMultiMarkerControls constructor is flawed. We will call it
+            // and then immediately and manually fix its internal parameters to ensure
+            // the sub-marker list is correctly configured.
+            multiMarkerControls = new THREEx.ArMultiMarkerControls(arToolkitContext, markerRoot, {});
+            multiMarkerControls.parameters.subMarkersControls = subMarkersControls;
+
+            console.log("Step 2: Created base ArMultiMarkerControls and manually corrected parameters.");
 
 
             // 3. Manually create the 'area' controller and patch the update function
@@ -309,9 +315,9 @@ function animateCombined() {
     
     if (arToolkitSource && arToolkitSource.ready) { 
         arToolkitContext.update(arToolkitSource.domElement); 
-        //if (multiMarkerControls) {
-            //multiMarkerControls.update();
-        //}
+        if (multiMarkerControls) {
+            multiMarkerControls.update();
+        }
     }
     renderer.render(scene, camera);
 }
