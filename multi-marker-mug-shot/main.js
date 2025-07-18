@@ -41,7 +41,7 @@ async function main() {
         await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
 
         //Fix for THREEx.ArMultiMarkerControls
-        THREEx.ArMultiMarkerControls.prototype.update=THREEx.ArMultiMarkerControls.prototype.update = function(markerRoot) {
+        THREEx.ArMultiMarkerControls.prototype.update = function(markerRoot) {
             var subMarkerControls = this.parameters.subMarkersControls;
 
             // Update all sub-markers
