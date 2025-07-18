@@ -203,9 +203,74 @@ function initLearner() {
 }
 
 async function initCombinedPlayer(profileData) {
+    console.log("Loaded Profile Data:", JSON.stringify(profileData, null, 2));
+    cleanup();
+    currentMode = 'player';
+    
+    const canvas = document.getElementById('outputCanvas');
+    canvas.style.display = 'block';
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    scene = new THREE.Scene();
+    camera = new THREE.Camera();
+    scene.add(camera);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
+    video = document.createElement('video');
+    video.setAttribute('autoplay', ''); video.setAttribute('muted', ''); video.setAttribute('playsinline', '');
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: {ideal: 1280}, height: {ideal: 720} } });
+    video.srcObject = stream;
+    document.body.appendChild(video);
+    video.style.position = 'absolute'; video.style.top = '0px'; video.style.left = '0px'; video.style.zIndex = '-1';
+    await new Promise(resolve => { video.onloadedmetadata = resolve; });
+    video.play();
+    arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'video', sourceElement: video });
+    arToolkitSource.init(() => { arToolkitSource.onResizeElement(); arToolkitSource.copyElementSizeTo(renderer.domElement); });
+    arToolkitContext = new THREEx.ArToolkitContext({ cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat', detectionMode: 'mono' });
+    arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
+    
+    const markerRoot = new THREE.Group();
+    scene.add(markerRoot);
+    multiMarkerControls = new THREEx.ArMultiMarkerControls(arToolkitContext, markerRoot, { multiMarkerFile: profileData });
+    
+    // --- DEBUGGING STEP 1: Inspect the object after creation ---
+    console.log('Inspecting multiMarkerControls after init:', multiMarkerControls);
+    
+    const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
+    arjsObject.position.y = 0.5;
+    markerRoot.add(arjsObject);
+    
+    const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
+    markerRoot.add(markerHelper.object3d);
+
+    animateCombined();
+}
+
+function animateCombined() {
+    if (currentMode !== 'player') return;
+    animationFrameId = requestAnimationFrame(animateCombined);
+
+    if (arToolkitSource && arToolkitSource.ready) { 
+        arToolkitContext.update(arToolkitSource.domElement); 
+    }
+    
+    // --- DEBUGGING STEP 2: Check for individual marker visibility ---
+    if (multiMarkerControls && multiMarkerControls.subMarkersControls) {
+        multiMarkerControls.subMarkersControls.forEach((subControl, index) => {
+            // The visibility is on the object3d managed by the control
+            if (subControl.object3d.visible) {
+                console.log(`Sub-marker ${index} (${subControl.parameters.patternUrl}) is VISIBLE.`);
+            }
+        });
+    }
+    
+    renderer.render(scene, camera);
+}
+
+/*
+async function initCombinedPlayer(profileData) {
 
     // --- ADD THIS LINE TO INSPECT THE DATA ---
-    console.log("Loaded Profile Data:", JSON.stringify(profileData, null, 2));
     
     cleanup();
     currentMode = 'player';
@@ -243,7 +308,7 @@ async function initCombinedPlayer(profileData) {
     markerRoot.add(markerHelper.object3d);    
     // --- END DEBUGGING 1 ---
 
-    /*const outputCanvas = document.getElementById('outputCanvas');
+    const outputCanvas = document.getElementById('outputCanvas');
     const arCanvas = document.getElementById('ARCanvas');
 
     WebARRocksObjectThreeHelper.init({
@@ -270,31 +335,31 @@ async function initCombinedPlayer(profileData) {
             }
         }
     });
-    */
+    
     animateCombined();
-}
+}*/
 
 // Animation loops
-function animateCombined() {
+/*function animateCombined() {
     if (currentMode !== 'player') return;
     animationFrameId = requestAnimationFrame(animateCombined);
-/*
+
     if (WebARRocksObjectThreeHelper.object3D && !webARrocksGroupAdded) {
         scene.add(WebARRocksObjectThreeHelper.object3D);
         webARrocksGroupAdded = true;
     }
-*/
+
     if (arToolkitSource && arToolkitSource.ready) { arToolkitContext.update(arToolkitSource.domElement); }
     
     // --- DEBUGGING 2: Log WebARRocks Detection State ---
- /*   const detectState = WebARRocksObjectThreeHelper.animate();
+    const detectState = WebARRocksObjectThreeHelper.animate();
     if (detectState && detectState.label) {
         console.log("WebARRocks detected:", detectState.label);
-    }*/
+    }
     // --- END DEBUGGING 2 ---
 
     renderer.render(scene, camera);
-}
+}*/
 
 function animate() {
     if (currentMode !== 'mediapipe') return;
