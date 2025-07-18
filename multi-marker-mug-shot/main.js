@@ -87,12 +87,24 @@ async function initMediaPipe() {
     profileInput.addEventListener('change', () => { playerButton.disabled = !profileInput.files.length; });
     
     playerButton.addEventListener('click', () => {
-        const file = profileInput.files[0];
-        if (file) {
-            const fileUrl = URL.createObjectURL(file);
-            initCombinedPlayer(fileUrl);
-        }
-    });
+    const file = profileInput.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                // Parse the file content into a JavaScript object
+                const profileData = JSON.parse(event.target.result);
+                // Call the player with the data object, not a URL
+                initCombinedPlayer(profileData);
+            } catch (e) {
+                alert("Error: The selected file is not a valid JSON profile.");
+                console.error("Error parsing JSON file:", e);
+            }
+        };
+        // Read the file as plain text
+        reader.readAsText(file);
+    }
+});
     animate();
 }
 
@@ -202,7 +214,7 @@ function initLearner() {
     animateAR();
 }
 
-async function initCombinedPlayer(profileDataURL) {
+async function initCombinedPlayer(profileData) {
     cleanup();
     currentMode = 'player';
     
@@ -233,14 +245,8 @@ async function initCombinedPlayer(profileDataURL) {
     const markerRoot = new THREE.Group();
     scene.add(markerRoot);
 
-    multiMarkerControls = new THREEx.ArMultiMarkerControls(arToolkitContext, markerRoot, {
-        multiMarkerFile: profileDataURL,
-    });
-    
-    multiMarkerControls.addEventListener('load', () => {
-        URL.revokeObjectURL(profileDataURL);
-        console.log("Marker profile loaded successfully via URL.");
-    });
+    multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, markerRoot, profileData);
+
 
     const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
     arjsObject.position.y = 0.5;
