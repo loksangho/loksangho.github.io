@@ -272,7 +272,6 @@ function animateCombined() {
     if (arToolkitSource && arToolkitSource.ready) { 
         arToolkitContext.update(arToolkitSource.domElement); 
         if (multiMarkerControls) {
-            console.log("Updating multiMarkerControls in player mode");
             multiMarkerControls.update();
         }
     }
