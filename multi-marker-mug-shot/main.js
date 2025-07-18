@@ -281,8 +281,8 @@ async function initCombinedPlayer(profileData) {
             // 💡 FIX: The ArMultiMarkerControls constructor is flawed. We will call it
             // and then immediately and manually fix its internal parameters to ensure
             // the sub-marker list is correctly configured.
-            console.log("$$$",subMarkersControls);
-            multiMarkerControls = new THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, {"subMarkersControls":subMarkersControls});
+            console.log("$$$",subMarkersControls.toString());
+            multiMarkerControls = new THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, {"subMarkersControls":subMarkersControls.toString()});
             //multiMarkerControls.parameters.subMarkersControls = subMarkersControls;
 
             console.log("Step 2: Created base ArMultiMarkerControls and manually corrected parameters.");
