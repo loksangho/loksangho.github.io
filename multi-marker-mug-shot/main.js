@@ -358,14 +358,27 @@ function animate() {
 
 function animateAR() {
     if (currentMode !== 'learner') return;
+
     animationFrameId = requestAnimationFrame(animateAR);
-    if (!arToolkitSource || !arToolkitSource.ready) return;
+
+    if (!arToolkitSource || !arToolkitSource.ready) {
+        return;
+    }
+
     arToolkitContext.update(arToolkitSource.domElement);
-    
+
     if (multiMarkerLearning) {
+        // 💡 FIX: Update each sub-marker's status on every frame.
+        // This was the missing step. It updates the .visible property for each marker.
+        multiMarkerLearning.subMarkersControls.forEach(function(markerControls) {
+            markerControls.update(arToolkitContext);
+        });
+
+        // Now that visibilities are updated, compute the learning result.
         multiMarkerLearning.computeResult();
 
-        // --- ENHANCED STATUS UI LOGIC ---
+
+        // --- UI update logic (this part remains the same) ---
         const statusElement = document.getElementById('learningStatus');
         const markerStatusContainer = document.getElementById('markerStatusContainer');
         
@@ -374,7 +387,6 @@ function animateAR() {
             let markerStatusHTML = '<ul style="list-style: none; padding: 0; margin: 0;">';
 
             multiMarkerLearning.subMarkersControls.forEach(function(markerControls) {
-                // Extract the marker name from the URL
                 const patternName = markerControls.parameters.patternUrl.split('.').pop();
                 
                 if (markerControls.parameters.matrix !== undefined) {
@@ -397,6 +409,7 @@ function animateAR() {
             }
         }
     }
+
     renderer.render(scene, camera);
 }
 
