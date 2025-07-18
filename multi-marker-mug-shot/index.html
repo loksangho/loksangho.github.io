@@ -72,6 +72,10 @@
     }</script>
     <script src="./helpers/DeviceOrientationHelper.js"></script>
     <!-- include jsartookit -->
+    <script type="module" type="javascript">
+      import * as THREE from 'three';
+      window.THREE = THREE; // Make THREE globally available
+    </script>
     <script src="jsartoolkit5/artoolkit.min.js"></script>
     <script src="jsartoolkit5/artoolkit.api.js"></script>
     <!-- include threex.artoolkit -->
