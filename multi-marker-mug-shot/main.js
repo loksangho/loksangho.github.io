@@ -224,7 +224,6 @@ async function initCombinedPlayer(profileData) {
     cleanup();
     currentMode = 'player';
 
-    let videoElement = null;
     // Hide all UI phases
     document.getElementById('uiContainer').style.display = 'none';
     document.getElementById('phase1').style.display = 'none';
@@ -260,7 +259,7 @@ async function initCombinedPlayer(profileData) {
         console.log("AR source initialized.");
 
         onResize();
-        
+
         // The library creates its own video element, which is accessed via .domElement
         // We just need to wait for it to be ready and then we can use it.
         // The onReady callback of init() is the right place to do this.
@@ -290,29 +289,6 @@ async function initCombinedPlayer(profileData) {
             const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
             markerRoot.add(markerHelper.object3d);
 
-             // --- WEBARROCKS INTEGRATION START ---
-            const arCanvas = document.getElementById('ARCanvas');
-            WebARRocksObjectThreeHelper.init({
-                video: videoElement, // Use the video element created by AR.js
-                NNPath: _settings.NNPath,
-                ARCanvas: arCanvas,
-                threeCanvas: canvas,
-                callbackReady: (err, three) => {
-                    if (err) { console.error(err); return; }
-                    if (exportedMeshData) {
-                        new GLTFLoader().parse(exportedMeshData, '', (gltf) => {
-                            if (gltf && gltf.scene) {
-                                gltf.scene.scale.set(0.4, 0.4, 0.4);
-                                WebARRocksObjectThreeHelper.add('CUP', gltf.scene);
-                            }
-                        });
-                    } else { 
-                        WebARRocksObjectThreeHelper.add('CUP', new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5), new THREE.MeshNormalMaterial())); 
-                    }
-                }
-            });
-            // --- WEBARROCKS INTEGRATION END ---
-
             console.log("AR setup complete. Starting animation loop.");
             animateCombined();
         });
@@ -329,14 +305,6 @@ function animateCombined() {
             multiMarkerControls.update();
         }
     }
-
-    // --- WEBARROCKS INTEGRATION START ---
-    if (WebARRocksObjectThreeHelper.object3D && !webARrocksGroupAdded) {
-        scene.add(WebARRocksObjectThreeHelper.object3D);
-        webARrocksGroupAdded = true;
-    }
-    WebARRocksObjectThreeHelper.animate();
-    // --- WEBARROCKS INTEGRATION END ---
     renderer.render(scene, camera);
 }
 
