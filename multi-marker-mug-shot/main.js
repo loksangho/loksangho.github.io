@@ -248,7 +248,20 @@ async function initCombinedPlayer(profileData) {
                 profileData.subMarkersControls.forEach(function(markerParams) {
                     const object3d = new THREE.Group();
                     scene.add(object3d);
+                    // Create the new controls instance from the basic parameters
                     const markerControls = new THREEx.ArMarkerControls(arToolkitContext, object3d, markerParams);
+
+                    // 💡 FIX: Manually reconstruct the learned matrix and attach it.
+                    // The ArMarkerControls constructor doesn't recognize the 'matrix'
+                    // parameter, so we must add it ourselves after initialization.
+                    if (markerParams.matrix && markerParams.matrix.elements) {
+                        const matrix = new THREE.Matrix4();
+                        matrix.fromArray(markerParams.matrix.elements);
+                        markerControls.parameters.matrix = matrix;
+                    } else {
+                        console.warn("A sub-marker is missing its learned matrix data!");
+                    }
+
                     subMarkersControls.push(markerControls);
                 });
                 console.log(`Step 1: Successfully created ${subMarkersControls.length} sub-marker controls.`);
