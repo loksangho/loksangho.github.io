@@ -250,9 +250,12 @@ function animateCombined() {
     if (currentMode !== 'player') return;
     animationFrameId = requestAnimationFrame(animateCombined);
     
+    console.log("Animation frame for player mode", arToolkitSource);
+
     if (arToolkitSource && arToolkitSource.ready) { 
         arToolkitContext.update(arToolkitSource.domElement); 
         if (multiMarkerControls) {
+            console.log("Updating multiMarkerControls in player mode");
             multiMarkerControls.update();
         }
     }
