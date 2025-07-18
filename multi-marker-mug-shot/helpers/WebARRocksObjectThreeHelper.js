@@ -1,396 +1,304 @@
-/**
- * Copyright 2020 WebAR.rocks ( https://webar.rocks )
- * 
- * WARNING: YOU SHOULD NOT MODIFY THIS FILE OTHERWISE WEBAR.ROCKS
- * WON'T BE RESPONSIBLE TO MAINTAIN AND KEEP YOUR ADDED FEATURES
- * WEBAR.ROCKS WON'T BE LIABLE FOR BREAKS IN YOUR ADDED FUNCTIONNALITIES
- *
- * WEBAR.ROCKS KEEP THE RIGHT TO WORK ON AN UNMODIFIED VERSION OF THIS SCRIPT.
- * 
- * THIS FILE IS A HELPER AND SHOULD NOT BE MODIFIED TO IMPLEMENT A SPECIFIC USER SCENARIO
- * OR TO ADDRESS A SPECIFIC USE CASE.
- */
+// main.js - Fixed WebARRocks object access
 
-/*
- spec properties:
-  - <HTMLCanvasElement> ARCanvas
-  - <HTMLCanvasElement> threeCanvas
-  - <HTMLVideoElement> video
-  - <function> callbackReady
-  - <string> NNPath
-  - <dict> loadNNOptions- 
-  - <dict> detectOptions
-  - <number> nDetectsPerLoop
-  - <float> cameraFov. 0 for auto estimation
-  - <boolean> followZRot
-  - <dict> scanSettings
-  - <object> stabilizerOptions
-  - <boolean> isFullScreen
-  - <float> zOffset - 0.5 by default, relative
- */
-const WebARRocksObjectThreeHelper_Module = (function(){
-  
-  const _defaultSpec = {
-    video: null,
-    canvas: null,
-   
-    // pose computation: 
-    zOffset: 0.5,
-    followZRot: false,
-    isUseDeviceOrientation: false,
-    deviceOrientationDOMTrigger: null,
-    deviceOrientationDOMTriggerOnClick: null,
-    deviceOrientationKeepRotYOnly: false,
-    deviceOrientationEnableDelay: 30, // number of iterations before enabling the feature
-    
-    // detection and tracking:
-    nDetectsPerLoop: 0,
-    detectOptions: null,
-    scanSettings: null,
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
+import { FACEMESH_TESSELATION } from './face_mesh_data.js';
+import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
 
-    // stabilization:
-    isStabilized: false,
-    stabilizerOptions: null,
+// Global variables
+let scene, camera, renderer, video, faceLandmarker;
+let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
+let exportedMeshData = null;
+const runningMode = "VIDEO";
+let animationFrameId;
+let currentMode = null;
 
-    // display:
-    isFullScreen: false,
-    cameraFov: 0, // auto FoV computation
-    cameraMinVideoDimFov: 35, // FoV along the minimum video dimension (height or width), in degrees. used only if auto FoV
-    cameraZNear: 0.1,
-    cameraZFar: 500
-  };
+// AR specific variables
+let arToolkitSource, arToolkitContext, multiMarkerControls, multiMarkerLearning;
+const _settings = { NNPath: './neuralNets/NN_COFFEE_0.json' };
 
-  const _three = {
-    renderer: null,
-    containers: {},
-    camera: null,
-    scene: null,
-    euler: null,
-    quaternion: null,
-    position: null
-  };
-
-  const _stabilizers = {};
-
-  const _videoRes = {
-    width: -1,
-    height: -1
-  };
-
-  const _deg2rad = Math.PI / 180;
-  const _deviceOrientation = {
-    isEnabled: false,
-    quatCamToWorld: null,
-    quatObjToWorld: null,
-    counter: 0
-  };
-
-  let _spec = null;
-  const _callbacks = {};
-
-
-  function init_deviceOrientation(){
-    if (!_spec.isUseDeviceOrientation){
-      return Promise.reject();
-    }
-    if (typeof(DeviceOrientationHelper) === 'undefined'){
-      throw new Error('Please include DeviceOrientationHelper.js to use isUseDeviceOrientation option');
-    }
-    return DeviceOrientationHelper.init({
-      THREE: THREE,
-      DOMTrigger: _spec.deviceOrientationDOMTrigger,
-      DOMTriggerOnClick: _spec.deviceOrientationDOMTriggerOnClick,
-      isRejectIfMissing: true,
-      DOMRetryTrigger: _three.renderer.domElement,
-      debugAlerts: false
+function loadLegacyScript(url) {
+    return new Promise((resolve, reject) => {
+        window.THREE = THREE;
+        if (!window.THREE.EventDispatcher) {
+            window.THREE.EventDispatcher = THREE.Object3D;
+        }
+        if (!window.THREE.Matrix4.prototype.getInverse) {
+            window.THREE.Matrix4.prototype.getInverse = function(matrix) {
+                return this.copy(matrix).invert();
+            };
+        }
+        const script = document.createElement('script');
+        script.src = url;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
     });
-  }
-
-  
-  function update_orientationFromDeviceOrientation(quatObjToCam, quatTarget){
-    ++ _deviceOrientation.counter;
-
-    if ( _deviceOrientation.counter < _spec.deviceOrientationEnableDelay){
-      // first detections, we consider the results of the neural network
-      // is not reliable enough to compute quatObjToWorld
-      return;
-    }
-
-    const quatWorldToCam = DeviceOrientationHelper.update();
-    _deviceOrientation.quatCamToWorld.copy(quatWorldToCam).invert();
-      
-    // compute _deviceOrientation.quatObjToWorld:
-    if ( _deviceOrientation.counter === _spec.deviceOrientationEnableDelay ){
-      _deviceOrientation.quatObjToWorld.copy(quatObjToCam).premultiply(quatWorldToCam);
-      if (_spec.deviceOrientationKeepRotYOnly){
-        const eulerOrder = 'YXZ';
-        const eulerObjToWorld = new THREE.Euler().setFromQuaternion(_deviceOrientation.quatObjToWorld, eulerOrder);
-        eulerObjToWorld.set(0.0, eulerObjToWorld.y, 0.0, eulerOrder);
-        _deviceOrientation.quatObjToWorld.setFromEuler(eulerObjToWorld);
-      }
-    }
-
-    quatTarget.copy(_deviceOrientation.quatObjToWorld).premultiply(_deviceOrientation.quatCamToWorld);
-
-    // DEBUG ZONE:
-    //quatTarget.identity(); // in keyboard demo, display cube always facing camera
-    //quatTarget.copy(quatWorldToCam); // in keyboard demo, rot movement seems inverted
-    //quatTarget.copy(_deviceOrientation.quatCamToWorld); // in keyboard demo, rot movement good but rot offset
-  }
-
-
-  const that = {
-    init: function(spec){
-      // Extract parameters:
-      _spec = Object.assign({}, _defaultSpec, spec, {
-        isStabilized: (spec.stabilizerOptions !== undefined && typeof(WebARRocksThreeStabilizer) !== 'undefined' ) ? true : false
-      });
-
-      // Initialize WebAR.rocks.object:
-      WEBARROCKSOBJECT.init({
-        video: _spec.video,
-        canvas: _spec.ARCanvas,
-        followZRot: _spec.followZRot,
-        scanSettings: _spec.scanSettings
-      });
-
-      // Initialize THREE.js instances:
-      _three.renderer = new THREE.WebGLRenderer({
-        canvas: _spec.threeCanvas,
-        alpha: true
-      });
-
-      _three.scene = new THREE.Scene();
-      _three.camera = new THREE.PerspectiveCamera( _spec.cameraFov, _spec.threeCanvas.width / _spec.threeCanvas.height, _spec.cameraZNear, _spec.cameraZFar );
-      _three.euler = new THREE.Euler(0, 0, 0, 'ZXY');
-      _three.position = new THREE.Vector3();
-      _three.quaternion = new THREE.Quaternion();
-
-      // Set neural network model:
-      WEBARROCKSOBJECT.set_NN(_spec.NNPath, function(err){
-        if (!err){
-          that.resize();
-          init_deviceOrientation().then(function(){
-            _deviceOrientation.isEnabled = true;
-            _deviceOrientation.quatCamToWorld = new THREE.Quaternion();
-            _deviceOrientation.quatObjToWorld = new THREE.Quaternion();
-          }).catch(function(err){
-            console.log('Device Orientation API is not used');
-          });
-        }
-        if (_spec.callbackReady){
-          _spec.callbackReady(err, _three);
-        }
-      }, _spec.loadNNOptions);
-    },
-
-
-    resize: function(){
-      const canvas = _three.renderer.domElement;
-      if (_spec.isFullScreen){
-        const dpr = window.devicePixelRatio || 1;
-        const fsw = window.innerWidth;
-        // do not use window.innerHeight because it excludes the URL bar
-        // on IOS:
-        const fsh = screen.availHeight;
-        canvas.width = fsw * dpr;
-        canvas.height = fsh * dpr;
-        canvas.style.width = fsw.toString() + 'px';
-        canvas.style.height = fsh.toString() + 'px';
-      } 
-      that.update_threeCamera();      
-    },
-
-
-    animate: function(){
-      const detectState = WEBARROCKSOBJECT.detect(_spec.nDetectsPerLoop, null, _spec.detectOptions);
-      
-      for(let label in _three.containers){
-        const threeContainer = _three.containers[label];
-
-        if (!detectState.label || detectState.label!==label){
-          if (threeContainer.visible){
-            that.trigger_callback(label, 'onloose');
-          }
-          threeContainer.visible = false;
-          _deviceOrientation.counter = 0;
-          continue;
-        }
-        
-        if (!threeContainer.visible && _spec.isStabilized){
-          _stabilizers[label].reset();
-        }
-
-        if (!threeContainer.visible){
-          that.trigger_callback(label, 'ondetect');
-        }
-        threeContainer.visible = true;
-
-        // compute position:
-        const halfTanFOV = Math.tan(_three.camera.aspect * _three.camera.fov * _deg2rad / 2); 
-
-        // // scale in the viewport of the camera:
-        const s = detectState.positionScale[2];
-
-        // move the cube in order to fit the head
-        const W = s;                        // relative width of the detection window (1-> whole width of the detection window)
-        const D = 1 / (2 * W * halfTanFOV); // distance between the front face of the cube and the camera
-        
-        // coords in 2D of the center of the detection window in the viewport of the camera:
-        const xv = (2 * detectState.positionScale[0] - 1);
-        const yv = (2 * detectState.positionScale[1] - 1);
-        
-        // coords in 3D of the center of the cube (in the view coordinates system)
-        const z = -D - _spec.zOffset;   // minus because view coordinate system Z goes backward. -0.5 because z is the coord of the center of the cube (not the front face)
-        const x = xv * D * halfTanFOV;
-        const y = yv * D * halfTanFOV / _three.camera.aspect;
-        _three.position.set(x, y, z);
-
-        // compute rotation:
-        const dPitch = detectState.pitch - Math.PI / 2; // look up/down rotation (around X axis)
-        _three.euler.set( -dPitch, detectState.yaw + Math.PI, -detectState.roll);
-        _three.quaternion.setFromEuler(_three.euler);
-
-        // apply position and rotation:
-        if (_spec.isStabilized){
-          _stabilizers[label].update(_three.position, _three.quaternion, detectState, _videoRes);
-        } else { // no stabilization, directly assign position and orientation:
-          threeContainer.position.copy(_three.position);
-          threeContainer.quaternion.copy(_three.quaternion);
-        }
-
-        if (_deviceOrientation.isEnabled){
-          update_orientationFromDeviceOrientation(threeContainer.quaternion, threeContainer.quaternion);
-        }
-      } //end for
-
-      _three.renderer.render(_three.scene, _three.camera);
-    },
-
-
-    add: function(label, threeStuff){
-      // build the threeContainer, which will track the detected object:
-      const isNew = (_three.containers[label]) ? false : true;
-      const threeContainer = (isNew) ? new THREE.Object3D() : _three.containers[label];
-      _three.containers[label] = threeContainer;
-      threeContainer.add(threeStuff);
-
-      if (isNew) {
-        _three.scene.add(threeContainer);
-        
-        // initialize stabilizer if required:
-        if (_spec.isStabilized){
-          _stabilizers[label] = WebARRocksThreeStabilizer.instance(Object.assign({
-            obj3D: threeContainer
-          }, _spec.stabilizerOptions));
-        }
-      }
-    },
-
-
-    set_callback: function(label, callbackType, callbackFunc){
-      if (!_callbacks[label]){
-        _callbacks[label] = {
-          'ondetect': null,
-          'onloose': null
-        }
-      }
-      _callbacks[label][callbackType] = callbackFunc;
-    },
-
-
-    trigger_callback: function(label, callbackType, args){
-      if (!_callbacks[label] || !_callbacks[label][callbackType]){
-        return;
-      }
-      _callbacks[label][callbackType](args);
-    },
-
-
-    get_occluderMaterial: function(){ // return depth occlusion material:
-      return new THREE.ShaderMaterial({
-        vertexShader: THREE.ShaderLib.basic.vertexShader,
-        fragmentShader: "precision lowp float;\n void main(void){\n gl_FragColor = vec4(1.,0.,0.,1.);\n }",
-        uniforms: THREE.ShaderLib.basic.uniforms,
-        side: THREE.DoubleSide,
-        colorWrite: false
-      });
-    },
-
-
-    update_threeCamera: function(){
-      // compute aspectRatio:
-      const canvasElement = _three.renderer.domElement;
-      const cvw = canvasElement.width;
-      const cvh = canvasElement.height;
-      const canvasAspectRatio = cvw / cvh;
-
-      // compute vertical field of view:
-      const vw = _spec.video.videoWidth;
-      const vh = _spec.video.videoHeight;
-      _videoRes.width = vw;
-      _videoRes.height = vh;
-      const videoAspectRatio = vw / vh;
-      let fov = -1;
-      if (_spec.cameraFov === 0){ // auto fov
-        const fovFactor = (vh > vw) ? (1.0 / videoAspectRatio) : 1.0;
-        fov = _spec.cameraMinVideoDimFov * fovFactor;        
-      } else {
-        fov = _spec.cameraFov;
-      }
-
-      // if fov is too large (over 90°), weird errors happens
-      fov = Math.min(fov, 60);
-      
-      // compute X and Y offsets in pixels:
-      let scale = 1.0;
-      if (canvasAspectRatio > videoAspectRatio) {
-        // the canvas is more in landscape format than the video, so we crop top and bottom margins:
-        scale = cvw / vw;
-      } else {
-        // the canvas is more in portrait format than the video, so we crop right and left margins:
-        scale = cvh / vh;
-      }
-      
-      const cvws = vw * scale, cvhs = vh * scale;
-      const offsetX = (cvws - cvw) / 2.0;
-      const offsetY = (cvhs - cvh) / 2.0;
-      
-      /*if (canvasAspectRatio > videoAspectRatio) {
-        // we also need to reduce the vertical fov because we crop top and bottom margins:
-        const halfFovRad = _deg2rad * fov / 2;
-        fov = 2 * Math.atan((cvh / cvhs) * Math.tan(halfFovRad)) / _deg2rad;
-      }*/
-
-      // reset camera:
-      _three.camera.clearViewOffset();
-      _three.camera.view = null; // fix a crappy THREE.js bug
-
-      // reinit camera:
-      _three.camera.aspect = videoAspectRatio;
-      _three.camera.fov = fov;
-      console.log('INFO in WebARRocksObjectThreeHelper.update_threeCamera(): camera vertical estimated FoV is', fov);
-
-      _three.camera.setViewOffset(cvws, cvhs, offsetX, offsetY, cvw, cvh);
-      _three.camera.updateProjectionMatrix();
-
-      // update drawing area:
-      _three.renderer.setSize(cvw, cvh, false);
-      _three.renderer.setViewport(0, 0, cvw, cvh);
-    }
-
-  }; //end that
-  return that;
-})();
-
-
-export const WebARRocksObjectThreeHelper = WebARRocksObjectThreeHelper_Module;
-
-/*
-// Export ES6 module:
-try {
-  module.exports = WebARRocksObjectThreeHelper;
-} catch(e){
-  console.log('ES6 Module not exported');
 }
-*/
+
+async function main() {
+    try {
+        await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
+        console.log("ar-threex.js loaded and patched for compatibility.");
+        initMediaPipe();
+    } catch (error) {
+        console.error("Error loading ar-threex.js:", error);
+    }
+}
+
+// Phase 1: MediaPipe Face Capture
+async function initMediaPipe() {
+    currentMode = 'mediapipe';
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 2.5;
+    const canvas = document.getElementById('outputCanvas');
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    canvas.style.display = 'block';
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+    dirLight.position.set(0, 1, 1);
+    scene.add(dirLight);
+    video = document.getElementById('webcamVideo');
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+    video.srcObject = stream;
+    await new Promise(resolve => video.onloadedmetadata = () => { video.play(); resolve(); });
+    video.style.display = 'none';
+    const visionResolver = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/wasm");
+    faceLandmarker = await FaceLandmarker.createFromOptions(visionResolver, {
+        baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task` },
+        runningMode, numFaces: 1 });
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(478 * 3), 3));
+    geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(478 * 2), 2));
+    geometry.setIndex(FACEMESH_TESSELATION.flat());
+    textureCanvas = document.createElement('canvas');
+    textureCanvas.width = 512; textureCanvas.height = 512;
+    textureCanvasCtx = textureCanvas.getContext('2d');
+    faceTexture = new THREE.CanvasTexture(textureCanvas);
+    const material = new THREE.MeshStandardMaterial({ map: faceTexture, side: THREE.DoubleSide });
+    faceMesh = new THREE.Mesh(geometry, material);
+    scene.add(faceMesh);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('uiContainer').style.display = 'flex';
+    document.getElementById('phase1').style.display = 'block';
+    document.getElementById('saveButton').addEventListener('click', saveMesh);
+    document.getElementById('learnerButton').addEventListener('click', initLearner);
+    const playerButton = document.getElementById('playerButton');
+    const profileInput = document.getElementById('profileInput');
+    profileInput.addEventListener('change', () => { playerButton.disabled = !profileInput.files.length; });
+    playerButton.addEventListener('click', () => {
+        const file = profileInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => initCombinedPlayer(JSON.parse(e.target.result));
+            reader.readAsText(file);
+        }
+    });
+    animate();
+}
+
+function saveMesh() {
+    if (currentMode !== 'mediapipe' || !faceLandmarker) return;
+    const results = faceLandmarker.detectForVideo(video, performance.now());
+    if (results.faceLandmarks.length === 0) { alert("No face detected. Please look at the camera."); return; }
+    const exporter = new GLTFExporter();
+    exporter.parse(faceMesh, (gltf) => {
+        exportedMeshData = gltf;
+        alert("Face mesh saved! Now, start the learner.");
+        document.getElementById('phase1').style.display = 'none';
+        document.getElementById('phase2').style.display = 'block';
+        document.getElementById('phase3').style.display = 'none';
+    }, (error) => console.error(error), { binary: true });
+}
+
+function cleanup() {
+    cancelAnimationFrame(animationFrameId);
+    if (video && video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); video.srcObject = null; }
+    if (renderer) {
+        renderer.dispose();
+        renderer = null;
+    }
+    if (currentMode === 'player') { WebARRocksObjectThreeHelper.destroy(); }
+    const dynamicUI = document.getElementById('dynamicUI');
+    if(dynamicUI) dynamicUI.remove();
+    document.getElementById('uiContainer').style.display = 'none';
+}
+
+function initLearner() {
+    cleanup();
+    currentMode = 'learner';
+    const canvas = document.getElementById('outputCanvas');
+    canvas.style.display = 'block';
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    scene = new THREE.Scene();
+    camera = new THREE.Camera();
+    scene.add(camera);
+    arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
+    arToolkitSource.init(() => {
+        setTimeout(() => {
+            arToolkitSource.onResizeElement();
+            arToolkitSource.copyElementSizeTo(renderer.domElement);
+        }, 100);
+    });
+    arToolkitContext = new THREEx.ArToolkitContext({
+        cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
+        detectionMode: 'mono',
+    });
+    arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
+    const subMarkersControls = [];
+    const markerNames = ['hiro', 'kanji'];
+    markerNames.forEach(function(markerName){
+        const markerRoot = new THREE.Group();
+        scene.add(markerRoot);
+        const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+            type: 'pattern',
+            patternUrl: `https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.${markerName}`,
+        });
+        const markerHelper = new THREEx.ArMarkerHelper(markerControls);
+        markerControls.object3d.add(markerHelper.object3d);
+        subMarkersControls.push(markerControls);
+    });
+    multiMarkerLearning = new THREEx.ArMultiMakersLearning(arToolkitContext, subMarkersControls);
+    multiMarkerLearning.enabled = true;
+    const controlsContainer = document.createElement('div');
+    controlsContainer.id = 'dynamicUI';
+    controlsContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px;';
+    controlsContainer.innerHTML = `<button id="resetBtn">Reset Learning</button><button id="downloadBtn">Download and Continue</button>`;
+    document.body.appendChild(controlsContainer);
+    document.getElementById('resetBtn').onclick = () => multiMarkerLearning.resetStats();
+    document.getElementById('downloadBtn').onclick = () => {
+        const jsonString = multiMarkerLearning.toJSON();
+        const profileData = JSON.parse(jsonString);
+        if (profileData.subMarkersControls.length < markerNames.length) {
+            alert(`Not all markers were learned! Found ${profileData.subMarkersControls.length}/${markerNames.length}. Please show all markers to the camera.`);
+            return;
+        }
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'multiMarkerProfile.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+        alert("Profile downloaded. Now please load it to start the combined AR.");
+        cleanup();
+        document.getElementById('uiContainer').style.display = 'flex';
+        document.getElementById('phase1').style.display = 'none';
+        document.getElementById('phase2').style.display = 'none';
+        document.getElementById('phase3').style.display = 'block';
+    };
+    animateAR();
+}
+
+async function initCombinedPlayer(profileData) {
+    cleanup();
+    currentMode = 'player';
+    const canvas = document.getElementById('outputCanvas');
+    canvas.style.display = 'block';
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    scene = new THREE.Scene();
+    camera = new THREE.Camera();
+    scene.add(camera);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
+    video = document.createElement('video');
+    video.setAttribute('autoplay', ''); video.setAttribute('muted', ''); video.setAttribute('playsinline', '');
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: {ideal: 1280}, height: {ideal: 720} } });
+    video.srcObject = stream;
+    document.body.appendChild(video);
+    video.style.position = 'absolute'; video.style.top = '0px'; video.style.left = '0px'; video.style.zIndex = '-1';
+    await new Promise(resolve => { video.onloadedmetadata = resolve; });
+    video.play();
+    arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'video', sourceElement: video });
+    arToolkitSource.init(() => { arToolkitSource.onResizeElement(); arToolkitSource.copyElementSizeTo(renderer.domElement); });
+    arToolkitContext = new THREEx.ArToolkitContext({ cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat', detectionMode: 'mono' });
+    arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
+    const markerRoot = new THREE.Group();
+    scene.add(markerRoot);
+    multiMarkerControls = new THREEx.ArMultiMarkerControls(arToolkitContext, markerRoot, { multiMarkerFile: profileData });
+    const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
+    arjsObject.position.y = 0.5;
+    markerRoot.add(arjsObject);
+    
+    const outputCanvas = document.getElementById('outputCanvas');
+    const arCanvas = document.getElementById('ARCanvas');
+
+    WebARRocksObjectThreeHelper.init({
+        video: video,
+        NNPath: _settings.NNPath,
+        ARCanvas: arCanvas,
+        threeCanvas: outputCanvas,
+        callbackReady: (err, three) => {
+            if (err) { console.error(err); return; }
+            if (exportedMeshData) {
+                new GLTFLoader().parse(exportedMeshData, '', (gltf) => { WebARRocksObjectThreeHelper.add('CUP', gltf.scene); });
+            } else { WebARRocksObjectThreeHelper.add('CUP', new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5), new THREE.MeshNormalMaterial())); }
+            
+            // --- CORRECTED API USAGE ---
+            // Use the .object3D property to get the group of tracked objects
+            const webARrocksObjectsGroup = WebARRocksObjectThreeHelper.object3D;
+            scene.add(webARrocksObjectsGroup);
+        }
+    });
+    
+    animateCombined();
+}
+
+// Animation loops
+function animateCombined() {
+    if (currentMode !== 'player') return;
+    animationFrameId = requestAnimationFrame(animateCombined);
+    if (arToolkitSource && arToolkitSource.ready) { arToolkitContext.update(arToolkitSource.domElement); }
+    WebARRocksObjectThreeHelper.animate();
+    renderer.render(scene, camera);
+}
+
+function animate() {
+    if (currentMode !== 'mediapipe') return;
+    animationFrameId = requestAnimationFrame(animate);
+    renderMediaPipe();
+}
+
+function animateAR() {
+    if (currentMode !== 'learner') return;
+    animationFrameId = requestAnimationFrame(animateAR);
+    if (!arToolkitSource || !arToolkitSource.ready) return;
+    arToolkitContext.update(arToolkitSource.domElement);
+    renderer.render(scene, camera);
+}
+
+// MediaPipe render function
+let lastVideoTime = -1;
+function renderMediaPipe() {
+    if (video && faceLandmarker && video.readyState === video.HAVE_ENOUGH_DATA && video.currentTime !== lastVideoTime) {
+        lastVideoTime = video.currentTime;
+        const results = faceLandmarker.detectForVideo(video, performance.now());
+        if (results.faceLandmarks.length > 0) {
+            faceMesh.visible = true;
+            const landmarks = results.faceLandmarks[0];
+            const positions = faceMesh.geometry.attributes.position.array;
+            const uvs = faceMesh.geometry.attributes.uv.array;
+            for (let i = 0; i < landmarks.length; i++) {
+                positions[i * 3]     = (landmarks[i].x - 0.5) * 2;
+                positions[i * 3 + 1] = -(landmarks[i].y - 0.5) * 2;
+                positions[i * 3 + 2] = -landmarks[i].z;
+                uvs[i * 2]           = landmarks[i].x;
+                uvs[i * 2 + 1]       = 1.0 - landmarks[i].y;
+            }
+            faceMesh.geometry.attributes.position.needsUpdate = true;
+            faceMesh.geometry.attributes.uv.needsUpdate = true;
+            faceMesh.geometry.computeVertexNormals();
+            textureCanvasCtx.clearRect(0, 0, 512, 512);
+            textureCanvasCtx.drawImage(video, 0, 0, 512, 512);
+            faceTexture.needsUpdate = true;
+        } else { faceMesh.visible = false; }
+    }
+    if (renderer) renderer.render(scene, camera);
+}
+
+main();
