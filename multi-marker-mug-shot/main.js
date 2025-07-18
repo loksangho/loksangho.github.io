@@ -38,10 +38,15 @@ function loadLegacyScript(url) {
 
 async function main() {
     try {
-        await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
+        // 💡 Load both the main library and the missing multi-marker area component
+        await Promise.all([
+            loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js'),
+            loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/threex-armultimarkerarea.js')
+        ]);
+        console.log("Both AR.js libraries loaded successfully.");
         initMediaPipe();
     } catch (error) {
-        console.error("Error loading ar-threex.js:", error);
+        console.error("Error loading AR.js libraries:", error);
     }
 }
 
