@@ -436,14 +436,23 @@ function animateAR() {
 
 let lastVideoTime = -1;
 function renderMediaPipe() {
-    if (video && faceLandmarker && video.readyState === video.HAVE_ENOUGH_DATA && video.currentTime !== lastVideoTime) {
+    if (
+        video &&
+        faceLandmarker &&
+        video.readyState === video.HAVE_ENOUGH_DATA &&
+        video.currentTime !== lastVideoTime &&
+        video.videoWidth > 0 &&
+        video.videoHeight > 0
+    ) {
         lastVideoTime = video.currentTime;
         const results = faceLandmarker.detectForVideo(video, performance.now());
+
         if (results.faceLandmarks.length > 0) {
             faceMesh.visible = true;
             const landmarks = results.faceLandmarks[0];
             const positions = faceMesh.geometry.attributes.position.array;
             const uvs = faceMesh.geometry.attributes.uv.array;
+
             for (let i = 0; i < landmarks.length; i++) {
                 positions[i * 3]     = (landmarks[i].x - 0.5) * 2;
                 positions[i * 3 + 1] = -(landmarks[i].y - 0.5) * 2;
@@ -451,15 +460,27 @@ function renderMediaPipe() {
                 uvs[i * 2]           = landmarks[i].x;
                 uvs[i * 2 + 1]       = 1.0 - landmarks[i].y;
             }
+
             faceMesh.geometry.attributes.position.needsUpdate = true;
             faceMesh.geometry.attributes.uv.needsUpdate = true;
             faceMesh.geometry.computeVertexNormals();
+
+            // ✅ Make sure dimensions are valid before drawing
             textureCanvasCtx.clearRect(0, 0, 512, 512);
-            textureCanvasCtx.drawImage(video, 0, 0, 512, 512);
-            faceTexture.needsUpdate = true;
-        } else { faceMesh.visible = false; }
+            try {
+                textureCanvasCtx.drawImage(video, 0, 0, 512, 512);
+                faceTexture.needsUpdate = true;
+            } catch (e) {
+                console.warn("drawImage failed:", e);
+            }
+
+        } else {
+            faceMesh.visible = false;
+        }
     }
+
     if (renderer) renderer.render(scene, camera);
 }
+
 
 main();
