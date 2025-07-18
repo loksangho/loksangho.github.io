@@ -235,24 +235,27 @@ function initLearner() {
     
     // --- MODIFIED BUTTON LOGIC TO SAVE TO MEMORY AND START PLAYER ---
     document.getElementById('saveAndPlayBtn').onclick = () => {
-        const profileData = JSON.parse(multiMarkerLearning.toJSON());
-        
-        if (!profileData || !profileData.subMarkersControls || profileData.subMarkersControls.length < markerNames.length) {
-            alert(`Learning not complete! Please show all markers to the camera until the status is 'Ready'.`);
+        // First, ensure the learning results are fully computed
+        multiMarkerLearning.computeResult();
+
+        // 💡 Stricter Check: Verify that EVERY sub-marker has a learned matrix.
+        const isLearningComplete = multiMarkerLearning.subMarkersControls.every(function(controls) {
+            return controls.parameters.matrix !== undefined;
+        });
+
+        if (!isLearningComplete) {
+            alert("Learning is not complete! Please show all markers to the camera at the same time until the model is stable.");
             return;
         }
-
+        
+        const profileData = JSON.parse(multiMarkerLearning.toJSON());
+        
         profileData.parameters = {
             type: 'area'
         };
         
-        // 💡 Save data to memory variable instead of downloading a file
         savedProfileData = profileData;
         alert("Profile saved to memory. Starting the player...");
-        
-        
-
-        // 💡 Directly initialize the player with the saved data
         initCombinedPlayer(savedProfileData);
     };
     
