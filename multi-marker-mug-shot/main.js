@@ -41,7 +41,65 @@ async function main() {
         await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
 
         //Fix for THREEx.ArMultiMarkerControls
-        THREEx.ArMultiMarkerControls.prototype.update=function(A){var I,g=this,B=g.parameters.subMarkersControls;if(B.forEach((function(A){A.update(g.arToolkitContext,A.object3d)})),0!==(I=B.filter((function(A){return A.object3d.visible===!0}))).length){A.visible=!0;for(var C=new THREE.Vector3,Q=[],E=0;E<I.length;E++){var i=new THREE.Matrix4;i.getInverse(I[E].object3d.matrix);var o=new THREE.Matrix4;o.elements=I[E].parameters.matrix.elements;var D=new THREE.Matrix4;D.multiplyMatrices(i,o),C.applyMatrix4(D);var a=new THREE.Matrix4;a.getInverse(D),Q.push(a)}var t=new THREE.Vector3,s=new THREE.Quaternion,w=new THREE.Vector3;C.divideScalar(I.length);var r=Q[0].clone();if(Q.forEach((function(A,I){0!==I&&r.multiply(A)})),r.decompose(t,s,w),A.position.copy(t),A.quaternion.copy(s),A.scale.copy(w),A.matrix.compose(A.position,A.quaternion,A.scale),A.matrixWorldNeedsUpdate=!0}else A.visible=!1};
+        THREEx.ArMultiMarkerControls.prototype.update=THREEx.ArMultiMarkerControls.prototype.update = function(markerRoot) {
+            var subMarkerControls = this.parameters.subMarkersControls;
+
+            // Update all sub-markers
+            subMarkerControls.forEach(function(markerControls) {
+                markerControls.update();
+            });
+
+            // Get the visible sub-markers
+            var visibleSubMarkers = subMarkerControls.filter(function(markerControls) {
+                return markerControls.object3d.visible === true;
+            });
+
+            // If no sub-marker is visible, then go back
+            if (visibleSubMarkers.length === 0) {
+                markerRoot.visible = false;
+                return;
+            }
+
+            // If at least one sub-marker is visible, then markerRoot is visible
+            markerRoot.visible = true;
+
+            // -- compute the center of the visible sub-markers --
+            var center = new THREE.Vector3();
+            var matrices = [];
+
+            for (var i = 0; i < visibleSubMarkers.length; i++) {
+                var subMatrix = new THREE.Matrix4().getInverse(visibleSubMarkers[i].object3d.matrix);
+                var learnedMatrix = new THREE.Matrix4();
+                learnedMatrix.elements = visibleSubMarkers[i].parameters.matrix.elements;
+
+                var resultMatrix = new THREE.Matrix4().multiplyMatrices(subMatrix, learnedMatrix);
+
+                center.applyMatrix4(resultMatrix);
+
+                var finalMatrix = new THREE.Matrix4().getInverse(resultMatrix);
+                matrices.push(finalMatrix);
+            }
+
+            center.divideScalar(visibleSubMarkers.length);
+
+            var averageMatrix = matrices[0].clone();
+            for (var i = 1; i < matrices.length; i++) {
+                averageMatrix.multiply(matrices[i]);
+            }
+            
+            // -- apply the averageMatrix to the markerRoot --
+            var position = new THREE.Vector3();
+            var quaternion = new THREE.Quaternion();
+            var scale = new THREE.Vector3();
+
+            averageMatrix.decompose(position, quaternion, scale);
+
+            markerRoot.position.copy(position);
+            markerRoot.quaternion.copy(quaternion);
+            markerRoot.scale.copy(scale);
+            markerRoot.matrix.compose(markerRoot.position, markerRoot.quaternion, markerRoot.scale);
+            markerRoot.matrixWorldNeedsUpdate = true;
+        };
         initMediaPipe();
     } catch (error) {
         console.error("Error loading ar-threex.js:", error);
