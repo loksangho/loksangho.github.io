@@ -203,6 +203,10 @@ function initLearner() {
 }
 
 async function initCombinedPlayer(profileData) {
+
+    // --- ADD THIS LINE TO INSPECT THE DATA ---
+    console.log("Loaded Profile Data:", JSON.stringify(profileData, null, 2));
+    
     cleanup();
     currentMode = 'player';
     const canvas = document.getElementById('outputCanvas');
