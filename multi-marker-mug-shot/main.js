@@ -200,7 +200,7 @@ function initLearner() {
     });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
     
-    multiMarkerLearner = new THREEx.ArMultiMarkerLearner(arToolkitContext);
+    multiMarkerLearner = new THREEx.ArMultiMakersLearning(arToolkitContext);
     multiMarkerLearner.baseURL = "https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.";
 
     const controlsContainer = document.createElement('div');
