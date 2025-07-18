@@ -182,7 +182,8 @@ function initLearner() {
         
         // Add this log to see the actual structure of the object
         console.log("Inspecting profileData from toJSON():", profileData);
-    
+        console.log(profileData["subMarkersControls"]);
+        
         // 2. THIS IS THE CORRECTED CHECK
         // It now safely checks if profileData and subMarkersControls exist before checking the length.
         if (!profileData || !profileData.subMarkersControls || profileData.subMarkersControls.length < markerNames.length) {
