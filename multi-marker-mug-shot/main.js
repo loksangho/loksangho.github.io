@@ -255,7 +255,7 @@ function onResize() {
     }
 }
 
-
+let _DOMVideo;
 async function initCombinedPlayer(profileData) {
     cleanup();
     currentMode = 'player';
@@ -322,39 +322,20 @@ async function initCombinedPlayer(profileData) {
             arjsObject.position.y = 0.5;
             markerRoot.add(arjsObject);
 
+            _DOMVideo = document.getElementById('webcamVideo'); 
+            WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
+                throw new Error('Cannot get video feed ' + err);
+                }, {
+                video: {
+                    width:  {min: 640, max: 1920, ideal: 1280},
+                    height: {min: 640, max: 1920, ideal: 720},
+                    facingMode: {ideal: 'environment'}
+                },
+                audio: false
+            });
             // 4. --- Initialize WebARRocks (as slave) ---
             // It ALSO uses the shared video element, and we tell it to use our main scene.
-            WebARRocksObjectThreeHelper.init({
-                video: renderer.domElement,
-                threeCanvas: renderer.domElement,
-                // We DON'T provide a separate canvas, letting it know it won't be managing rendering.
-                NNPath: _settings.NNPath,
-                callbackReady: (err, three) => {
-                    if (err) { console.error(err); return; }
-                    // Add the saved face mesh to the WebARRocks tracker
-                    if (exportedMeshData) {
-                        new GLTFLoader().parse(exportedMeshData, '', (gltf) => {
-                            WebARRocksObjectThreeHelper.add('CUP', gltf.scene); // Label must match your NN
-                        });
-                    } else {
-                        WebARRocksObjectThreeHelper.add('CUP', new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5), new THREE.MeshNormalMaterial()));
-                    }
-                    
-                    // Get the container for WebARRocks objects and add it to our main scene
-                    if (WebARRocksObjectThreeHelper.object3D && !webARrocksGroupAdded) {
-                        scene.add(WebARRocksObjectThreeHelper.object3D);
-                        webARrocksGroupAdded = true;
-                    }
-                },
-                loadNNOptions: _settings.loadNNOptions,
-                nDetectsPerLoop: _settings.nDetectsPerLoop,
-                detectOptions: _settings.detectOptions,
-                cameraFov: _settings.cameraFov,
-                followZRot: _settings.followZRot,
-                scanSettings: _settings.scanSettings,
-                //isFullScreen: true,
-                stabilizerOptions: {}
-            });
+            
 
             const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
             markerRoot.add(markerHelper.object3d);
@@ -363,6 +344,27 @@ async function initCombinedPlayer(profileData) {
             animateCombined();
         });
     });
+}
+
+function initWebARRocks(){
+    const ARCanvas = document.getElementById('ARCanvas');
+    const threeCanvas = document.getElementById('threeCanvas');
+    
+    WebARRocksObjectThreeHelper.init({
+    video: _DOMVideo,
+    ARCanvas: ARCanvas,
+    threeCanvas: threeCanvas,
+    NNPath: _settings.NNPath,
+    callbackReady: startWebARRocks,
+    loadNNOptions: _settings.loadNNOptions,
+    nDetectsPerLoop: _settings.nDetectsPerLoop,
+    detectOptions: _settings.detectOptions,
+    cameraFov: _settings.cameraFov,
+    followZRot: _settings.followZRot,
+    scanSettings: _settings.scanSettings,
+    isFullScreen: true,
+    stabilizerOptions: {}
+  });
 }
 
 function animateCombined() {
