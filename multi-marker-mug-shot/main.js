@@ -351,6 +351,12 @@ function initWebARRocks(){
     const ARCanvas = document.getElementById('ARCanvas');
     const threeCanvas = document.getElementById('threeCanvas');
     
+    const originalInit = WebARRocksObjectThreeHelper.init;
+    WebARRocksObjectThreeHelper.init = function (spec) {
+        console.log('WebARRocks INIT CALLED WITH:', spec);
+        return originalInit.call(this, spec);
+    };
+
     WebARRocksObjectThreeHelper.init({
     video: _DOMVideo,
     ARCanvas: ARCanvas,
