@@ -390,13 +390,27 @@ function animateCombined() {
         arToolkitContext.update(arToolkitSource.domElement); 
     }
 
+    
     if (WebARRocksObjectThreeHelper.object3D && !webARrocksGroupAdded) {
         scene.add(WebARRocksObjectThreeHelper.object3D);
         webARrocksGroupAdded = true;
     }
-    WebARRocksObjectThreeHelper.animate();
 
-    renderer.render(scene, camera);
+    if (WebARRocksObjectThreeHelper.animate) {
+        try {
+            WebARRocksObjectThreeHelper.animate();
+        } catch (err) {
+            console.warn("WebARRocks animate error:", err);
+        }
+    }
+
+
+    try {
+        renderer.render(scene, camera);
+    } catch (err) {
+        console.error('WebGL render error:', err);
+    }
+
 }
 
 function animate() {
@@ -431,7 +445,12 @@ function animateAR() {
             }
         }
     }
-    renderer.render(scene, camera);
+    try {
+        renderer.render(scene, camera);
+    } catch (err) {
+        console.error('WebGL render error:', err);
+    }
+
 }
 
 let lastVideoTime = -1;
@@ -459,7 +478,14 @@ function renderMediaPipe() {
             faceTexture.needsUpdate = true;
         } else { faceMesh.visible = false; }
     }
-    if (renderer) renderer.render(scene, camera);
+    if (renderer) {
+        try {
+            renderer.render(scene, camera);
+        } catch (err) {
+            console.error('WebGL render error:', err);
+        }
+
+    }
 }
 
 main();
