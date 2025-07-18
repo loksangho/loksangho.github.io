@@ -216,7 +216,7 @@ async function initCombinedPlayer(profileData) {
     video.srcObject = stream;
     document.body.appendChild(video);
     video.style.position = 'absolute'; video.style.top = '0px'; video.style.left = '0px'; video.style.zIndex = '-1';
-    await new Promise(resolve => { video.onloadedmetadata = resolve; });
+    await new Promise(resolve => { video.oncanplay = resolve; });
     video.play();
     arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'video', sourceElement: video });
     console.log("AR source created with video element:", arToolkitSource);
