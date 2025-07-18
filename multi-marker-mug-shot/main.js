@@ -367,6 +367,44 @@ function initWebARRocks(){
   });
 }
 
+function startWebARRocks(err, three) {
+    if (err) {
+        console.error("Error in WebAR.rocks initialization:", err);
+        return;
+    }
+
+    // Add lighting to the AR Scene
+    three.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const arDirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+    arDirLight.position.set(0, 1, 1);
+    three.scene.add(arDirLight);
+
+    if (exportedMeshData) {
+        const loader = new GLTFLoader();
+
+        // CORRECT: Pass an empty string for the path (2nd argument),
+        // so your callback is the 3rd argument (onLoad).
+        loader.parse(exportedMeshData, '', function (gltf) {
+            const loadedMesh = gltf.scene;
+            loadedMesh.scale.set(1, 1, 1);
+
+            
+            // Access classic script helper via the 'window' object
+            WebARRocksObjectThreeHelper.add('CUP', loadedMesh);
+             
+        }, function (error) {
+            console.error('An error happened during GLTF parsing:', error);
+        });
+
+    } else {
+        // Fallback to a cube if no mesh was saved
+        const arCube = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshNormalMaterial());
+        WebARRocksObjectThreeHelper.add('CUP', arCube);
+        alert("No mesh data found, showing a debug cube instead.");
+    }
+    animateCombined();
+}
+
 function animateCombined() {
     if (currentMode !== 'player') return;
     animationFrameId = requestAnimationFrame(animateCombined);
