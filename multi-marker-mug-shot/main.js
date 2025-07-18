@@ -38,14 +38,10 @@ function loadLegacyScript(url) {
 
 async function main() {
     try {
-        // 💡 Load both the main library and the missing multi-marker area component
-        await Promise.all([
-            loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js'),
-        ]);
-        console.log("AR.js libraries loaded successfully.");
+        await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
         initMediaPipe();
     } catch (error) {
-        console.error("Error loading AR.js libraries:", error);
+        console.error("Error loading ar-threex.js:", error);
     }
 }
 
@@ -225,12 +221,26 @@ async function initCombinedPlayer(profileData) {
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
 
-    arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
+    // 💡 REMOVED all manual <video> element and getUserMedia code.
+
+    // 💡 Initialize ArToolkitSource with sourceType 'webcam'.
+    // The library will now create the video element and get the camera stream by itself.
+    arToolkitSource = new THREEx.ArToolkitSource({
+        sourceType: 'webcam',
+    });
 
     arToolkitSource.init(() => {
+        // This log should now appear correctly
         console.log("AR source initialized.");
+
+        // The library creates its own video element, which is accessed via .domElement
+        // We just need to wait for it to be ready and then we can use it.
+        // The onReady callback of init() is the right place to do this.
         arToolkitSource.onResizeElement();
         arToolkitSource.copyElementSizeTo(renderer.domElement);
+        
+        // Note: The library automatically appends its video element to the body,
+        // so we don't need to manually append arToolkitSource.domElement.
 
         arToolkitContext = new THREEx.ArToolkitContext({
             cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
@@ -240,66 +250,15 @@ async function initCombinedPlayer(profileData) {
         arToolkitContext.init(() => {
             camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
 
-            // =================================================================
-            // 💡 REPLACEMENT FOR fromJSON WITH DETAILED LOGGING
-            // =================================================================
-            console.log("Attempting to build multi-marker controls manually...");
-            console.log("Received Profile Data:", profileData);
-
-            // 1. Create sub-marker controls from the profile data
-            const subMarkersControls = [];
-            if (profileData && profileData.subMarkersControls) {
-                profileData.subMarkersControls.forEach(function(markerParams) {
-                    const object3d = new THREE.Group();
-                    scene.add(object3d);
-                    // Create the new controls instance from the basic parameters
-                    const markerControls = new THREEx.ArMarkerControls(arToolkitContext, object3d, markerParams);
-
-                    // 💡 FIX: Manually reconstruct the learned matrix and attach it.
-                    // The ArMarkerControls constructor doesn't recognize the 'matrix'
-                    // parameter, so we must add it ourselves after initialization.
-                    if (markerParams.matrix && markerParams.matrix.elements) {
-                        const matrix = new THREE.Matrix4();
-                        matrix.fromArray(markerParams.matrix.elements);
-                        markerControls.parameters.matrix = matrix;
-                    } else {
-                        console.warn("A sub-marker is missing its learned matrix data!");
-                    }
-
-                    subMarkersControls.push(markerControls);
-                });
-                console.log(`Step 1: Successfully created ${subMarkersControls.length} sub-marker controls.`);
-            } else {
-                console.error("Step 1 Failed: profileData.subMarkersControls not found!");
-                return; // Stop execution
-            }
-
-            // 2. Create the main multi-marker controls object
             const markerRoot = new THREE.Group();
             scene.add(markerRoot);
 
-            // 💡 FIX: The ArMultiMarkerControls constructor is flawed. We will call it
-            // and then immediately and manually fix its internal parameters to ensure
-            // the sub-marker list is correctly configured.
-            multiMarkerControls = new THREEx.ArMultiMarkerControls(arToolkitContext, scene, markerRoot, {});
-            multiMarkerControls.parameters.subMarkersControls = subMarkersControls;
-
-            console.log("Step 2: Created base ArMultiMarkerControls and manually corrected parameters.");
-
-
-            // 3. Manually create the 'area' controller and patch the update function
-            if (profileData.parameters && profileData.parameters.type === 'area') {
-                console.log("Step 3: Profile type is 'area'. Attempting to create ArMultiMarkerArea...");
-            } else {
-                console.error("Step 3 FAILED: Profile 'type' is not 'area' or parameters object is missing!", profileData.parameters);
-            }
-            // =================================================================
-            // END REPLACEMENT
-            // =================================================================
+            multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
 
             const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
             arjsObject.position.y = 0.5;
             markerRoot.add(arjsObject);
+
             const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
             markerRoot.add(markerHelper.object3d);
 
