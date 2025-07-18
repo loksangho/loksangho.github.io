@@ -102,6 +102,60 @@ async function main() {
         await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
 
         //Fix for THREEx.ArMultiMarkerControls
+        // 2. NOW, apply the monkey patch to the loaded THREEx object
+        THREEx.ArMultiMarkerControls.prototype.update = function(markerRoot) {
+            var subMarkerControls = this.parameters.subMarkersControls;
+
+            // Update all sub-markers
+            subMarkerControls.forEach(function(markerControls) {
+                markerControls.update();
+            });
+
+            // Get the visible sub-markers
+            var visibleSubMarkers = subMarkerControls.filter(function(markerControls) {
+                return markerControls.object3d.visible === true;
+            });
+
+            // If no sub-marker is visible, then go back
+            if (visibleSubMarkers.length === 0) {
+                markerRoot.visible = false;
+                return;
+            }
+
+            markerRoot.visible = true;
+            
+            // ... (rest of the corrected update function)
+            var center = new THREE.Vector3();
+            var matrices = [];
+
+            for (var i = 0; i < visibleSubMarkers.length; i++) {
+                var subMatrix = new THREE.Matrix4().getInverse(visibleSubMarkers[i].object3d.matrix);
+                var learnedMatrix = new THREE.Matrix4();
+                learnedMatrix.elements = visibleSubMarkers[i].parameters.matrix.elements;
+                var resultMatrix = new THREE.Matrix4().multiplyMatrices(subMatrix, learnedMatrix);
+                center.applyMatrix4(resultMatrix);
+                var finalMatrix = new THREE.Matrix4().getInverse(resultMatrix);
+                matrices.push(finalMatrix);
+            }
+
+            center.divideScalar(visibleSubMarkers.length);
+            var averageMatrix = matrices[0].clone();
+            for (var i = 1; i < matrices.length; i++) {
+                averageMatrix.multiply(matrices[i]);
+            }
+            
+            var position = new THREE.Vector3();
+            var quaternion = new THREE.Quaternion();
+            var scale = new THREE.Vector3();
+            averageMatrix.decompose(position, quaternion, scale);
+
+            markerRoot.position.copy(position);
+            markerRoot.quaternion.copy(quaternion);
+            markerRoot.scale.copy(scale);
+            markerRoot.matrix.compose(markerRoot.position, markerRoot.quaternion, markerRoot.scale);
+            markerRoot.matrixWorldNeedsUpdate = true;
+        };
+        console.log("AR.js update function patched.");
         
         initMediaPipe();
     } catch (error) {
