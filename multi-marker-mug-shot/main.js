@@ -1,12 +1,10 @@
-// main.js - Combined Simultaneous AR.js Player and WebARRocks (Corrected)
+// main.js - Combined with corrected THREEx loader
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { FACEMESH_TESSELATION } from './face_mesh_data.js';
-
-// Import WebARRocks helpers
 import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
 
 // Global variables
@@ -15,28 +13,31 @@ let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
 let exportedMeshData = null;
 const runningMode = "VIDEO";
 let animationFrameId;
-let currentMode = null; // 'mediapipe', 'learner', 'player'
+let currentMode = null;
 
 // AR specific variables
 let arToolkitSource, arToolkitContext, multiMarkerControls, multiMarkerLearner;
 const _settings = { NNPath: './neuralNets/NN_COFFEE_0.json' };
 
-// Helper to load the legacy AR.js script
+// --- CORRECTED SCRIPT LOADER ---
+// This function now correctly sets window.THREE *before* the script loads.
 function loadLegacyScript(url) {
     return new Promise((resolve, reject) => {
+        // Make THREE globally available for the legacy script
+        window.THREE = THREE;
+
         const script = document.createElement('script');
         script.src = url;
-        script.onload = () => { window.THREE = THREE; resolve(); };
+        script.onload = resolve; // The script can now find window.THREE when it executes
         script.onerror = reject;
         document.head.appendChild(script);
     });
 }
 
 async function main() {
-    window.THREE = THREE;
     try {
         await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
-        console.log("ar-threex.js loaded successfully.");
+        console.log("ar-threex.js loaded successfully. THREEx is now defined.");
         initMediaPipe();
     } catch (error) {
         console.error("Error loading ar-threex.js:", error);
@@ -47,7 +48,6 @@ async function main() {
 async function initMediaPipe() {
     currentMode = 'mediapipe';
 
-    // Setup Scene for MediaPipe
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 2.5;
@@ -63,7 +63,6 @@ async function initMediaPipe() {
     dirLight.position.set(0, 1, 1);
     scene.add(dirLight);
 
-    // Setup MediaPipe
     video = document.getElementById('webcamVideo');
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
     video.srcObject = stream;
@@ -78,11 +77,9 @@ async function initMediaPipe() {
         numFaces: 1
     });
 
-    // --- FULL FACE MESH IMPLEMENTATION (CORRECTED) ---
     const geometry = new THREE.BufferGeometry();
-    const numLandmarks = 478;
-    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(numLandmarks * 3), 3));
-    geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(numLandmarks * 2), 2));
+    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(478 * 3), 3));
+    geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(478 * 2), 2));
     geometry.setIndex(FACEMESH_TESSELATION.flat());
     
     textureCanvas = document.createElement('canvas');
@@ -94,9 +91,7 @@ async function initMediaPipe() {
     const material = new THREE.MeshStandardMaterial({ map: faceTexture, side: THREE.DoubleSide });
     faceMesh = new THREE.Mesh(geometry, material);
     scene.add(faceMesh);
-    // --- END OF CORRECTION ---
 
-    // UI Setup for the new flow
     document.getElementById('loading').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'flex';
     document.getElementById('phase1').style.display = 'block';
@@ -118,7 +113,7 @@ async function initMediaPipe() {
         }
     });
 
-    animate(); // Starts the MediaPipe render loop
+    animate();
 }
 
 function saveMesh() {
@@ -146,11 +141,11 @@ function cleanup() {
     }
 
     if (renderer) {
-        renderer.dispose();
         const domElement = renderer.domElement;
         if (domElement && domElement.parentElement) {
             domElement.parentElement.removeChild(domElement);
         }
+        renderer.dispose();
         renderer = null;
     }
 
@@ -168,16 +163,16 @@ function cleanup() {
 }
 
 function initLearner() {
-    //cleanup();
+    cleanup();
     currentMode = 'learner';
 
-    //renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    //renderer.setSize(window.innerWidth, window.innerHeight);
-    //document.body.appendChild(renderer.domElement);
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-    //scene = new THREE.Scene();
-    //camera = new THREE.Camera();
-    //scene.add(camera);
+    scene = new THREE.Scene();
+    camera = new THREE.Camera();
+    scene.add(camera);
     
     arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
     arToolkitSource.init(() => {
@@ -231,7 +226,6 @@ async function initCombinedPlayer(profileData) {
     cleanup();
     currentMode = 'player';
 
-    // 1. --- Master Scene Setup ---
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
@@ -241,7 +235,6 @@ async function initCombinedPlayer(profileData) {
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
 
-    // 2. --- Shared Video Stream ---
     video = document.createElement('video');
     video.setAttribute('autoplay', '');
     video.setAttribute('muted', '');
@@ -258,7 +251,6 @@ async function initCombinedPlayer(profileData) {
     await new Promise(resolve => { video.onloadedmetadata = resolve; });
     video.play();
 
-    // 3. --- Initialize AR.js (as master) ---
     arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'video', sourceElement: video });
     arToolkitSource.init(() => {
         arToolkitSource.onResizeElement();
@@ -280,7 +272,6 @@ async function initCombinedPlayer(profileData) {
     arjsObject.position.y = 0.5;
     markerRoot.add(arjsObject);
 
-    // 4. --- Initialize WebARRocks (as slave) ---
     WebARRocksObjectThreeHelper.init({
         video: video,
         NNPath: _settings.NNPath,
@@ -298,7 +289,6 @@ async function initCombinedPlayer(profileData) {
         }
     });
     
-    // 5. --- Start Combined Animation Loop ---
     animateCombined();
 }
 
@@ -327,7 +317,6 @@ function animateAR() {
     renderer.render(scene, camera);
 }
 
-// --- FULL RENDERMEDIAPIPE IMPLEMENTATION (CORRECTED) ---
 let lastVideoTime = -1;
 function renderMediaPipe() {
     if (video && faceLandmarker && video.readyState === video.HAVE_ENOUGH_DATA && video.currentTime !== lastVideoTime) {
@@ -360,9 +349,7 @@ function renderMediaPipe() {
             faceMesh.visible = false;
         }
     }
-    renderer.render(scene, camera);
+    if (renderer) renderer.render(scene, camera);
 }
-// --- END OF CORRECTION ---
 
-// Start the application
 main();
