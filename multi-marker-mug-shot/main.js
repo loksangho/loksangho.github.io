@@ -165,7 +165,7 @@ function initLearner() {
 
     // --- EXPLICITLY DEFINE MARKERS TO LEARN ---
     // This makes the process more robust.
-    let markers = {};
+    let markers = [];
     const markerNames = ['hiro', 'kanji']; // Add other marker names here if you use more
     const markerRoot = new THREE.Group(); // A dummy group for the controls
     scene.add(markerRoot);
@@ -176,7 +176,7 @@ function initLearner() {
             patternUrl: `https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.${name}`,
         });
         // Add the marker control to the learner
-        markers[name] = markerControls;
+        markers.push(JSON.stringify(markerControls));
     });
     // --- END OF CHANGE ---
     
