@@ -177,12 +177,16 @@ function initLearner() {
 
     // --- CORRECTED DOWNLOAD LOGIC ---
     document.getElementById('downloadBtn').onclick = () => {
-        // 1. Get the profile data OBJECT
+       // 1. Get the profile data OBJECT
         const profileData = multiMarkerLearning.toJSON();
         
-        // 2. Check if enough markers were learned
-        if (profileData.subMarkersControls.length < markerNames.length) {
-            alert(`Not all markers were learned! Found ${profileData.subMarkersControls.length}/${markerNames.length}. Please show all markers to the camera.`);
+        // Add this log to see the actual structure of the object
+        console.log("Inspecting profileData from toJSON():", profileData);
+    
+        // 2. THIS IS THE CORRECTED CHECK
+        // It now safely checks if profileData and subMarkersControls exist before checking the length.
+        if (!profileData || !profileData.subMarkersControls || profileData.subMarkersControls.length < markerNames.length) {
+            alert(`Not all markers were learned! Please show all markers to the camera.`);
             return;
         }
 
