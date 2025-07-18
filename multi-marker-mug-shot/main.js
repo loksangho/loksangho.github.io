@@ -57,7 +57,8 @@ async function main() {
 
             // Get the visible sub-markers
             var visibleSubMarkers = subMarkerControls.filter(function(markerControls) {
-                return markerControls.object3d.visible === true;
+                // 💡 Filter for markers that are visible AND have the required matrix data
+                return markerControls.object3d.visible === true && markerControls.parameters.matrix;
             });
 
             // If no sub-marker is visible, hide the root and stop
