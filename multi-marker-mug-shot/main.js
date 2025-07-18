@@ -19,41 +19,7 @@ let webARrocksGroupAdded = false;
 // AR specific variables
 let arToolkitSource, arToolkitContext, multiMarkerControls, multiMarkerLearning;
 let savedProfileData = null; // 💡 To store the marker profile in memory
-const _settings = {
-  nDetectsPerLoop: 0, // 0 -> adaptative
-
-  loadNNOptions: {
-    notHereFactor: 0.0,
-    paramsPerLabel: {
-      CUP: {
-        thresholdDetect: 0.92
-      }
-    }
-  },
-
-  detectOptions: {
-    isKeepTracking: true,
-    isSkipConfirmation: false,
-    thresholdDetectFactor: 1,
-    cutShader: 'median',
-    thresholdDetectFactorUnstitch: 0.2,
-    trackingFactors: [0.5, 0.4, 1.5]
-  },
-
-  NNPath: './neuralNets/NN_COFFEE_0.json',
-
-  cameraFov: 0, // In degrees, camera vertical FoV. 0 -> auto mode
-  scanSettings:{
-    nScaleLevels: 2,
-    scale0Factor: 0.8,
-    overlapFactors: [2, 2, 2], // between 0 (max overlap) and 1 (no overlap). Along X,Y,S
-    scanCenterFirst: true    
-  },
-
-  followZRot: true,
-
-  displayDebugCylinder: false
-};
+const _settings = { NNPath: './neuralNets/NN_COFFEE_0.json' };
 
 function loadLegacyScript(url) {
     return new Promise((resolve, reject) => {
@@ -345,15 +311,7 @@ async function initCombinedPlayer(profileData) {
                         scene.add(WebARRocksObjectThreeHelper.object3D);
                         webARrocksGroupAdded = true;
                     }
-                },
-                loadNNOptions: _settings.loadNNOptions,
-                nDetectsPerLoop: _settings.nDetectsPerLoop,
-                detectOptions: _settings.detectOptions,
-                cameraFov: _settings.cameraFov,
-                followZRot: _settings.followZRot,
-                scanSettings: _settings.scanSettings,
-                isFullScreen: true,
-                stabilizerOptions: {}
+                }
             });
 
             const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
