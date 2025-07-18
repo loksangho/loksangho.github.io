@@ -231,7 +231,8 @@ async function initCombinedPlayer(profileData) {
     
     const markerRoot = new THREE.Group();
     scene.add(markerRoot);
-    multiMarkerControls = new THREEx.ArMultiMarkerControls(arToolkitContext, markerRoot, { multiMarkerFile: profileData });
+    multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, profileData);
+
     
     // --- DEBUGGING STEP 1: Inspect the object after creation ---
     console.log('Inspecting multiMarkerControls after init:', multiMarkerControls);
