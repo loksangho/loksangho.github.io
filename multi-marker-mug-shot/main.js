@@ -43,12 +43,16 @@ async function main() {
 
         //Fix for THREEx.ArMultiMarkerControls
         // 2. NOW, apply the monkey patch to the loaded THREEx object
-        THREEx.ArMultiMarkerControls.prototype.update = function(markerRoot) {
+        THREEx.ArMultiMarkerControls.prototype.update = function() {
+        // Get the markerRoot and context from 'this' instead of an argument
+            var markerRoot = this.object3d;
+            var arToolkitContext = this.arToolkitContext; 
             var subMarkerControls = this.parameters.subMarkersControls;
 
             // Update all sub-markers
             subMarkerControls.forEach(function(markerControls) {
-                markerControls.update();
+                // Call the sub-marker's update, which uses its own internal state
+                markerControls.update(arToolkitContext);
             });
 
             // Get the visible sub-markers
@@ -56,15 +60,16 @@ async function main() {
                 return markerControls.object3d.visible === true;
             });
 
-            // If no sub-marker is visible, then go back
+            // If no sub-marker is visible, hide the root and stop
             if (visibleSubMarkers.length === 0) {
                 markerRoot.visible = false;
                 return;
             }
 
+            // If we have visible markers, make the root visible
             markerRoot.visible = true;
-            
-            // ... (rest of the corrected update function)
+
+            // --- The rest of the matrix calculation logic remains the same ---
             var center = new THREE.Vector3();
             var matrices = [];
 
@@ -79,6 +84,7 @@ async function main() {
             }
 
             center.divideScalar(visibleSubMarkers.length);
+
             var averageMatrix = matrices[0].clone();
             for (var i = 1; i < matrices.length; i++) {
                 averageMatrix.multiply(matrices[i]);
