@@ -1,4 +1,4 @@
-// main.js - Patched for Matrix4.getInverse()
+// main.js - Fixed WebARRocks init call
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -22,23 +22,14 @@ const _settings = { NNPath: './neuralNets/NN_COFFEE_0.json' };
 function loadLegacyScript(url) {
     return new Promise((resolve, reject) => {
         window.THREE = THREE;
-
-        // Patch for EventDispatcher
         if (!window.THREE.EventDispatcher) {
             window.THREE.EventDispatcher = THREE.Object3D;
         }
-
-        // --- NEW PATCH FOR getInverse ---
-        // ar-threex.js uses the old .getInverse() method on Matrix4,
-        // which was replaced by .invert(). We polyfill it here.
-        // The old function took a matrix as an argument and stored the result in 'this'.
         if (!window.THREE.Matrix4.prototype.getInverse) {
             window.THREE.Matrix4.prototype.getInverse = function(matrix) {
                 return this.copy(matrix).invert();
             };
         }
-        // --- END OF NEW PATCH ---
-
         const script = document.createElement('script');
         script.src = url;
         script.onload = resolve;
@@ -140,12 +131,10 @@ function cleanup() {
 function initLearner() {
     cleanup();
     currentMode = 'learner';
-
     const canvas = document.getElementById('outputCanvas');
     canvas.style.display = 'block';
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-
     scene = new THREE.Scene();
     camera = new THREE.Camera();
     scene.add(camera);
@@ -161,7 +150,6 @@ function initLearner() {
         detectionMode: 'mono',
     });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
-    
     const subMarkersControls = [];
     const markerNames = ['hiro', 'kanji'];
     markerNames.forEach(function(markerName){
@@ -175,10 +163,8 @@ function initLearner() {
         markerControls.object3d.add(markerHelper.object3d);
         subMarkersControls.push(markerControls);
     });
-    
     multiMarkerLearning = new THREEx.ArMultiMakersLearning(arToolkitContext, subMarkersControls);
     multiMarkerLearning.enabled = true;
-
     const controlsContainer = document.createElement('div');
     controlsContainer.id = 'dynamicUI';
     controlsContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px;';
@@ -199,32 +185,27 @@ function initLearner() {
         a.click();
         URL.revokeObjectURL(a.href);
         alert("Profile downloaded. Now please load it to start the combined AR.");
-        
         cleanup();
         document.getElementById('uiContainer').style.display = 'flex';
         document.getElementById('phase1').style.display = 'none';
         document.getElementById('phase2').style.display = 'none';
         document.getElementById('phase3').style.display = 'block';
     };
-    
     animateAR();
 }
 
 async function initCombinedPlayer(profileData) {
     cleanup();
     currentMode = 'player';
-    
     const canvas = document.getElementById('outputCanvas');
     canvas.style.display = 'block';
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-
     scene = new THREE.Scene();
     camera = new THREE.Camera();
     scene.add(camera);
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
-    
     video = document.createElement('video');
     video.setAttribute('autoplay', ''); video.setAttribute('muted', ''); video.setAttribute('playsinline', '');
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: {ideal: 1280}, height: {ideal: 720} } });
@@ -233,22 +214,27 @@ async function initCombinedPlayer(profileData) {
     video.style.position = 'absolute'; video.style.top = '0px'; video.style.left = '0px'; video.style.zIndex = '-1';
     await new Promise(resolve => { video.onloadedmetadata = resolve; });
     video.play();
-    
     arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'video', sourceElement: video });
     arToolkitSource.init(() => { arToolkitSource.onResizeElement(); arToolkitSource.copyElementSizeTo(renderer.domElement); });
     arToolkitContext = new THREEx.ArToolkitContext({ cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat', detectionMode: 'mono' });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
-    
     const markerRoot = new THREE.Group();
     scene.add(markerRoot);
     multiMarkerControls = new THREEx.ArMultiMarkerControls(arToolkitContext, markerRoot, { multiMarkerFile: profileData });
-    
     const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
     arjsObject.position.y = 0.5;
     markerRoot.add(arjsObject);
-    
+
+    // --- CORRECTED WebARRocks INIT ---
+    // Get references to both canvases
+    const outputCanvas = document.getElementById('outputCanvas');
+    const arCanvas = document.getElementById('ARCanvas');
+
     WebARRocksObjectThreeHelper.init({
-        video: video, NNPath: _settings.NNPath,
+        video: video,
+        NNPath: _settings.NNPath,
+        ARCanvas: arCanvas,         // The canvas for processing
+        threeCanvas: outputCanvas,  // The canvas for rendering
         callbackReady: (err, three) => {
             if (err) { console.error(err); return; }
             if (exportedMeshData) {
