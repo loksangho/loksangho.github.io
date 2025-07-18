@@ -140,7 +140,8 @@ function initLearner() {
     });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
     const subMarkersControls = [];
-    const markerNames = ['hiro', 'kanji'];
+    const markerNames = ['hiro', 'kanji', 'letterA'];
+
     markerNames.forEach(function(markerName){
         const markerRoot = new THREE.Group();
         scene.add(markerRoot);
