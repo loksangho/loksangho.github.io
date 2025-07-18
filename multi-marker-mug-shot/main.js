@@ -1,4 +1,4 @@
-// main.js - Added check for valid GLTF scene
+// main.js - With debugging helpers
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -51,6 +51,7 @@ async function main() {
 
 // Phase 1: MediaPipe Face Capture
 async function initMediaPipe() {
+    // ... code for this function is unchanged ...
     currentMode = 'mediapipe';
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -103,6 +104,7 @@ async function initMediaPipe() {
 }
 
 function saveMesh() {
+    // ... code for this function is unchanged ...
     if (currentMode !== 'mediapipe' || !faceLandmarker) return;
     const results = faceLandmarker.detectForVideo(video, performance.now());
     if (results.faceLandmarks.length === 0) { alert("No face detected. Please look at the camera."); return; }
@@ -117,6 +119,7 @@ function saveMesh() {
 }
 
 function cleanup() {
+    // ... code for this function is unchanged ...
     cancelAnimationFrame(animationFrameId);
     if (video && video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); video.srcObject = null; }
     if (renderer) {
@@ -133,6 +136,7 @@ function cleanup() {
 }
 
 function initLearner() {
+    // ... code for this function is unchanged ...
     cleanup();
     currentMode = 'learner';
     const canvas = document.getElementById('outputCanvas');
@@ -229,6 +233,12 @@ async function initCombinedPlayer(profileData) {
     arjsObject.position.y = 0.5;
     markerRoot.add(arjsObject);
     
+    // --- DEBUGGING 1: Add AR.js Helper ---
+    // This will draw a wireframe box on the markers if AR.js detects them.
+    const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
+    markerRoot.add(markerHelper);
+    // --- END DEBUGGING 1 ---
+
     const outputCanvas = document.getElementById('outputCanvas');
     const arCanvas = document.getElementById('ARCanvas');
 
@@ -241,8 +251,11 @@ async function initCombinedPlayer(profileData) {
             if (err) { console.error(err); return; }
             if (exportedMeshData) {
                 new GLTFLoader().parse(exportedMeshData, '', (gltf) => {
-                    // --- ADDED THIS CHECK ---
                     if (gltf && gltf.scene) {
+                        // --- DEBUGGING 3: Set Scale of Face Mesh ---
+                        // The saved mesh might be too big or too small.
+                        gltf.scene.scale.set(0.4, 0.4, 0.4);
+                        // --- END DEBUGGING 3 ---
                         WebARRocksObjectThreeHelper.add('CUP', gltf.scene);
                     } else {
                         console.error("Error: GLTF parsing resulted in an empty scene.");
@@ -268,7 +281,14 @@ function animateCombined() {
     }
 
     if (arToolkitSource && arToolkitSource.ready) { arToolkitContext.update(arToolkitSource.domElement); }
-    WebARRocksObjectThreeHelper.animate();
+    
+    // --- DEBUGGING 2: Log WebARRocks Detection State ---
+    const detectState = WebARRocksObjectThreeHelper.animate();
+    if (detectState && detectState.label) {
+        console.log("WebARRocks detected:", detectState.label);
+    }
+    // --- END DEBUGGING 2 ---
+
     renderer.render(scene, camera);
 }
 
@@ -289,6 +309,7 @@ function animateAR() {
 // MediaPipe render function
 let lastVideoTime = -1;
 function renderMediaPipe() {
+    // ... code for this function is unchanged ...
     if (video && faceLandmarker && video.readyState === video.HAVE_ENOUGH_DATA && video.currentTime !== lastVideoTime) {
         lastVideoTime = video.currentTime;
         const results = faceLandmarker.detectForVideo(video, performance.now());
