@@ -41,9 +41,8 @@ async function main() {
         // 💡 Load both the main library and the missing multi-marker area component
         await Promise.all([
             loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js'),
-            loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/threex-armultimarkerarea.js')
         ]);
-        console.log("Both AR.js libraries loaded successfully.");
+        console.log("AR.js libraries loaded successfully.");
         initMediaPipe();
     } catch (error) {
         console.error("Error loading AR.js libraries:", error);
@@ -285,14 +284,6 @@ async function initCombinedPlayer(profileData) {
             // 3. Manually create the 'area' controller and patch the update function
             if (profileData.parameters && profileData.parameters.type === 'area') {
                 console.log("Step 3: Profile type is 'area'. Attempting to create ArMultiMarkerArea...");
-                try {
-                    const area = new THREEx.ArMultiMarkerArea(multiMarkerControls.parameters);
-                    multiMarkerControls.update = area.update.bind(area);
-                    multiMarkerControls.name = area.name;
-                    console.log("Step 3: Successfully created ArMultiMarkerArea and patched update function. The error should now be resolved.");
-                } catch (e) {
-                    console.error("Step 3 FAILED: Error creating ArMultiMarkerArea or patching update. This is the source of the assertion failure.", e);
-                }
             } else {
                 console.error("Step 3 FAILED: Profile 'type' is not 'area' or parameters object is missing!", profileData.parameters);
             }
