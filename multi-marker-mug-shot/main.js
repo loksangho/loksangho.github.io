@@ -262,7 +262,7 @@ async function initCombinedPlayer(profileData) {
     const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
     markerRoot.add(markerHelper.object3d);
     //scene.add(markerHelper.object3d);
-    
+    console.log("currentMode:", currentMode);
     animateCombined();
 }
 
