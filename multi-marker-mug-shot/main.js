@@ -215,9 +215,9 @@ function onResize() {
         const canvas = renderer.domElement;
         console.log(`Resizing renderer to ${canvas.clientWidth}x${canvas.clientHeight}`);
         console.log(`Window size: ${window.innerWidth}, ${window.innerHeight}`);
-        camera.aspect = canvas.clientWidth / canvas.clientHeight;
+        camera.aspect = window.innerHeight / window.innerWidth;
         camera.updateProjectionMatrix();
-        renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+        renderer.setSize(window.innerHeight, window.innerWidth, false);
     }
 }
 
