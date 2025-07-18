@@ -164,6 +164,12 @@ export const WebARRocksObjectThreeHelper = (function(){
       });
 
       _three.scene = new THREE.Scene();
+
+      // MODIFIED: Create and add the public container to the private scene
+      _three.object3D = new THREE.Group();
+      _three.object3D.name = "WebARRocksObjectThreeHelper_Root";
+      _three.scene.add(_three.object3D);
+     
       _three.camera = new THREE.PerspectiveCamera( _spec.cameraFov, _spec.threeCanvas.width / _spec.threeCanvas.height, _spec.cameraZNear, _spec.cameraZFar );
       _three.euler = new THREE.Euler(0, 0, 0, 'ZXY');
       _three.position = new THREE.Vector3();
@@ -272,23 +278,22 @@ export const WebARRocksObjectThreeHelper = (function(){
 
 
     add: function(label, threeStuff){
-      // build the threeContainer, which will track the detected object:
-      const isNew = (_three.containers[label]) ? false : true;
-      const threeContainer = (isNew) ? new THREE.Object3D() : _three.containers[label];
-      _three.containers[label] = threeContainer;
-      threeContainer.add(threeStuff);
+      const isNew = (_three.containers[label]) ? false : true;
+      const threeContainer = (isNew) ? new THREE.Object3D() : _three.containers[label];
+      _three.containers[label] = threeContainer;
+      threeContainer.add(threeStuff);
 
-      if (isNew) {
-        _three.scene.add(threeContainer);
-        
-        // initialize stabilizer if required:
-        if (_spec.isStabilized){
-          _stabilizers[label] = WebARRocksThreeStabilizer.instance(Object.assign({
-            obj3D: threeContainer
-          }, _spec.stabilizerOptions));
-        }
-      }
-    },
+      if (isNew) {
+        // MODIFIED: Add the container to our public object3D, not the private scene
+        _three.object3D.add(threeContainer);
+        
+        if (_spec.isStabilized){
+          _stabilizers[label] = WebARRocksThreeStabilizer.instance(Object.assign({
+            obj3D: threeContainer
+          }, _spec.stabilizerOptions));
+        }
+      }
+    },
 
 
     set_callback: function(label, callbackType, callbackFunc){
