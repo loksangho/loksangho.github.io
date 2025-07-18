@@ -288,6 +288,29 @@ async function initCombinedPlayer(profileData) {
             arjsObject.position.y = 0.5;
             markerRoot.add(arjsObject);
 
+            // 4. --- Initialize WebARRocks (as slave) ---
+            // It ALSO uses the shared video element, and we tell it to use our main scene.
+            WebARRocksObjectThreeHelper.init({
+                video: video,
+                // We DON'T provide a separate canvas, letting it know it won't be managing rendering.
+                NNPath: _settings.NNPath,
+                callbackReady: (err, three) => {
+                    if (err) { console.error(err); return; }
+                    // Add the saved face mesh to the WebARRocks tracker
+                    if (exportedMeshData) {
+                        new GLTFLoader().parse(exportedMeshData, '', (gltf) => {
+                            WebARRocksObjectThreeHelper.add('CUP', gltf.scene); // Label must match your NN
+                        });
+                    } else {
+                        WebARRocksObjectThreeHelper.add('CUP', new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5), new THREE.MeshNormalMaterial()));
+                    }
+                    
+                    // Get the container for WebARRocks objects and add it to our main scene
+                    const webARrocksObjectsGroup = WebARRocksObjectThreeHelper.get_threeObject();
+                    scene.add(webARrocksObjectsGroup);
+                }
+            });
+
             const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
             markerRoot.add(markerHelper.object3d);
 
@@ -307,6 +330,10 @@ function animateCombined() {
             multiMarkerControls.update();
         }
     }
+
+    // Update WebARRocks - it processes the video and updates its internal object poses
+    WebARRocksObjectThreeHelper.animate();
+
     renderer.render(scene, camera);
 }
 
