@@ -24,7 +24,7 @@ const _settings = { NNPath: './neuralNets/NN_COFFEE_0.json' };
 function loadLegacyScript(url) {
     return new Promise((resolve, reject) => {
         window.THREE = THREE;
-        if (!window.THREE.EventDispatcher) { window.THREE.EventDispatcher = THREE.Object3D; }
+        if (!window.THREE.EventDispatcher) { window.THREE.EventDispatcher = THREE.ObjectD; }
         if (!window.THREE.Matrix4.prototype.getInverse) {
             window.THREE.Matrix4.prototype.getInverse = function(matrix) { return this.copy(matrix).invert(); };
         }
@@ -249,36 +249,18 @@ async function initCombinedPlayer(profileData) {
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
 
     // 💡 REMOVED all manual <video> element and getUserMedia code.
-    // 2. --- Shared Video Stream ---
-    // We create ONE video element and get the camera stream ONCE.
-    video = document.createElement('video');
-    video.setAttribute('autoplay', '');
-    video.setAttribute('muted', '');
-    video.setAttribute('playsinline', '');
-    const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: {ideal: 1280}, height: {ideal: 720} }
-    });
-    video.srcObject = stream;
-    document.body.appendChild(video);
-    video.style.position = 'absolute';
-    video.style.top = '0';
-    video.style.left = '0';
-    video.style.zIndex = '-1'; // Hide video behind canvas
-    await new Promise(resolve => { video.onloadedmetadata = resolve; });
-    video.play();
-
-
 
     // 💡 Initialize ArToolkitSource with sourceType 'webcam'.
     // The library will now create the video element and get the camera stream by itself.
     arToolkitSource = new THREEx.ArToolkitSource({
         sourceType: 'webcam',
-        sourceElement: video
     });
 
     arToolkitSource.init(() => {
         // This log should now appear correctly
         console.log("AR source initialized.");
+
+        onResize();
 
         // The library creates its own video element, which is accessed via .domElement
         // We just need to wait for it to be ready and then we can use it.
@@ -309,7 +291,7 @@ async function initCombinedPlayer(profileData) {
             // 4. --- Initialize WebARRocks (as slave) ---
             // It ALSO uses the shared video element, and we tell it to use our main scene.
             WebARRocksObjectThreeHelper.init({
-                video: video,
+                video: arToolkitSource.domElement,
                 // We DON'T provide a separate canvas, letting it know it won't be managing rendering.
                 NNPath: _settings.NNPath,
                 callbackReady: (err, three) => {
