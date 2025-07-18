@@ -307,8 +307,7 @@ async function initCombinedPlayer(profileData) {
     // 💡 Initialize ArToolkitSource with sourceType 'webcam'.
     // The library will now create the video element and get the camera stream by itself.
     arToolkitSource = new THREEx.ArToolkitSource({
-        sourceType: 'webcam',
-        sourceElement: renderer.domElement
+        sourceType: 'webcam'
     });
 
     arToolkitSource.init(() => {
@@ -346,7 +345,7 @@ async function initCombinedPlayer(profileData) {
             // --- CORRECTED WEBARROCKS INIT ---
             const arCanvas = document.getElementById('ARCanvas');
             WebARRocksObjectThreeHelper.init({
-                video: arToolkitSource.domElement,
+                video: video,
                 NNPath: _settings.NNPath,
                 ARCanvas: arCanvas,
                 threeCanvas: canvas, // <-- This was the missing property
@@ -355,15 +354,6 @@ async function initCombinedPlayer(profileData) {
                     if (exportedMeshData) {
                         new GLTFLoader().parse(exportedMeshData, '', (gltf) => {
                             if (gltf && gltf.scene) {
-                                gltf.scene.traverse((node) => {
-                                    if (node.isMesh) {
-                                        const posAttr = node.geometry.attributes.position;
-                                        const idxAttr = node.geometry.index;
-                                        console.log('Mesh:', node.name);
-                                        console.log('Position count:', posAttr?.count); 
-                                        console.log('Index count:', idxAttr?.count);
-                                    }
-                                });
                                 gltf.scene.scale.set(1, 1, 1);
                                 WebARRocksObjectThreeHelper.add('CUP', gltf.scene);
                             }
@@ -399,27 +389,13 @@ function animateCombined() {
         arToolkitContext.update(arToolkitSource.domElement); 
     }
 
-    
     if (WebARRocksObjectThreeHelper.object3D && !webARrocksGroupAdded) {
         scene.add(WebARRocksObjectThreeHelper.object3D);
         webARrocksGroupAdded = true;
     }
+    WebARRocksObjectThreeHelper.animate();
 
-    if (WebARRocksObjectThreeHelper.animate) {
-        try {
-            WebARRocksObjectThreeHelper.animate();
-        } catch (err) {
-            console.warn("WebARRocks animate error:", err);
-        }
-    }
-
-
-    try {
-        renderer.render(scene, camera);
-    } catch (err) {
-        console.error('WebGL render error:', err);
-    }
-
+    renderer.render(scene, camera);
 }
 
 function animate() {
@@ -454,12 +430,7 @@ function animateAR() {
             }
         }
     }
-    try {
-        renderer.render(scene, camera);
-    } catch (err) {
-        console.error('WebGL render error:', err);
-    }
-
+    renderer.render(scene, camera);
 }
 
 let lastVideoTime = -1;
@@ -487,14 +458,7 @@ function renderMediaPipe() {
             faceTexture.needsUpdate = true;
         } else { faceMesh.visible = false; }
     }
-    if (renderer) {
-        try {
-            renderer.render(scene, camera);
-        } catch (err) {
-            console.error('WebGL render error:', err);
-        }
-
-    }
+    if (renderer) renderer.render(scene, camera);
 }
 
 main();
