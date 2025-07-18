@@ -236,7 +236,7 @@ async function initCombinedPlayer(profileData) {
     // --- DEBUGGING 1: Add AR.js Helper ---
     // This will draw a wireframe box on the markers if AR.js detects them.
     const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
-    markerRoot.add(markerHelper);
+    markerRoot.add(markerHelper.object3d);    
     // --- END DEBUGGING 1 ---
 
     const outputCanvas = document.getElementById('outputCanvas');
