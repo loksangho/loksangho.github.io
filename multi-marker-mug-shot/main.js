@@ -268,7 +268,11 @@ async function initCombinedPlayer(profileData) {
 
 function animateCombined() {
     if (currentMode !== 'player') return;
+    console.log("Player mode");
     animationFrameId = requestAnimationFrame(animateCombined);
+    console.log("arToolkitSource:", arToolkitSource);
+
+    
     if (arToolkitSource && arToolkitSource.ready) { 
         arToolkitContext.update(arToolkitSource.domElement); 
         if (multiMarkerControls) {
