@@ -129,10 +129,12 @@ function initLearner() {
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     scene = new THREE.Scene();
-    camera = new THREE.Camera();
+    camera = new THREE.PerspectiveCamera();
     scene.add(camera);
     arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
     arToolkitSource.init(() => {
+        onResize();
+
         setTimeout(() => {
             arToolkitSource.onResizeElement();
             arToolkitSource.copyElementSizeTo(renderer.domElement);
@@ -239,7 +241,7 @@ async function initCombinedPlayer(profileData) {
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
 
     scene = new THREE.Scene();
-    camera = new THREE.Camera();
+    camera = new THREE.PerspectiveCamera();
     scene.add(camera);
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
