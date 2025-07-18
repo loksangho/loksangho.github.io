@@ -1,4 +1,4 @@
-// main.js - With robust multi-marker learner
+// main.js - Reverted to correct learner implementation
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -45,8 +45,6 @@ async function main() {
 
 // Phase 1: MediaPipe Face Capture
 async function initMediaPipe() {
-    // ... This function is correct from the previous version ...
-    // (The full implementation is included below for completeness)
     currentMode = 'mediapipe';
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -100,7 +98,6 @@ async function initMediaPipe() {
 }
 
 function saveMesh() {
-    // ... This function is correct from the previous version ...
     if (currentMode !== 'mediapipe' || !faceLandmarker) return;
     const results = faceLandmarker.detectForVideo(video, performance.now());
     if (results.faceLandmarks.length === 0) { alert("No face detected. Please look at the camera."); return; }
@@ -114,7 +111,6 @@ function saveMesh() {
 }
 
 function cleanup() {
-    // ... This function is correct from the previous version ...
     cancelAnimationFrame(animationFrameId);
     if (video && video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); video.srcObject = null; }
     if (renderer) {
@@ -131,14 +127,10 @@ function cleanup() {
     if (existingVideo) existingVideo.remove();
 }
 
-// --- UPDATED LEARNER FUNCTION ---
+// --- CORRECT LEARNER FUNCTION ---
 function initLearner() {
-    //cleanup();
+    cleanup();
     currentMode = 'learner';
-
-
-    document.getElementById('outputCanvas').style.display = 'none';
-    document.getElementById('uiContainer').style.display = 'none';
 
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -161,96 +153,41 @@ function initLearner() {
         detectionMode: 'mono',
     });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
+    
+    // Initialize the learner object. This is the correct object to manage the process.
+    multiMarkerLearner = new THREEx.ArMultiMakersLearning(arToolkitContext);
 
-
-    // --- EXPLICITLY DEFINE MARKERS TO LEARN ---
-    // This makes the process more robust.
-    let markers = [];
-    const markerNames = ['hiro', 'kanji']; // Add other marker names here if you use more
-    const markerRoot = new THREE.Group(); // A dummy group for the controls
+    // Define the markers we want to learn
+    const markerNames = ['hiro', 'kanji'];
+    const markerRoot = new THREE.Group();
     scene.add(markerRoot);
 
+    // Create controls for each marker and add them to the learner
     markerNames.forEach(name => {
         const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
             type: 'pattern',
             patternUrl: `https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.${name}`,
         });
-        // Add the marker control to the learner
-        markers.push(JSON.stringify(markerControls));
+        // Use the .trackMarker() method to add controls. DO NOT use JSON.stringify here.
+        multiMarkerLearner.trackMarker(markerControls);
     });
-    // --- END OF CHANGE ---
-    
-    var urlOptions = {
-        backURL: null,
-        trackingBackend: "artoolkit",
-        markersControlsParameters: []
-    }
-    let markerObjs = JSON.parse(markers)
-    for (let idx in markerObjs) {
-        console.log(markerObjs[idx])
-        urlOptions.markersControlsParameters.push(markerObjs[idx])
-    }
-    //urlOptions.markersControlsParameters.push({ barcodeValue: "0", type: "barcode" })
 
-    urlOptions.trackingBackend = "artoolkit"
-
-
-    var subMarkersControls = []
-    urlOptions.markersControlsParameters.forEach(function (markerControlsParameters) {
-        // create a markerRoot
-        var markerRoot = new THREE.Group()
-        scene.add(markerRoot)
-        
-        // create markerControls for our markerRoot
-        var markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, markerControlsParameters)
-
-
-        // TODO here put a THREEx.ArSmoothedControls behind a flag - could be useful for tunning
-        var smoothedControls = null
-        if (false) {
-            // build a smoothedControls
-            var smoothedRoot = new THREE.Group()
-            scene.add(smoothedRoot)
-            var smoothedControls = new THREEx.ArSmoothedControls(smoothedRoot)
-            onRenderFcts.push(function () {
-                smoothedControls.update(markerRoot)
-            })
-        }
-
-        // add an helper to visuable each sub-marker
-        var markerHelper = new THREEx.ArMarkerHelper(markerControls)
-        if (smoothedControls !== null) {
-            smoothedControls.object3d.add(markerHelper.object3d)
-        } else {
-            markerControls.object3d.add(markerHelper.object3d)
-        }
-
-
-
-
-        // store it in the parameters
-        if (smoothedControls !== null) {
-            // TODO put that in the if above
-            subMarkersControls.push(smoothedControls)
-        } else {
-            subMarkersControls.push(markerControls)
-        }
-    })
-
-    var multiMarkerLearning = new THREEx.ArMultiMakersLearning(arToolkitContext, subMarkersControls)
-
+    // Set up the UI for this phase
     const controlsContainer = document.createElement('div');
     controlsContainer.id = 'dynamicUI';
     controlsContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px;';
     controlsContainer.innerHTML = `<button id="restartBtn">Restart Learning</button><button id="downloadBtn">Download and Continue</button>`;
     document.body.appendChild(controlsContainer);
     document.getElementById('restartBtn').onclick = () => { multiMarkerLearner.reset(); alert('Learning restarted!'); };
+    
+    // The download button uses the learner's special .toJSON() method
     document.getElementById('downloadBtn').onclick = () => {
         multiMarkerLearner.toJSON(profileData => {
-            if (profileData.subMarkersControls.length === 0) {
-                alert("No markers were learned! Please show both hiro and kanji markers to the camera.");
+            if (profileData.subMarkersControls.length < markerNames.length) {
+                alert(`Not all markers were learned! Found ${profileData.subMarkersControls.length}/${markerNames.length}. Please show all markers to the camera.`);
                 return;
             }
+            // This profileData is now a clean JSON object, safe to stringify
             const jsonString = JSON.stringify(profileData, null, 2);
             const blob = new Blob([jsonString], { type: 'application/json' });
             const a = document.createElement('a');
@@ -259,6 +196,7 @@ function initLearner() {
             a.click();
             URL.revokeObjectURL(a.href);
             alert("Profile downloaded. Now please load it to start the combined AR.");
+            
             cleanup();
             document.getElementById('uiContainer').style.display = 'flex';
             document.getElementById('phase1').style.display = 'none';
@@ -271,7 +209,6 @@ function initLearner() {
 }
 
 async function initCombinedPlayer(profileData) {
-    // ... This function is correct from the previous version ...
     cleanup();
     currentMode = 'player';
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -315,7 +252,6 @@ async function initCombinedPlayer(profileData) {
 }
 
 function animateCombined() {
-    // ... This function is correct from the previous version ...
     if (currentMode !== 'player') return;
     animationFrameId = requestAnimationFrame(animateCombined);
     if (arToolkitSource && arToolkitSource.ready) { arToolkitContext.update(arToolkitSource.domElement); }
@@ -324,14 +260,12 @@ function animateCombined() {
 }
 
 function animate() {
-    // ... This function is correct from the previous version ...
     if (currentMode !== 'mediapipe') return;
     animationFrameId = requestAnimationFrame(animate);
     renderMediaPipe();
 }
 
 function animateAR() {
-    // ... This function is correct from the previous version ...
     if (currentMode !== 'learner') return;
     animationFrameId = requestAnimationFrame(animateAR);
     if (!arToolkitSource || !arToolkitSource.ready) return;
@@ -342,7 +276,6 @@ function animateAR() {
 
 let lastVideoTime = -1;
 function renderMediaPipe() {
-    // ... This function is correct from the previous version ...
     if (video && faceLandmarker && video.readyState === video.HAVE_ENOUGH_DATA && video.currentTime !== lastVideoTime) {
         lastVideoTime = video.currentTime;
         const results = faceLandmarker.detectForVideo(video, performance.now());
