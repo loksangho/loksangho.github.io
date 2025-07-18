@@ -296,22 +296,6 @@ async function initCombinedPlayer(profileData) {
         // This log should now appear correctly
         console.log("AR source initialized.");
 
-        const videoEl = arToolkitSource.domElement;
-
-        // Append if not already in DOM
-        if (!document.body.contains(videoEl)) {
-            document.body.appendChild(videoEl);
-        }
-
-        // Force fullscreen styles
-        videoEl.style.position = 'fixed';
-        videoEl.style.top = '0';
-        videoEl.style.left = '0';
-        videoEl.style.width = '100%';
-        videoEl.style.height = '100%';
-        videoEl.style.objectFit = 'cover';
-        videoEl.style.zIndex = '-1'; // Behind your canvas
-
         onResize();
 
         // The library creates its own video element, which is accessed via .domElement
