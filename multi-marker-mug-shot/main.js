@@ -191,58 +191,88 @@ function initLearner() {
 async function initCombinedPlayer(profileData) {
     cleanup();
     currentMode = 'player';
-    
+
     // Hide all UI phases
     document.getElementById('uiContainer').style.display = 'none';
     document.getElementById('phase1').style.display = 'none';
     document.getElementById('phase2').style.display = 'none';
-    // Phase 3 is no longer used for uploading
     const phase3 = document.getElementById('phase3');
     if (phase3) phase3.style.display = 'none';
-
 
     const canvas = document.getElementById('outputCanvas');
     canvas.style.display = 'block';
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
+
+    // Manually reset WebGL state to prevent texture errors
+    const gl = renderer.getContext();
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+
     scene = new THREE.Scene();
     camera = new THREE.Camera();
     scene.add(camera);
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
+
     video = document.createElement('video');
-    video.setAttribute('autoplay', ''); video.setAttribute('muted', ''); video.setAttribute('playsinline', '');
+    video.setAttribute('autoplay', '');
+    video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
     video.srcObject = stream;
     document.body.appendChild(video);
-    video.style.position = 'absolute'; video.style.top = '0px'; video.style.left = '0px'; video.style.zIndex = '-1';
-    await new Promise(resolve => { video.oncanplay = resolve; });
-    video.play();
-    arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'video', sourceElement: video });
-    console.log("AR source created with video element:", arToolkitSource);
-    arToolkitSource.init(() => { arToolkitSource.onResizeElement(); arToolkitSource.copyElementSizeTo(renderer.domElement); console.log("AR source initialized"); });
-    arToolkitContext = new THREEx.ArToolkitContext({ cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat', detectionMode: 'mono' });
-    arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
-    
-    const markerRoot = new THREE.Group();
-    scene.add(markerRoot);
-    
-    // The profileData object is passed directly
-    multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
-    
-    console.log("Inspecting controls object after creation:");
-    console.log("Sub-marker controls found:", multiMarkerControls.subMarkersControls.length);
-    console.log(multiMarkerControls);
-    
-    const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
-    arjsObject.position.y = 0.5;
-    markerRoot.add(arjsObject);
-    
-    const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
-    markerRoot.add(markerHelper.object3d);
-    
-    console.log("currentMode:", currentMode);
-    animateCombined();
+    video.style.position = 'absolute';
+    video.style.top = '0px';
+    video.style.left = '0px';
+    video.style.zIndex = '-1';
+
+    // 💡 Add an event listener that runs the AR setup only when the video is truly playing.
+    video.addEventListener('playing', () => {
+        console.log("Video has started playing. Initializing AR components...");
+
+        // Initialize ArToolkitSource within the event listener
+        arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'video', sourceElement: video });
+
+        arToolkitSource.init(() => {
+            // This log should now appear
+            console.log("AR source initialized.");
+
+            arToolkitSource.onResizeElement();
+            arToolkitSource.copyElementSizeTo(renderer.domElement);
+
+            arToolkitContext = new THREEx.ArToolkitContext({
+                cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
+                detectionMode: 'mono'
+            });
+
+            arToolkitContext.init(() => {
+                camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+
+                const markerRoot = new THREE.Group();
+                scene.add(markerRoot);
+
+                multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
+                
+                const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
+                arjsObject.position.y = 0.5;
+                markerRoot.add(arjsObject);
+                
+                const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
+                markerRoot.add(markerHelper.object3d);
+
+                console.log("AR setup complete. Starting animation loop.");
+                animateCombined();
+            });
+        });
+    });
+
+    // Trigger the video to play, which will eventually fire the 'playing' event.
+    video.play().catch(e => {
+        console.error("Video playback failed:", e);
+        alert("Could not start camera. Please check device permissions and refresh the page.");
+    });
 }
 
 function animateCombined() {
