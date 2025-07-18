@@ -24,7 +24,7 @@ const _settings = { NNPath: './neuralNets/NN_COFFEE_0.json' };
 function loadLegacyScript(url) {
     return new Promise((resolve, reject) => {
         window.THREE = THREE;
-        if (!window.THREE.EventDispatcher) { window.THREE.EventDispatcher = THREE.ObjectD; }
+        if (!window.THREE.EventDispatcher) { window.THREE.EventDispatcher = THREE.Object3D; }
         if (!window.THREE.Matrix4.prototype.getInverse) {
             window.THREE.Matrix4.prototype.getInverse = function(matrix) { return this.copy(matrix).invert(); };
         }
@@ -280,8 +280,6 @@ async function initCombinedPlayer(profileData) {
         // This log should now appear correctly
         console.log("AR source initialized.");
 
-        onResize();
-
         // The library creates its own video element, which is accessed via .domElement
         // We just need to wait for it to be ready and then we can use it.
         // The onReady callback of init() is the right place to do this.
@@ -310,24 +308,25 @@ async function initCombinedPlayer(profileData) {
 
             // 4. --- Initialize WebARRocks (as slave) ---
             // It ALSO uses the shared video element, and we tell it to use our main scene.
+            // --- CORRECTED WEBARROCKS INIT ---
+            const arCanvas = document.getElementById('ARCanvas');
             WebARRocksObjectThreeHelper.init({
-                video: video,
-                // We DON'T provide a separate canvas, letting it know it won't be managing rendering.
+                video: videoElement,
                 NNPath: _settings.NNPath,
+                ARCanvas: arCanvas,
+                threeCanvas: canvas, // <-- This was the missing property
                 callbackReady: (err, three) => {
                     if (err) { console.error(err); return; }
-                    // Add the saved face mesh to the WebARRocks tracker
                     if (exportedMeshData) {
                         new GLTFLoader().parse(exportedMeshData, '', (gltf) => {
-                            WebARRocksObjectThreeHelper.add('CUP', gltf.scene); // Label must match your NN
+                            if (gltf && gltf.scene) {
+                                gltf.scene.scale.set(0.4, 0.4, 0.4);
+                                WebARRocksObjectThreeHelper.add('CUP', gltf.scene);
+                            }
                         });
-                    } else {
-                        WebARRocksObjectThreeHelper.add('CUP', new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5), new THREE.MeshNormalMaterial()));
+                    } else { 
+                        WebARRocksObjectThreeHelper.add('CUP', new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5), new THREE.MeshNormalMaterial())); 
                     }
-                    
-                    // Get the container for WebARRocks objects and add it to our main scene
-                    const webARrocksObjectsGroup = WebARRocksObjectThreeHelper.get_threeObject();
-                    scene.add(webARrocksObjectsGroup);
                 }
             });
 
@@ -346,12 +345,12 @@ function animateCombined() {
     
     if (arToolkitSource && arToolkitSource.ready) { 
         arToolkitContext.update(arToolkitSource.domElement); 
-        if (multiMarkerControls) {
-            multiMarkerControls.update();
-        }
     }
 
-    // Update WebARRocks - it processes the video and updates its internal object poses
+    if (WebARRocksObjectThreeHelper.object3D && !webARrocksGroupAdded) {
+        scene.add(WebARRocksObjectThreeHelper.object3D);
+        webARrocksGroupAdded = true;
+    }
     WebARRocksObjectThreeHelper.animate();
 
     renderer.render(scene, camera);
