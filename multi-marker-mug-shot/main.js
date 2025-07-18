@@ -1,4 +1,4 @@
-// main.js - Fixed WebARRocks object access
+// main.js - Added check for valid GLTF scene
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -14,6 +14,7 @@ let exportedMeshData = null;
 const runningMode = "VIDEO";
 let animationFrameId;
 let currentMode = null;
+let webARrocksGroupAdded = false;
 
 // AR specific variables
 let arToolkitSource, arToolkitContext, multiMarkerControls, multiMarkerLearning;
@@ -122,7 +123,10 @@ function cleanup() {
         renderer.dispose();
         renderer = null;
     }
-    if (currentMode === 'player') { WebARRocksObjectThreeHelper.destroy(); }
+    if (currentMode === 'player') { 
+        WebARRocksObjectThreeHelper.destroy();
+        webARrocksGroupAdded = false;
+    }
     const dynamicUI = document.getElementById('dynamicUI');
     if(dynamicUI) dynamicUI.remove();
     document.getElementById('uiContainer').style.display = 'none';
@@ -236,13 +240,17 @@ async function initCombinedPlayer(profileData) {
         callbackReady: (err, three) => {
             if (err) { console.error(err); return; }
             if (exportedMeshData) {
-                new GLTFLoader().parse(exportedMeshData, '', (gltf) => { WebARRocksObjectThreeHelper.add('CUP', gltf.scene); });
-            } else { WebARRocksObjectThreeHelper.add('CUP', new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5), new THREE.MeshNormalMaterial())); }
-            
-            // --- CORRECTED API USAGE ---
-            // Use the .object3D property to get the group of tracked objects
-            const webARrocksObjectsGroup = WebARRocksObjectThreeHelper.object3D;
-            scene.add(webARrocksObjectsGroup);
+                new GLTFLoader().parse(exportedMeshData, '', (gltf) => {
+                    // --- ADDED THIS CHECK ---
+                    if (gltf && gltf.scene) {
+                        WebARRocksObjectThreeHelper.add('CUP', gltf.scene);
+                    } else {
+                        console.error("Error: GLTF parsing resulted in an empty scene.");
+                    }
+                });
+            } else { 
+                WebARRocksObjectThreeHelper.add('CUP', new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5), new THREE.MeshNormalMaterial())); 
+            }
         }
     });
     
@@ -253,6 +261,12 @@ async function initCombinedPlayer(profileData) {
 function animateCombined() {
     if (currentMode !== 'player') return;
     animationFrameId = requestAnimationFrame(animateCombined);
+
+    if (WebARRocksObjectThreeHelper.object3D && !webARrocksGroupAdded) {
+        scene.add(WebARRocksObjectThreeHelper.object3D);
+        webARrocksGroupAdded = true;
+    }
+
     if (arToolkitSource && arToolkitSource.ready) { arToolkitContext.update(arToolkitSource.domElement); }
     WebARRocksObjectThreeHelper.animate();
     renderer.render(scene, camera);
