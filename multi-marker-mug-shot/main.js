@@ -26,7 +26,7 @@ const _settings = {
     notHereFactor: 0.0,
     paramsPerLabel: {
       CUP: {
-        thresholdDetect: 0.92
+        thresholdDetect: 0.52
       }
     }
   },
@@ -354,7 +354,7 @@ async function initCombinedPlayer(profileData) {
                     if (exportedMeshData) {
                         new GLTFLoader().parse(exportedMeshData, '', (gltf) => {
                             if (gltf && gltf.scene) {
-                                gltf.scene.scale.set(0.4, 0.4, 0.4);
+                                gltf.scene.scale.set(1, 1, 1);
                                 WebARRocksObjectThreeHelper.add('CUP', gltf.scene);
                             }
                         });
