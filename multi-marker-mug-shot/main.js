@@ -230,6 +230,7 @@ function initLearner() {
         <button id="resetBtn">Reset Learning</button>
         <button id="saveAndPlayBtn">Save Profile & Start Player</button>
         <div style="margin-top: 10px;">Status: <span id="learningStatus" style="font-weight: bold; color: red;">In Progress...</span></div>
+        <div id="markerStatusContainer" style="margin-top: 10px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 3px; font-family: monospace;"></div>
     `;
     document.body.appendChild(controlsContainer);
     document.getElementById('resetBtn').onclick = () => multiMarkerLearning.resetStats();
@@ -363,17 +364,32 @@ function animateAR() {
     
     if (multiMarkerLearning) {
         multiMarkerLearning.computeResult();
+
+        // --- ENHANCED STATUS UI LOGIC ---
         const statusElement = document.getElementById('learningStatus');
-        if (statusElement) {
+        const markerStatusContainer = document.getElementById('markerStatusContainer');
+        
+        if (statusElement && markerStatusContainer) {
             let nMarkersLearned = 0;
+            let markerStatusHTML = '<ul style="list-style: none; padding: 0; margin: 0;">';
+
             multiMarkerLearning.subMarkersControls.forEach(function(markerControls) {
-                if (markerControls.object3d.userData.result === undefined) return;
-                if (markerControls.object3d.userData.result.confidenceFactor < 1) return;
-                nMarkersLearned++;
+                // Extract the marker name from the URL
+                const patternName = markerControls.parameters.patternUrl.split('.').pop();
+                
+                if (markerControls.parameters.matrix !== undefined) {
+                    nMarkersLearned++;
+                    markerStatusHTML += `<li style="color: lightgreen;">- ${patternName}: Learned ✔️</li>`;
+                } else {
+                    markerStatusHTML += `<li style="color: #FF8A8A;">- ${patternName}: Waiting... ❌</li>`;
+                }
             });
 
+            markerStatusHTML += '</ul>';
+            markerStatusContainer.innerHTML = markerStatusHTML;
+
             if (nMarkersLearned === multiMarkerLearning.subMarkersControls.length) {
-                statusElement.innerHTML = 'Ready to Start Player!';
+                statusElement.innerHTML = 'Ready to Save Profile!';
                 statusElement.style.color = 'lightgreen';
             } else {
                 statusElement.innerHTML = `In Progress... (${nMarkersLearned}/${multiMarkerLearning.subMarkersControls.length})`;
