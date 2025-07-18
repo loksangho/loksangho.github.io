@@ -270,18 +270,26 @@ async function initCombinedPlayer(profileData) {
 
     const canvas = document.getElementById('outputCanvas');
     canvas.style.display = 'block';
-    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
 
-    const gl = renderer.getContext();
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
 
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera();
+
+    let ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
+    scene.add(ambientLight);
+
+    camera = new THREE.Camera();
     scene.add(camera);
-    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-    scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
+
+    renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true
+    });
+    renderer.setClearColor(new THREE.Color('lightgrey'), 0)
+    renderer.setSize(800, 600);
+    renderer.domElement.style.position = 'absolute'
+    renderer.domElement.style.top = '0px'
+    renderer.domElement.style.left = '0px'
+    document.body.appendChild(renderer.domElement);
 
     ////////////////////////////////////////////////////////////
     // setup arToolkitSource
