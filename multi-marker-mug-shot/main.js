@@ -1,4 +1,4 @@
-// main.js - Fixed JSON stringify issue in learner
+// main.js - Added learner status UI to prevent early download
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -23,13 +23,9 @@ const _settings = { NNPath: './neuralNets/NN_COFFEE_0.json' };
 function loadLegacyScript(url) {
     return new Promise((resolve, reject) => {
         window.THREE = THREE;
-        if (!window.THREE.EventDispatcher) {
-            window.THREE.EventDispatcher = THREE.Object3D;
-        }
+        if (!window.THREE.EventDispatcher) { window.THREE.EventDispatcher = THREE.ObjectD; }
         if (!window.THREE.Matrix4.prototype.getInverse) {
-            window.THREE.Matrix4.prototype.getInverse = function(matrix) {
-                return this.copy(matrix).invert();
-            };
+            window.THREE.Matrix4.prototype.getInverse = function(matrix) { return this.copy(matrix).invert(); };
         }
         const script = document.createElement('script');
         script.src = url;
@@ -42,7 +38,6 @@ function loadLegacyScript(url) {
 async function main() {
     try {
         await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
-        console.log("ar-threex.js loaded and patched for compatibility.");
         initMediaPipe();
     } catch (error) {
         console.error("Error loading ar-threex.js:", error);
@@ -90,12 +85,12 @@ async function initMediaPipe() {
     const playerButton = document.getElementById('playerButton');
     const profileInput = document.getElementById('profileInput');
     profileInput.addEventListener('change', () => { playerButton.disabled = !profileInput.files.length; });
+    
     playerButton.addEventListener('click', () => {
         const file = profileInput.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => initCombinedPlayer(JSON.parse(e.target.result));
-            reader.readAsText(file);
+            const fileUrl = URL.createObjectURL(file);
+            initCombinedPlayer(fileUrl);
         }
     });
     animate();
@@ -111,7 +106,6 @@ function saveMesh() {
         alert("Face mesh saved! Now, start the learner.");
         document.getElementById('phase1').style.display = 'none';
         document.getElementById('phase2').style.display = 'block';
-        document.getElementById('phase3').style.display = 'none';
     }, (error) => console.error(error), { binary: true });
 }
 
@@ -128,7 +122,6 @@ function cleanup() {
     }
     const dynamicUI = document.getElementById('dynamicUI');
     if(dynamicUI) dynamicUI.remove();
-    document.getElementById('uiContainer').style.display = 'none';
 }
 
 function initLearner() {
@@ -168,46 +161,53 @@ function initLearner() {
     });
     multiMarkerLearning = new THREEx.ArMultiMakersLearning(arToolkitContext, subMarkersControls);
     multiMarkerLearning.enabled = true;
+
+    // --- ADDED UI FOR LEARNING STATUS ---
     const controlsContainer = document.createElement('div');
     controlsContainer.id = 'dynamicUI';
-    controlsContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px;';
-    controlsContainer.innerHTML = `<button id="resetBtn">Reset Learning</button><button id="downloadBtn">Download and Continue</button>`;
+    controlsContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; color: white;';
+    controlsContainer.innerHTML = `
+        <button id="resetBtn">Reset Learning</button>
+        <button id="downloadBtn">Download and Continue</button>
+        <div style="margin-top: 10px;">Status: <span id="learningStatus" style="font-weight: bold; color: red;">In Progress...</span></div>
+    `;
     document.body.appendChild(controlsContainer);
     document.getElementById('resetBtn').onclick = () => multiMarkerLearning.resetStats();
-
-    // --- CORRECTED ASYNCHRONOUS DOWNLOAD LOGIC ---
+    
+    // --- CORRECTED SYNCHRONOUS DOWNLOAD LOGIC ---
     document.getElementById('downloadBtn').onclick = () => {
-        // Use the callback version of toJSON to wait for the data
-        multiMarkerLearning.toJSON(function(profileData) {
-            console.log("Profile data received from callback:", profileData);
-            if (!profileData || !profileData.subMarkersControls || profileData.subMarkersControls.length < markerNames.length) {
-                alert(`Not all markers were learned! Please show all markers and try again.`);
-                return;
-            }
-            
-            const jsonStringForFile = JSON.stringify(profileData, null, 2);
-            const blob = new Blob([jsonStringForFile], { type: 'application/json' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'multiMarkerProfile.json';
-            a.click();
-            URL.revokeObjectURL(a.href);
-            
-            alert("Profile downloaded. Now please load it to start the combined AR.");
-            cleanup();
-            document.getElementById('uiContainer').style.display = 'flex';
-            document.getElementById('phase1').style.display = 'none';
-            document.getElementById('phase2').style.display = 'none';
-            document.getElementById('phase3').style.display = 'block';
-        });
+        const profileData = multiMarkerLearning.toJSON();
+        
+        if (!profileData || !profileData.subMarkersControls || profileData.subMarkersControls.length < markerNames.length) {
+            alert(`Learning not complete! Please show all markers to the camera until the status is 'Ready'.`);
+            return;
+        }
+        
+        const jsonStringForFile = JSON.stringify(profileData, null, 2);
+        const blob = new Blob([jsonStringForFile], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'multiMarkerProfile.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+        
+        alert("Profile downloaded. Now please load it to start the combined AR.");
+        cleanup();
+        document.getElementById('uiContainer').style.display = 'flex';
+        document.getElementById('phase1').style.display = 'none';
+        document.getElementById('phase2').style.display = 'none';
+        document.getElementById('phase3').style.display = 'block';
     };
     
     animateAR();
 }
 
-async function initCombinedPlayer(profileData) {
+async function initCombinedPlayer(profileDataURL) {
     cleanup();
     currentMode = 'player';
+    
+    // This is a simplified player for testing AR.js.
+    // Once the wireframes show up, we can re-add the WebARRocks code.
     const canvas = document.getElementById('outputCanvas');
     canvas.style.display = 'block';
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
@@ -229,50 +229,35 @@ async function initCombinedPlayer(profileData) {
     arToolkitSource.init(() => { arToolkitSource.onResizeElement(); arToolkitSource.copyElementSizeTo(renderer.domElement); });
     arToolkitContext = new THREEx.ArToolkitContext({ cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat', detectionMode: 'mono' });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
+    
     const markerRoot = new THREE.Group();
     scene.add(markerRoot);
-    multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, profileData);
+
+    multiMarkerControls = new THREEx.ArMultiMarkerControls(arToolkitContext, markerRoot, {
+        multiMarkerFile: profileDataURL,
+    });
+    
+    multiMarkerControls.addEventListener('load', () => {
+        URL.revokeObjectURL(profileDataURL);
+        console.log("Marker profile loaded successfully via URL.");
+    });
+
     const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
     arjsObject.position.y = 0.5;
     markerRoot.add(arjsObject);
+    
     const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
     markerRoot.add(markerHelper.object3d);
-    const outputCanvas = document.getElementById('outputCanvas');
-    const arCanvas = document.getElementById('ARCanvas');
-    WebARRocksObjectThreeHelper.init({
-        video: video,
-        NNPath: _settings.NNPath,
-        ARCanvas: arCanvas,
-        threeCanvas: outputCanvas,
-        callbackReady: (err, three) => {
-            if (err) { console.error(err); return; }
-            if (exportedMeshData) {
-                new GLTFLoader().parse(exportedMeshData, '', (gltf) => {
-                    if (gltf && gltf.scene) {
-                        gltf.scene.scale.set(0.4, 0.4, 0.4);
-                        WebARRocksObjectThreeHelper.add('CUP', gltf.scene);
-                    } else {
-                        console.error("Error: GLTF parsing resulted in an empty scene.");
-                    }
-                });
-            } else { 
-                WebARRocksObjectThreeHelper.add('CUP', new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5), new THREE.MeshNormalMaterial())); 
-            }
-        }
-    });
+    
     animateCombined();
 }
 
-// Animation loops
 function animateCombined() {
     if (currentMode !== 'player') return;
     animationFrameId = requestAnimationFrame(animateCombined);
-    if (WebARRocksObjectThreeHelper.object3D && !webARrocksGroupAdded) {
-        scene.add(WebARRocksObjectThreeHelper.object3D);
-        webARrocksGroupAdded = true;
+    if (arToolkitSource && arToolkitSource.ready) { 
+        arToolkitContext.update(arToolkitSource.domElement); 
     }
-    if (arToolkitSource && arToolkitSource.ready) { arToolkitContext.update(arToolkitSource.domElement); }
-    WebARRocksObjectThreeHelper.animate();
     renderer.render(scene, camera);
 }
 
@@ -282,18 +267,39 @@ function animate() {
     renderMediaPipe();
 }
 
+// --- UPDATED LEARNER ANIMATION LOOP ---
 function animateAR() {
     if (currentMode !== 'learner') return;
     animationFrameId = requestAnimationFrame(animateAR);
     if (!arToolkitSource || !arToolkitSource.ready) return;
     arToolkitContext.update(arToolkitSource.domElement);
+    
     if (multiMarkerLearning) {
         multiMarkerLearning.computeResult();
+
+        // --- UPDATE STATUS UI ---
+        const statusElement = document.getElementById('learningStatus');
+        if (statusElement) {
+            let nMarkersLearned = 0;
+            multiMarkerLearning.subMarkersControls.forEach(function(markerControls) {
+                if (markerControls.object3d.userData.result === undefined) return;
+                if (markerControls.object3d.userData.result.confidenceFactor < 1) return;
+                nMarkersLearned++;
+            });
+
+            if (nMarkersLearned === multiMarkerLearning.subMarkersControls.length) {
+                statusElement.innerHTML = 'Ready to Download!';
+                statusElement.style.color = 'lightgreen';
+            } else {
+                statusElement.innerHTML = `In Progress... (${nMarkersLearned}/${multiMarkerLearning.subMarkersControls.length})`;
+                statusElement.style.color = 'red';
+            }
+        }
     }
+
     renderer.render(scene, camera);
 }
 
-// MediaPipe render function
 let lastVideoTime = -1;
 function renderMediaPipe() {
     if (video && faceLandmarker && video.readyState === video.HAVE_ENOUGH_DATA && video.currentTime !== lastVideoTime) {
