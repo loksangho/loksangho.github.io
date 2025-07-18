@@ -75,6 +75,7 @@ async function initMediaPipe() {
     textureCanvas.width = 512; textureCanvas.height = 512;
     textureCanvasCtx = textureCanvas.getContext('2d');
     faceTexture = new THREE.CanvasTexture(textureCanvas);
+    faceTexture.flipY = false;
     const material = new THREE.MeshStandardMaterial({ map: faceTexture, side: THREE.DoubleSide });
     faceMesh = new THREE.Mesh(geometry, material);
     scene.add(faceMesh);
@@ -335,7 +336,7 @@ function renderMediaPipe() {
                 positions[i * 3 + 1] = -(landmarks[i].y - 0.5) * 2;
                 positions[i * 3 + 2] = -landmarks[i].z;
                 uvs[i * 2]           = landmarks[i].x;
-                uvs[i * 2 + 1]       = 1.0 - landmarks[i].y;
+                uvs[i * 2 + 1]       = landmarks[i].y;
             }
             faceMesh.geometry.attributes.position.needsUpdate = true;
             faceMesh.geometry.attributes.uv.needsUpdate = true;
