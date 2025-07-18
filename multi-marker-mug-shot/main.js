@@ -360,7 +360,7 @@ async function initCombinedPlayer(profileData) {
                                         const posAttr = node.geometry.attributes.position;
                                         const idxAttr = node.geometry.index;
                                         console.log('Mesh:', node.name);
-                                        console.log('Position count:', posAttr?.count);
+                                        console.log('Position count:', posAttr?.count); 
                                         console.log('Index count:', idxAttr?.count);
                                     }
                                 });
