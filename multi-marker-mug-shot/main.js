@@ -154,7 +154,7 @@ function initLearner() {
         }, 100);
     });
     arToolkitContext = new THREEx.ArToolkitContext({
-        //cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
+        cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
         detectionMode: 'mono',
     });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
@@ -231,7 +231,8 @@ async function initCombinedPlayer(profileData) {
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
     video = document.createElement('video');
     video.setAttribute('autoplay', ''); video.setAttribute('muted', ''); video.setAttribute('playsinline', '');
-    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: {ideal: 1280}, height: {ideal: 720} } });
+    //const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: {ideal: 1280}, height: {ideal: 720} } });
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
     video.srcObject = stream;
     document.body.appendChild(video);
     video.style.position = 'absolute'; video.style.top = '0px'; video.style.left = '0px'; video.style.zIndex = '-1';
