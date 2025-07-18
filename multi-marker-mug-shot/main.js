@@ -235,23 +235,24 @@ function initLearner() {
     animateAR();
 }
 
-// 💡 NEW: A robust resize handler for all modes
+// --- CORRECTED STATE-AWARE RESIZE HANDLER ---
 function onResize() {
-    if (arToolkitSource) {
-        arToolkitSource.onResizeElement();
-        arToolkitSource.copyElementSizeTo(renderer.domElement);
-        if (arToolkitContext && arToolkitContext.arController !== null) {
-            arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
-        }
-    }
+    if (!renderer) return;
 
-    if (renderer) {
-        const canvas = renderer.domElement;
-        console.log(`Resizing renderer to ${canvas.clientWidth}x${canvas.clientHeight}`);
-        console.log(`Window size: ${window.innerWidth}, ${window.innerHeight}`);
+    if (currentMode === 'mediapipe') {
+        // In MediaPipe mode, we control the perspective camera.
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
+    } else {
+        // In 'learner' or 'player' mode, AR.js handles resizing.
+        if (arToolkitSource && arToolkitSource.ready) {
+            arToolkitSource.onResizeElement();
+            arToolkitSource.copyElementSizeTo(renderer.domElement);
+            if (arToolkitContext && arToolkitContext.arController !== null) {
+                arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
+            }
+        }
     }
 }
 
@@ -285,7 +286,7 @@ async function initCombinedPlayer(profileData) {
     // 💡 REMOVED all manual <video> element and getUserMedia code.
     // 2. --- Shared Video Stream ---
     // We create ONE video element and get the camera stream ONCE.
-    video = document.createElement('video');
+    /*video = document.createElement('video');
     video.setAttribute('autoplay', '');
     video.setAttribute('muted', '');
     video.setAttribute('playsinline', '');
@@ -299,7 +300,7 @@ async function initCombinedPlayer(profileData) {
     video.style.left = '0';
     video.style.zIndex = '-1'; // Hide video behind canvas
     await new Promise(resolve => { video.onloadedmetadata = resolve; });
-    video.play();
+    video.play();*/
 
 
 
@@ -307,7 +308,7 @@ async function initCombinedPlayer(profileData) {
     // The library will now create the video element and get the camera stream by itself.
     arToolkitSource = new THREEx.ArToolkitSource({
         sourceType: 'webcam',
-        sourceElement: video
+        sourceElement: renderer.domElement
     });
 
     arToolkitSource.init(() => {
