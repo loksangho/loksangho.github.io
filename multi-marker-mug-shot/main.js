@@ -1,31 +1,38 @@
-// main.js - Final version with local scripts and fullscreen resizing.
+// main.js - Modified to save marker profiles in memory instead of file download/upload.
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { FACEMESH_TESSELATION } from './face_mesh_data.js';
+import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
 
-// --- Global variables ---
+// Global variables
 let scene, camera, renderer, video, faceLandmarker;
 let faceMesh, textureCanvas, textureCanvasCtx, faceTexture;
 let exportedMeshData = null;
 const runningMode = "VIDEO";
 let animationFrameId;
 let currentMode = null;
-let onRenderFcts = []; // An array of functions for the render loop
+let onRenderFcts = [];
+let webARrocksGroupAdded = false;
 
-// --- AR specific variables ---
-let arToolkitSource, arToolkitContext, multiMarkerControls;
-let savedProfileData = null; 
+// AR specific variables
+let arToolkitSource, arToolkitContext, multiMarkerControls, multiMarkerLearning;
+let savedProfileData = null; // 💡 To store the marker profile in memory
+const _settings = { NNPath: './neuralNets/NN_COFFEE_0.json' };
 
 function loadLegacyScript(url) {
     return new Promise((resolve, reject) => {
         window.THREE = THREE;
+        if (!window.THREE.EventDispatcher) { window.THREE.EventDispatcher = THREE.ObjectD; }
+        if (!window.THREE.Matrix4.prototype.getInverse) {
+            window.THREE.Matrix4.prototype.getInverse = function(matrix) { return this.copy(matrix).invert(); };
+        }
         const script = document.createElement('script');
         script.src = url;
         script.onload = resolve;
-        script.onerror = () => reject(new Error(`Failed to load script: ${url}`));
+        script.onerror = reject;
         document.head.appendChild(script);
     });
 }
@@ -48,61 +55,43 @@ function onResize() {
     }
 }
 
-
 async function main() {
     try {
-        // Load the local AR.js libraries. This is the most reliable way.
-        await Promise.all([
-            loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js')
-            //loadLegacyScript('./vendor/threex-armultimarker.js')
-        ]);
-        console.log("✅ Local AR.js libraries loaded successfully.");
+        await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
         
-        THREEx.ArToolkitContext.baseURL = './';
-
         // 💡 Add the resize event listener globally
         window.addEventListener('resize', onResize, false);
-        
-        initMediaPipe();
 
+        initMediaPipe();
     } catch (error) {
-        console.error("❌ Error loading AR.js scripts:", error);
+        console.error("Error loading ar-threex.js:", error);
     }
 }
-
-// =================================================================================
-// MEDIAPIPE PHASE (Largely unchanged)
-// =================================================================================
 
 async function initMediaPipe() {
     currentMode = 'mediapipe';
     onRenderFcts = [];
-    
+
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 2.5;
-
     const canvas = document.getElementById('outputCanvas');
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     canvas.style.display = 'block';
-
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
     dirLight.position.set(0, 1, 1);
     scene.add(dirLight);
-
     video = document.getElementById('webcamVideo');
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
     video.srcObject = stream;
-    await new Promise(resolve => { video.onloadedmetadata = () => { video.play(); resolve(); }; });
+    await new Promise(resolve => video.onloadedmetadata = () => { video.play(); resolve(); });
     video.style.display = 'none';
-
     const visionResolver = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/wasm");
     faceLandmarker = await FaceLandmarker.createFromOptions(visionResolver, {
         baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task` },
         runningMode, numFaces: 1 });
-
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(478 * 3), 3));
     geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(478 * 2), 2));
@@ -114,13 +103,13 @@ async function initMediaPipe() {
     const material = new THREE.MeshStandardMaterial({ map: faceTexture, side: THREE.DoubleSide });
     faceMesh = new THREE.Mesh(geometry, material);
     scene.add(faceMesh);
-
     document.getElementById('loading').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'flex';
     document.getElementById('phase1').style.display = 'block';
     document.getElementById('saveButton').addEventListener('click', saveMesh);
     document.getElementById('learnerButton').addEventListener('click', initLearner);
 
+    // 💡 REMOVED playerButton and profileInput logic, as player is now started from the learner.
     onRenderFcts.push(renderMediaPipe);
     animate();
 }
@@ -138,6 +127,20 @@ function saveMesh() {
     }, (error) => console.error(error), { binary: true });
 }
 
+function cleanup() {
+    cancelAnimationFrame(animationFrameId);
+    if (video && video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); video.srcObject = null; }
+    if (renderer) {
+        renderer.dispose();
+        renderer = null;
+    }
+    if (currentMode === 'player') { 
+        WebARRocksObjectThreeHelper.destroy();
+        webARrocksGroupAdded = false;
+    }
+    const dynamicUI = document.getElementById('dynamicUI');
+    if(dynamicUI) dynamicUI.remove();
+}
 
 // =================================================================================
 // LEARNER PHASE (Updated with resize logic)
@@ -266,6 +269,7 @@ async function initCombinedPlayer(profileData) {
     animate();
 }
 
+
 // =================================================================================
 // GENERAL ANIMATION & UTILITY FUNCTIONS
 // =================================================================================
@@ -350,5 +354,4 @@ function renderMediaPipe() {
     }
 }
 
-// --- Start the Application ---
 main();
