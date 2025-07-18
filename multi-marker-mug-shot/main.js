@@ -14,7 +14,6 @@ let exportedMeshData = null;
 const runningMode = "VIDEO";
 let animationFrameId;
 let currentMode = null;
-let onRenderFcts = [];
 let webARrocksGroupAdded = false;
 
 // AR specific variables
@@ -37,24 +36,6 @@ function loadLegacyScript(url) {
     });
 }
 
-// 💡 NEW: A robust resize handler for all modes
-function onResize() {
-    if (arToolkitSource) {
-        arToolkitSource.onResizeElement();
-        arToolkitSource.copyElementSizeTo(renderer.domElement);
-        if (arToolkitContext && arToolkitContext.arController !== null) {
-            arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
-        }
-    }
-
-    if (renderer) {
-        const canvas = renderer.domElement;
-        camera.aspect = canvas.clientWidth / canvas.clientHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
-    }
-}
-
 async function main() {
     try {
         await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
@@ -70,8 +51,6 @@ async function main() {
 
 async function initMediaPipe() {
     currentMode = 'mediapipe';
-    onRenderFcts = [];
-
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 2.5;
@@ -110,7 +89,7 @@ async function initMediaPipe() {
     document.getElementById('learnerButton').addEventListener('click', initLearner);
 
     // 💡 REMOVED playerButton and profileInput logic, as player is now started from the learner.
-    onRenderFcts.push(renderMediaPipe);
+    
     animate();
 }
 
@@ -127,63 +106,65 @@ function saveMesh() {
     }, (error) => console.error(error), { binary: true });
 }
 
-
-
-// =================================================================================
-// LEARNER PHASE (Updated with resize logic)
-// =================================================================================
+function cleanup() {
+    cancelAnimationFrame(animationFrameId);
+    if (video && video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); video.srcObject = null; }
+    if (renderer) {
+        renderer.dispose();
+        renderer = null;
+    }
+    if (currentMode === 'player') { 
+        WebARRocksObjectThreeHelper.destroy();
+        webARrocksGroupAdded = false;
+    }
+    const dynamicUI = document.getElementById('dynamicUI');
+    if(dynamicUI) dynamicUI.remove();
+}
 
 function initLearner() {
     cleanup();
     currentMode = 'learner';
-    onRenderFcts = [];
-
     const canvas = document.getElementById('outputCanvas');
-    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-    renderer.setClearColor(new THREE.Color('lightgrey'), 0);
-    renderer.setSize(window.innerWidth, window.innerHeight);
     canvas.style.display = 'block';
-
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
     scene = new THREE.Scene();
     camera = new THREE.Camera();
     scene.add(camera);
-
     arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
     arToolkitSource.init(() => {
-        // 💡 Call onResize here to set the initial size correctly.
-        onResize();
+        setTimeout(() => {
+            arToolkitSource.onResizeElement();
+            arToolkitSource.copyElementSizeTo(renderer.domElement);
+        }, 100);
     });
-
     arToolkitContext = new THREEx.ArToolkitContext({
         cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
         detectionMode: 'mono',
     });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
-    
-    onRenderFcts.push(() => {
-        if (!arToolkitSource || !arToolkitSource.ready) return;
-        arToolkitContext.update(arToolkitSource.domElement);
-    });
-
     const subMarkersControls = [];
     const markerNames = ['hiro', 'kanji', 'letterA'];
-    markerNames.forEach(markerName => {
+
+    markerNames.forEach(function(markerName){
         const markerRoot = new THREE.Group();
         scene.add(markerRoot);
         const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
             type: 'pattern',
             patternUrl: `./patt/patt.${markerName}`,
         });
+        const markerHelper = new THREEx.ArMarkerHelper(markerControls);
+        markerControls.object3d.add(markerHelper.object3d);
         subMarkersControls.push(markerControls);
     });
-
     multiMarkerLearning = new THREEx.ArMultiMakersLearning(arToolkitContext, subMarkersControls);
     multiMarkerLearning.enabled = true;
 
-    // --- UI (Same as before) ---
+    // --- MODIFIED UI FOR LEARNING STATUS ---
     const controlsContainer = document.createElement('div');
     controlsContainer.id = 'dynamicUI';
     controlsContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; color: white;';
+    // 💡 Changed button to "Save Profile & Start Player"
     controlsContainer.innerHTML = `
         <button id="resetBtn">Reset Learning</button>
         <button id="saveAndPlayBtn">Save Profile & Start Player</button>
@@ -191,37 +172,71 @@ function initLearner() {
     `;
     document.body.appendChild(controlsContainer);
     document.getElementById('resetBtn').onclick = () => multiMarkerLearning.resetStats();
+    
+    // --- MODIFIED BUTTON LOGIC TO SAVE TO MEMORY AND START PLAYER ---
     document.getElementById('saveAndPlayBtn').onclick = () => {
         const profileData = JSON.parse(multiMarkerLearning.toJSON());
+        
         if (!profileData || !profileData.subMarkersControls || profileData.subMarkersControls.length < markerNames.length) {
-            alert(`Learning not complete! Please show all markers.`);
+            alert(`Learning not complete! Please show all markers to the camera until the status is 'Ready'.`);
             return;
         }
-        profileData.parameters = { type: 'area' };
+
+        profileData.parameters = {
+            type: 'area'
+        };
+        
+        // 💡 Save data to memory variable instead of downloading a file
         savedProfileData = profileData;
-        alert("Profile saved. Starting player...");
+        alert("Profile saved to memory. Starting the player...");
+        
+        
+
+        // 💡 Directly initialize the player with the saved data
         initCombinedPlayer(savedProfileData);
     };
-
-    onRenderFcts.push(animateARLearner);
-    animate();
+    
+    animateAR();
 }
 
-// =================================================================================
-// PLAYER PHASE (Updated with resize logic)
-// =================================================================================
+// 💡 NEW: A robust resize handler for all modes
+function onResize() {
+    if (arToolkitSource) {
+        arToolkitSource.onResizeElement();
+        arToolkitSource.copyElementSizeTo(renderer.domElement);
+        if (arToolkitContext && arToolkitContext.arController !== null) {
+            arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
+        }
+    }
+
+    if (renderer) {
+        const canvas = renderer.domElement;
+        camera.aspect = canvas.clientWidth / canvas.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+    }
+}
+
 
 async function initCombinedPlayer(profileData) {
     cleanup();
     currentMode = 'player';
-    onRenderFcts = [];
+
+    // Hide all UI phases
     document.getElementById('uiContainer').style.display = 'none';
+    document.getElementById('phase1').style.display = 'none';
+    document.getElementById('phase2').style.display = 'none';
+    const phase3 = document.getElementById('phase3');
+    if (phase3) phase3.style.display = 'none';
 
     const canvas = document.getElementById('outputCanvas');
-    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-    renderer.setClearColor(new THREE.Color('lightgrey'), 0);
-    renderer.setSize(window.innerWidth, window.innerHeight);
     canvas.style.display = 'block';
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const gl = renderer.getContext();
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
 
     scene = new THREE.Scene();
     camera = new THREE.Camera();
@@ -229,69 +244,91 @@ async function initCombinedPlayer(profileData) {
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
 
-    arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
+    // 💡 REMOVED all manual <video> element and getUserMedia code.
+
+    // 💡 Initialize ArToolkitSource with sourceType 'webcam'.
+    // The library will now create the video element and get the camera stream by itself.
+    arToolkitSource = new THREEx.ArToolkitSource({
+        sourceType: 'webcam',
+    });
+
     arToolkitSource.init(() => {
-        // 💡 Call onResize here as well.
+        // This log should now appear correctly
+        console.log("AR source initialized.");
+
         onResize();
+
+        // The library creates its own video element, which is accessed via .domElement
+        // We just need to wait for it to be ready and then we can use it.
+        // The onReady callback of init() is the right place to do this.
+        arToolkitSource.onResizeElement();
+        arToolkitSource.copyElementSizeTo(renderer.domElement);
+        
+        // Note: The library automatically appends its video element to the body,
+        // so we don't need to manually append arToolkitSource.domElement.
 
         arToolkitContext = new THREEx.ArToolkitContext({
             cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
             detectionMode: 'mono'
         });
+
         arToolkitContext.init(() => {
             camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+
+            const markerRoot = new THREE.Group();
+            scene.add(markerRoot);
+
+            multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
+
+            const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
+            arjsObject.position.y = 0.5;
+            markerRoot.add(arjsObject);
+
+            const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
+            markerRoot.add(markerHelper.object3d);
+
+            console.log("AR setup complete. Starting animation loop.");
+            animateCombined();
         });
-
-        const markerRoot = new THREE.Group();
-        scene.add(markerRoot);
-        multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
-
-        const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
-        arjsObject.position.y = 0.5;
-        markerRoot.add(arjsObject);
-        
-        onRenderFcts.push(animateCombinedPlayer);
     });
-    
-    animate();
 }
 
-
-// =================================================================================
-// GENERAL ANIMATION & UTILITY FUNCTIONS
-// =================================================================================
-
-function cleanup() {
-    cancelAnimationFrame(animationFrameId);
-    if (video && video.srcObject) {
-        video.srcObject.getTracks().forEach(track => track.stop());
-        video.srcObject = null;
+function animateCombined() {
+    if (currentMode !== 'player') return;
+    animationFrameId = requestAnimationFrame(animateCombined);
+    
+    if (arToolkitSource && arToolkitSource.ready) { 
+        arToolkitContext.update(arToolkitSource.domElement); 
+        if (multiMarkerControls) {
+            multiMarkerControls.update();
+        }
     }
-    if (renderer) {
-        renderer.dispose();
-        renderer = null;
-    }
-    const dynamicUI = document.getElementById('dynamicUI');
-    if (dynamicUI) dynamicUI.remove();
+    renderer.render(scene, camera);
 }
 
 function animate() {
+    if (currentMode !== 'mediapipe') return;
     animationFrameId = requestAnimationFrame(animate);
-    onRenderFcts.forEach(fct => fct());
-    if(renderer) renderer.render(scene, camera);
+    renderMediaPipe();
 }
 
-function animateARLearner() {
+function animateAR() {
+    if (currentMode !== 'learner') return;
+    animationFrameId = requestAnimationFrame(animateAR);
+    if (!arToolkitSource || !arToolkitSource.ready) return;
+    arToolkitContext.update(arToolkitSource.domElement);
+    
     if (multiMarkerLearning) {
         multiMarkerLearning.computeResult();
         const statusElement = document.getElementById('learningStatus');
         if (statusElement) {
             let nMarkersLearned = 0;
             multiMarkerLearning.subMarkersControls.forEach(function(markerControls) {
-                if (markerControls.object3d.userData.result?.confidenceFactor >= 1) {
-                    nMarkersLearned++;
-                }
+                if (markerControls.object3d.userData.result === undefined) return;
+                if (markerControls.object3d.userData.result.confidenceFactor < 1) return;
+                nMarkersLearned++;
             });
+
             if (nMarkersLearned === multiMarkerLearning.subMarkersControls.length) {
                 statusElement.innerHTML = 'Ready to Start Player!';
                 statusElement.style.color = 'lightgreen';
@@ -301,20 +338,12 @@ function animateARLearner() {
             }
         }
     }
-}
-
-function animateCombinedPlayer() {
-    if (arToolkitSource && arToolkitSource.ready) {
-        arToolkitContext.update(arToolkitSource.domElement);
-        if (multiMarkerControls) {
-            multiMarkerControls.update();
-        }
-    }
+    renderer.render(scene, camera);
 }
 
 let lastVideoTime = -1;
 function renderMediaPipe() {
-    if (video && faceLandmarker && video.readyState >= 2 && video.currentTime !== lastVideoTime) {
+    if (video && faceLandmarker && video.readyState === video.HAVE_ENOUGH_DATA && video.currentTime !== lastVideoTime) {
         lastVideoTime = video.currentTime;
         const results = faceLandmarker.detectForVideo(video, performance.now());
         if (results.faceLandmarks.length > 0) {
@@ -323,11 +352,11 @@ function renderMediaPipe() {
             const positions = faceMesh.geometry.attributes.position.array;
             const uvs = faceMesh.geometry.attributes.uv.array;
             for (let i = 0; i < landmarks.length; i++) {
-                positions[i * 3] = (landmarks[i].x - 0.5) * 2;
+                positions[i * 3]     = (landmarks[i].x - 0.5) * 2;
                 positions[i * 3 + 1] = -(landmarks[i].y - 0.5) * 2;
                 positions[i * 3 + 2] = -landmarks[i].z;
-                uvs[i * 2] = landmarks[i].x;
-                uvs[i * 2 + 1] = 1.0 - landmarks[i].y;
+                uvs[i * 2]           = landmarks[i].x;
+                uvs[i * 2 + 1]       = 1.0 - landmarks[i].y;
             }
             faceMesh.geometry.attributes.position.needsUpdate = true;
             faceMesh.geometry.attributes.uv.needsUpdate = true;
@@ -335,10 +364,9 @@ function renderMediaPipe() {
             textureCanvasCtx.clearRect(0, 0, 512, 512);
             textureCanvasCtx.drawImage(video, 0, 0, 512, 512);
             faceTexture.needsUpdate = true;
-        } else {
-            faceMesh.visible = false;
-        }
+        } else { faceMesh.visible = false; }
     }
+    if (renderer) renderer.render(scene, camera);
 }
 
 main();
