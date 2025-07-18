@@ -121,7 +121,7 @@ async function initMediaPipe() {
     document.getElementById('uiContainer').style.display = 'flex';
     document.getElementById('phase1').style.display = 'block';
     document.getElementById('saveButton').addEventListener('click', saveMesh);
-    document.getElementById('learnerButton').addEventListener('click', initLearner);
+    document.getElementById('playerButton').addEventListener('click', initCombinedPlayer);
 
     // 💡 REMOVED playerButton and profileInput logic, as player is now started from the learner.
     
@@ -135,7 +135,7 @@ function saveMesh() {
     const exporter = new GLTFExporter();
     exporter.parse(faceMesh, (gltf) => {
         exportedMeshData = gltf;
-        alert("Face mesh saved! Now, start the learner.");
+        alert("Face mesh saved! Now, start the player.");
         document.getElementById('phase1').style.display = 'none';
         document.getElementById('phase2').style.display = 'block';
     }, (error) => console.error(error), { binary: true });
