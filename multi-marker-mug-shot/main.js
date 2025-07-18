@@ -243,7 +243,7 @@ async function initCombinedPlayer(profileData) {
     markerRoot.add(markerHelper.object3d);    
     // --- END DEBUGGING 1 ---
 
-    const outputCanvas = document.getElementById('outputCanvas');
+    /*const outputCanvas = document.getElementById('outputCanvas');
     const arCanvas = document.getElementById('ARCanvas');
 
     WebARRocksObjectThreeHelper.init({
@@ -270,7 +270,7 @@ async function initCombinedPlayer(profileData) {
             }
         }
     });
-    
+    */
     animateCombined();
 }
 
@@ -278,19 +278,19 @@ async function initCombinedPlayer(profileData) {
 function animateCombined() {
     if (currentMode !== 'player') return;
     animationFrameId = requestAnimationFrame(animateCombined);
-
+/*
     if (WebARRocksObjectThreeHelper.object3D && !webARrocksGroupAdded) {
         scene.add(WebARRocksObjectThreeHelper.object3D);
         webARrocksGroupAdded = true;
     }
-
+*/
     if (arToolkitSource && arToolkitSource.ready) { arToolkitContext.update(arToolkitSource.domElement); }
     
     // --- DEBUGGING 2: Log WebARRocks Detection State ---
-    const detectState = WebARRocksObjectThreeHelper.animate();
+ /*   const detectState = WebARRocksObjectThreeHelper.animate();
     if (detectState && detectState.label) {
         console.log("WebARRocks detected:", detectState.label);
-    }
+    }*/
     // --- END DEBUGGING 2 ---
 
     renderer.render(scene, camera);
