@@ -179,19 +179,28 @@ function initLearner() {
     controlsContainer.innerHTML = `<button id="resetBtn">Reset Learning</button><button id="downloadBtn">Download and Continue</button>`;
     document.body.appendChild(controlsContainer);
     document.getElementById('resetBtn').onclick = () => multiMarkerLearning.resetStats();
+    // --- CORRECTED DOWNLOAD LOGIC ---
     document.getElementById('downloadBtn').onclick = () => {
-        const jsonString = multiMarkerLearning.toJSON();
-        const profileData = JSON.parse(jsonString);
+        // 1. Get the profile data OBJECT
+        const profileData = multiMarkerLearning.toJSON();
+        
+        // 2. Check if enough markers were learned
         if (profileData.subMarkersControls.length < markerNames.length) {
             alert(`Not all markers were learned! Found ${profileData.subMarkersControls.length}/${markerNames.length}. Please show all markers to the camera.`);
             return;
         }
-        const blob = new Blob([jsonString], { type: 'application/json' });
+
+        // 3. Convert the OBJECT to a proper JSON STRING for the file
+        const jsonStringForFile = JSON.stringify(profileData, null, 2);
+
+        // 4. Create the downloadable file (Blob) from the STRING
+        const blob = new Blob([jsonStringForFile], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = 'multiMarkerProfile.json';
         a.click();
         URL.revokeObjectURL(a.href);
+        
         alert("Profile downloaded. Now please load it to start the combined AR.");
         cleanup();
         document.getElementById('uiContainer').style.display = 'flex';
