@@ -16,6 +16,7 @@ const runningMode = "VIDEO";
 let animationFrameId;
 let currentMode = null;
 let webARrocksGroupAdded = false;
+let isWebARRocksReady = false;
 
 // AR specific variables
 let arToolkitSource, arToolkitContext, multiMarkerControls, multiMarkerLearning;
@@ -351,27 +352,23 @@ function initWebARRocks(){
     const ARCanvas = document.getElementById('ARCanvas');
     const threeCanvas = document.getElementById('threeCanvas');
     
-    const originalInit = WebARRocksObjectThreeHelper.init;
-    WebARRocksObjectThreeHelper.init = function (spec) {
-        console.log('WebARRocks INIT CALLED WITH:', spec);
-        return originalInit.call(this, spec);
-    };
+    
 
     WebARRocksObjectThreeHelper.init({
-    video: _DOMVideo,
-    ARCanvas: ARCanvas,
-    threeCanvas: threeCanvas,
-    NNPath: _settings.NNPath,
-    callbackReady: startWebARRocks,
-    loadNNOptions: _settings.loadNNOptions,
-    nDetectsPerLoop: _settings.nDetectsPerLoop,
-    detectOptions: _settings.detectOptions,
-    cameraFov: _settings.cameraFov,
-    followZRot: _settings.followZRot,
-    scanSettings: _settings.scanSettings,
-    isFullScreen: true,
-    stabilizerOptions: {}
-  });
+        video: _DOMVideo,
+        ARCanvas: ARCanvas,
+        threeCanvas: threeCanvas,
+        NNPath: _settings.NNPath,
+        callbackReady: startWebARRocks,
+        loadNNOptions: _settings.loadNNOptions,
+        nDetectsPerLoop: _settings.nDetectsPerLoop,
+        detectOptions: _settings.detectOptions,
+        cameraFov: _settings.cameraFov,
+        followZRot: _settings.followZRot,
+        scanSettings: _settings.scanSettings,
+        isFullScreen: true,
+        stabilizerOptions: {}
+    });
 
   console.log("init config", {
     video: renderer.domElement,
@@ -415,6 +412,7 @@ function startWebARRocks(err, three) {
         WebARRocksObjectThreeHelper.add('CUP', arCube);
         alert("No mesh data found, showing a debug cube instead.");
     }
+    isWebARRocksReady = true;
     animateCombined();
 }
 
@@ -430,11 +428,17 @@ function animateCombined() {
     }
 
     // Update WebARRocks - it processes the video and updates its internal object poses
-    
-    try {
+    if (isWebARRocksReady) {
+        try {
+        if (WebARRocksObjectThreeHelper.object3D && !webARrocksGroupAdded) {
+            scene.add(WebARRocksObjectThreeHelper.object3D);
+            webARrocksGroupAdded = true;
+        }
+
         WebARRocksObjectThreeHelper.animate();
-    } catch (e) {
-        console.warn('WebARRocks animate error:', e);
+        } catch (e) {
+        console.warn("WebARRocks animate error:", e);
+        }
     }
         
 
