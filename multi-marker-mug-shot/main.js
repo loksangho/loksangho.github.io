@@ -234,7 +234,7 @@ function initLearner() {
             patternUrl: `https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.${name}`,
         });
         // Add the marker control to the learner
-        multiMarkerLearner.trackMarker(markerControls);
+        multiMarkerLearning.push(markerControls);
     });
     // --- END OF CHANGE ---
 
