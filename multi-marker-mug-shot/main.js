@@ -102,6 +102,48 @@ async function main() {
             markerRoot.matrix.compose(markerRoot.position, markerRoot.quaternion, markerRoot.scale);
             markerRoot.matrixWorldNeedsUpdate = true;
         };
+
+        THREEx.ArMultiMakersLearning.prototype.computeResult = function() {
+            const subMarkersControls = this.subMarkersControls;
+            const visibleSubMarkers = subMarkersControls.filter(controls => controls.object3d.visible);
+
+            // If we can't see any markers, do nothing.
+            if (visibleSubMarkers.length === 0) {
+                return;
+            }
+
+            // Find if an anchor marker has already been established.
+            let anchorMarker = subMarkersControls.find(controls => controls.parameters.matrix !== undefined);
+
+            // If no anchor exists yet, make the first visible marker the anchor.
+            // Its matrix is the Identity matrix (no transformation relative to itself).
+            if (!anchorMarker && visibleSubMarkers.length > 0) {
+                anchorMarker = visibleSubMarkers[0];
+                anchorMarker.parameters.matrix = new THREE.Matrix4();
+            }
+            
+            // If we still couldn't establish an anchor, exit.
+            if (!anchorMarker) {
+                return;
+            }
+
+            // Get the anchor's current transformation matrix in world space.
+            const anchorMatrix = anchorMarker.object3d.matrix.clone();
+
+            // For any other visible marker that hasn't been learned yet...
+            visibleSubMarkers.forEach(function(markerControls) {
+                if (markerControls === anchorMarker || markerControls.parameters.matrix !== undefined) {
+                    return; //...skip it if it's the anchor or is already learned.
+                }
+
+                // Get this marker's transformation matrix.
+                var markerMatrix = markerControls.object3d.matrix.clone();
+                
+                // Calculate the matrix that transforms from the anchor's space to this marker's space,
+                // and store it. This is the "learned" relative position.
+                markerControls.parameters.matrix = new THREE.Matrix4().multiplyMatrices(markerMatrix.clone().invert(), anchorMatrix);
+            });
+        };
         console.log("AR.js update function patched.");
         
         initMediaPipe();
