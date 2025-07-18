@@ -74,7 +74,7 @@ function loadLegacyScript(url) {
 
 async function main() {
     try {
-        await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
+        //await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
         
         // 💡 Add the resize event listener globally
         window.addEventListener('resize', onResize, false);
