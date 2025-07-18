@@ -291,7 +291,7 @@ async function initCombinedPlayer(profileData) {
             // 4. --- Initialize WebARRocks (as slave) ---
             // It ALSO uses the shared video element, and we tell it to use our main scene.
             WebARRocksObjectThreeHelper.init({
-                video: arToolkitSource.domElement,
+                video: renderer.domElement,
                 // We DON'T provide a separate canvas, letting it know it won't be managing rendering.
                 NNPath: _settings.NNPath,
                 callbackReady: (err, three) => {
