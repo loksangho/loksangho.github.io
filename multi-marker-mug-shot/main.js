@@ -221,26 +221,12 @@ async function initCombinedPlayer(profileData) {
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
 
-    // 💡 REMOVED all manual <video> element and getUserMedia code.
-
-    // 💡 Initialize ArToolkitSource with sourceType 'webcam'.
-    // The library will now create the video element and get the camera stream by itself.
-    arToolkitSource = new THREEx.ArToolkitSource({
-        sourceType: 'webcam',
-    });
+    arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
 
     arToolkitSource.init(() => {
-        // This log should now appear correctly
         console.log("AR source initialized.");
-
-        // The library creates its own video element, which is accessed via .domElement
-        // We just need to wait for it to be ready and then we can use it.
-        // The onReady callback of init() is the right place to do this.
         arToolkitSource.onResizeElement();
         arToolkitSource.copyElementSizeTo(renderer.domElement);
-        
-        // Note: The library automatically appends its video element to the body,
-        // so we don't need to manually append arToolkitSource.domElement.
 
         arToolkitContext = new THREEx.ArToolkitContext({
             cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
@@ -250,15 +236,55 @@ async function initCombinedPlayer(profileData) {
         arToolkitContext.init(() => {
             camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
 
+            // =================================================================
+            // 💡 REPLACEMENT FOR fromJSON WITH DETAILED LOGGING
+            // =================================================================
+            console.log("Attempting to build multi-marker controls manually...");
+            console.log("Received Profile Data:", profileData);
+
+            // 1. Create sub-marker controls from the profile data
+            const subMarkersControls = [];
+            if (profileData && profileData.subMarkersControls) {
+                profileData.subMarkersControls.forEach(function(markerParams) {
+                    const object3d = new THREE.Group();
+                    scene.add(object3d);
+                    const markerControls = new THREEx.ArMarkerControls(arToolkitContext, object3d, markerParams);
+                    subMarkersControls.push(markerControls);
+                });
+                console.log(`Step 1: Successfully created ${subMarkersControls.length} sub-marker controls.`);
+            } else {
+                console.error("Step 1 Failed: profileData.subMarkersControls not found!");
+                return; // Stop execution
+            }
+
+            // 2. Create the main multi-marker controls object
             const markerRoot = new THREE.Group();
             scene.add(markerRoot);
+            multiMarkerControls = new THREEx.ArMultiMarkerControls(arToolkitContext, markerRoot, subMarkersControls);
+            console.log("Step 2: Successfully created base ArMultiMarkerControls object.");
 
-            multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
+
+            // 3. Manually create the 'area' controller and patch the update function
+            if (profileData.parameters && profileData.parameters.type === 'area') {
+                console.log("Step 3: Profile type is 'area'. Attempting to create ArMultiMarkerArea...");
+                try {
+                    const area = new THREEx.ArMultiMarkerArea(multiMarkerControls.parameters);
+                    multiMarkerControls.update = area.update.bind(area);
+                    multiMarkerControls.name = area.name;
+                    console.log("Step 3: Successfully created ArMultiMarkerArea and patched update function. The error should now be resolved.");
+                } catch (e) {
+                    console.error("Step 3 FAILED: Error creating ArMultiMarkerArea or patching update. This is the source of the assertion failure.", e);
+                }
+            } else {
+                console.error("Step 3 FAILED: Profile 'type' is not 'area' or parameters object is missing!", profileData.parameters);
+            }
+            // =================================================================
+            // END REPLACEMENT
+            // =================================================================
 
             const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
             arjsObject.position.y = 0.5;
             markerRoot.add(arjsObject);
-
             const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
             markerRoot.add(markerHelper.object3d);
 
