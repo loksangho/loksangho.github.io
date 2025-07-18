@@ -161,9 +161,66 @@ function initLearner() {
         detectionMode: 'mono',
     });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
-    
-    // Initialize the learner object
-    multiMarkerLearner = new THREEx.ArMultiMakersLearning(arToolkitContext);
+
+
+    var urlOptions = {
+        backURL: null,
+        trackingBackend: "artoolkit",
+        markersControlsParameters: []
+    }
+    let markerObjs = JSON.parse(markers)
+    for (let idx in markerObjs) {
+        console.log(markerObjs[idx])
+        urlOptions.markersControlsParameters.push(markerObjs[idx])
+    }
+    //urlOptions.markersControlsParameters.push({ barcodeValue: "0", type: "barcode" })
+
+    urlOptions.trackingBackend = "artoolkit"
+
+
+    var subMarkersControls = []
+    urlOptions.markersControlsParameters.forEach(function (markerControlsParameters) {
+        // create a markerRoot
+        var markerRoot = new THREE.Group()
+        scene.add(markerRoot)
+
+        // create markerControls for our markerRoot
+        var markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, markerControlsParameters)
+
+
+        // TODO here put a THREEx.ArSmoothedControls behind a flag - could be useful for tunning
+        var smoothedControls = null
+        if (false) {
+            // build a smoothedControls
+            var smoothedRoot = new THREE.Group()
+            scene.add(smoothedRoot)
+            var smoothedControls = new THREEx.ArSmoothedControls(smoothedRoot)
+            onRenderFcts.push(function () {
+                smoothedControls.update(markerRoot)
+            })
+        }
+
+        // add an helper to visuable each sub-marker
+        var markerHelper = new THREEx.ArMarkerHelper(markerControls)
+        if (smoothedControls !== null) {
+            smoothedControls.object3d.add(markerHelper.object3d)
+        } else {
+            markerControls.object3d.add(markerHelper.object3d)
+        }
+
+
+
+
+        // store it in the parameters
+        if (smoothedControls !== null) {
+            // TODO put that in the if above
+            subMarkersControls.push(smoothedControls)
+        } else {
+            subMarkersControls.push(markerControls)
+        }
+    })
+
+    var multiMarkerLearning = new THREEx.ArMultiMakersLearning(arToolkitContext, subMarkersControls)
 
     // --- EXPLICITLY DEFINE MARKERS TO LEARN ---
     // This makes the process more robust.
