@@ -26,7 +26,7 @@ const _settings = {
     notHereFactor: 0.0,
     paramsPerLabel: {
       CUP: {
-        thresholdDetect: 0.92
+        thresholdDetect: 0.72
       }
     }
   },
