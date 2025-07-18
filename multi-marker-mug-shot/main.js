@@ -26,7 +26,7 @@ const _settings = {
     notHereFactor: 0.0,
     paramsPerLabel: {
       CUP: {
-        thresholdDetect: 0.52
+        thresholdDetect: 0.92
       }
     }
   },
@@ -235,24 +235,23 @@ function initLearner() {
     animateAR();
 }
 
-// --- CORRECTED STATE-AWARE RESIZE HANDLER ---
+// 💡 NEW: A robust resize handler for all modes
 function onResize() {
-    if (!renderer) return;
+    if (arToolkitSource) {
+        arToolkitSource.onResizeElement();
+        arToolkitSource.copyElementSizeTo(renderer.domElement);
+        if (arToolkitContext && arToolkitContext.arController !== null) {
+            arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
+        }
+    }
 
-    if (currentMode === 'mediapipe') {
-        // In MediaPipe mode, we control the perspective camera.
+    if (renderer) {
+        const canvas = renderer.domElement;
+        console.log(`Resizing renderer to ${canvas.clientWidth}x${canvas.clientHeight}`);
+        console.log(`Window size: ${window.innerWidth}, ${window.innerHeight}`);
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-    } else {
-        // In 'learner' or 'player' mode, AR.js handles resizing.
-        if (arToolkitSource && arToolkitSource.ready) {
-            arToolkitSource.onResizeElement();
-            arToolkitSource.copyElementSizeTo(renderer.domElement);
-            if (arToolkitContext && arToolkitContext.arController !== null) {
-                arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
-            }
-        }
     }
 }
 
@@ -282,25 +281,6 @@ async function initCombinedPlayer(profileData) {
     scene.add(camera);
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
-
-    // 💡 REMOVED all manual <video> element and getUserMedia code.
-    // 2. --- Shared Video Stream ---
-    // We create ONE video element and get the camera stream ONCE.
-    /*video = document.createElement('video');
-    video.setAttribute('autoplay', '');
-    video.setAttribute('muted', '');
-    video.setAttribute('playsinline', '');
-    const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: {ideal: 1280}, height: {ideal: 720} }
-    });
-    video.srcObject = stream;
-    document.body.appendChild(video);
-    video.style.position = 'absolute';
-    video.style.top = '0';
-    video.style.left = '0';
-    video.style.zIndex = '-1'; // Hide video behind canvas
-    await new Promise(resolve => { video.onloadedmetadata = resolve; });
-    video.play();*/
 
 
 
@@ -354,7 +334,7 @@ async function initCombinedPlayer(profileData) {
                     if (exportedMeshData) {
                         new GLTFLoader().parse(exportedMeshData, '', (gltf) => {
                             if (gltf && gltf.scene) {
-                                gltf.scene.scale.set(1, 1, 1);
+                                gltf.scene.scale.set(0.4, 0.4, 0.4);
                                 WebARRocksObjectThreeHelper.add('CUP', gltf.scene);
                             }
                         });
