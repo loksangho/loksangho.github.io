@@ -311,7 +311,7 @@ async function initCombinedPlayer(profileData) {
             // --- CORRECTED WEBARROCKS INIT ---
             const arCanvas = document.getElementById('ARCanvas');
             WebARRocksObjectThreeHelper.init({
-                video: videoElement,
+                video: video,
                 NNPath: _settings.NNPath,
                 ARCanvas: arCanvas,
                 threeCanvas: canvas, // <-- This was the missing property
