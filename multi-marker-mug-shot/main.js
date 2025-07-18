@@ -203,6 +203,12 @@ async function initCombinedPlayer(profileData) {
     canvas.style.display = 'block';
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
+
+    // 💡 FIX: Manually reset WebGL state before AR.js initialization
+    const gl = renderer.getContext();
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+
     scene = new THREE.Scene();
     camera = new THREE.Camera();
     scene.add(camera);
