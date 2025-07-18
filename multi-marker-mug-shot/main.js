@@ -154,7 +154,7 @@ function initLearner() {
         }, 100);
     });
     arToolkitContext = new THREEx.ArToolkitContext({
-        cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
+        //cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
         detectionMode: 'mono',
     });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
@@ -259,8 +259,8 @@ async function initCombinedPlayer(profileData) {
     markerRoot.add(arjsObject);
     
     const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
-    //markerRoot.add(markerHelper.object3d);
-    scene.add(markerHelper.object3d);
+    markerRoot.add(markerHelper.object3d);
+    //scene.add(markerHelper.object3d);
     
     animateCombined();
 }
