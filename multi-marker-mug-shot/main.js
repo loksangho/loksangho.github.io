@@ -245,7 +245,9 @@ async function initCombinedPlayer(profileData) {
     const markerRoot = new THREE.Group();
     scene.add(markerRoot);
 
-    multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, markerRoot, JSON.stringify(profileData));
+    console.log("profileData", profileData);
+    
+    multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, markerRoot, profileData);
 
 
     const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
