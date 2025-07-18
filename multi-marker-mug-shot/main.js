@@ -307,8 +307,7 @@ async function initCombinedPlayer(profileData) {
         videoEl.style.position = 'fixed';
         videoEl.style.top = '0';
         videoEl.style.left = '0';
-        videoEl.style.width = '100vw';
-        videoEl.style.height = '100vh';
+        
         videoEl.style.objectFit = 'cover';
         videoEl.style.zIndex = '-1'; // Behind your canvas
 
