@@ -147,7 +147,7 @@ function initLearner() {
         scene.add(markerRoot);
         const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
             type: 'pattern',
-            patternUrl: `https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.${markerName}`,
+            patternUrl: `./patt/patt.${markerName}`,
         });
         const markerHelper = new THREEx.ArMarkerHelper(markerControls);
         markerControls.object3d.add(markerHelper.object3d);
