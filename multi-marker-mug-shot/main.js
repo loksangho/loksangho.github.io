@@ -241,8 +241,8 @@ async function initCombinedPlayer(profileData) {
             
             // --- CORRECTED API USAGE ---
             // Use the .object3D property to get the group of tracked objects
-            const webARrocksObjectsGroup = WebARRocksObjectThreeHelper.object3D;
-            scene.add(webARrocksObjectsGroup);
+            //const webARrocksObjectsGroup = WebARRocksObjectThreeHelper.object3D;
+            //scene.add(webARrocksObjectsGroup);
         }
     });
     
