@@ -39,16 +39,19 @@ function loadLegacyScript(url) {
 
 async function main() {
     try {
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-artoolkitsource.js'),
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-artoolkitprofile.js'),
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-artoolkitcontext.js'),
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-arsmoothedcontrols.js'),
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-armarkerhelper.js'),
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-armarkercontrols.js'),
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-armarkercloak.js'),
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-arbasecontrols.js'),
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-arclickability.js'),
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-arvideoinwebgl.js'),
+        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-artoolkitsource.js');
+        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-artoolkitprofile.js');
+        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-artoolkitcontext.js');
+        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-arsmoothedcontrols.js');
+        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-armarkerhelper.js');
+        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-armarkercontrols.js');
+        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-armarkercloak.js');
+        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-arbasecontrols.js');
+        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-arclickability.js');
+        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-arvideoinwebgl.js');
+        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-armultimarkercontrols.js');
+        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-armultimarkerslearning.js');
+        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-arprofile.js');
         //Fix for THREEx.ArMultiMarkerControls
         // 2. NOW, apply the monkey patch to the loaded THREEx object
         THREEx.ArMultiMarkerControls.prototype.update = function() {
