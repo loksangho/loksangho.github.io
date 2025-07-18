@@ -355,6 +355,15 @@ async function initCombinedPlayer(profileData) {
                     if (exportedMeshData) {
                         new GLTFLoader().parse(exportedMeshData, '', (gltf) => {
                             if (gltf && gltf.scene) {
+                                gltf.scene.traverse((node) => {
+                                    if (node.isMesh) {
+                                        const posAttr = node.geometry.attributes.position;
+                                        const idxAttr = node.geometry.index;
+                                        console.log('Mesh:', node.name);
+                                        console.log('Position count:', posAttr?.count);
+                                        console.log('Index count:', idxAttr?.count);
+                                    }
+                                });
                                 gltf.scene.scale.set(1, 1, 1);
                                 WebARRocksObjectThreeHelper.add('CUP', gltf.scene);
                             }
