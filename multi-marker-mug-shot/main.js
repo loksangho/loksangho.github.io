@@ -1,4 +1,4 @@
-// main.js - Added learner status UI to prevent early download
+// main.js - Modified to save marker profiles in memory instead of file download/upload.
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -18,6 +18,7 @@ let webARrocksGroupAdded = false;
 
 // AR specific variables
 let arToolkitSource, arToolkitContext, multiMarkerControls, multiMarkerLearning;
+let savedProfileData = null; // 💡 To store the marker profile in memory
 const _settings = { NNPath: './neuralNets/NN_COFFEE_0.json' };
 
 function loadLegacyScript(url) {
@@ -82,29 +83,9 @@ async function initMediaPipe() {
     document.getElementById('phase1').style.display = 'block';
     document.getElementById('saveButton').addEventListener('click', saveMesh);
     document.getElementById('learnerButton').addEventListener('click', initLearner);
-    const playerButton = document.getElementById('playerButton');
-    const profileInput = document.getElementById('profileInput');
-    profileInput.addEventListener('change', () => { playerButton.disabled = !profileInput.files.length; });
+
+    // 💡 REMOVED playerButton and profileInput logic, as player is now started from the learner.
     
-    playerButton.addEventListener('click', () => {
-    const file = profileInput.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            try {
-                // Parse the file content into a JavaScript object
-                const profileData = JSON.parse(event.target.result);
-                // Call the player with the data object, not a URL
-                initCombinedPlayer(profileData);
-            } catch (e) {
-                alert("Error: The selected file is not a valid JSON profile.");
-                console.error("Error parsing JSON file:", e);
-            }
-        };
-        // Read the file as plain text
-        reader.readAsText(file);
-    }
-});
     animate();
 }
 
@@ -174,20 +155,21 @@ function initLearner() {
     multiMarkerLearning = new THREEx.ArMultiMakersLearning(arToolkitContext, subMarkersControls);
     multiMarkerLearning.enabled = true;
 
-    // --- ADDED UI FOR LEARNING STATUS ---
+    // --- MODIFIED UI FOR LEARNING STATUS ---
     const controlsContainer = document.createElement('div');
     controlsContainer.id = 'dynamicUI';
     controlsContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; color: white;';
+    // 💡 Changed button to "Save Profile & Start Player"
     controlsContainer.innerHTML = `
         <button id="resetBtn">Reset Learning</button>
-        <button id="downloadBtn">Download and Continue</button>
+        <button id="saveAndPlayBtn">Save Profile & Start Player</button>
         <div style="margin-top: 10px;">Status: <span id="learningStatus" style="font-weight: bold; color: red;">In Progress...</span></div>
     `;
     document.body.appendChild(controlsContainer);
     document.getElementById('resetBtn').onclick = () => multiMarkerLearning.resetStats();
     
-    // --- CORRECTED SYNCHRONOUS DOWNLOAD LOGIC ---
-    document.getElementById('downloadBtn').onclick = () => {
+    // --- MODIFIED BUTTON LOGIC TO SAVE TO MEMORY AND START PLAYER ---
+    document.getElementById('saveAndPlayBtn').onclick = () => {
         const profileData = JSON.parse(multiMarkerLearning.toJSON());
         
         if (!profileData || !profileData.subMarkersControls || profileData.subMarkersControls.length < markerNames.length) {
@@ -195,20 +177,12 @@ function initLearner() {
             return;
         }
         
-        const jsonStringForFile = JSON.stringify(profileData, null, 2);
-        const blob = new Blob([jsonStringForFile], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'multiMarkerProfile.json';
-        a.click();
-        URL.revokeObjectURL(a.href);
+        // 💡 Save data to memory variable instead of downloading a file
+        savedProfileData = profileData;
+        alert("Profile saved to memory. Starting the player...");
         
-        alert("Profile downloaded. Now please load it to start the combined AR.");
-        cleanup();
-        document.getElementById('uiContainer').style.display = 'flex';
-        document.getElementById('phase1').style.display = 'none';
-        document.getElementById('phase2').style.display = 'none';
-        document.getElementById('phase3').style.display = 'block';
+        // 💡 Directly initialize the player with the saved data
+        initCombinedPlayer(savedProfileData);
     };
     
     animateAR();
@@ -218,8 +192,15 @@ async function initCombinedPlayer(profileData) {
     cleanup();
     currentMode = 'player';
     
-    // This is a simplified player for testing AR.js.
-    // Once the wireframes show up, we can re-add the WebARRocks code.
+    // Hide all UI phases
+    document.getElementById('uiContainer').style.display = 'none';
+    document.getElementById('phase1').style.display = 'none';
+    document.getElementById('phase2').style.display = 'none';
+    // Phase 3 is no longer used for uploading
+    const phase3 = document.getElementById('phase3');
+    if (phase3) phase3.style.display = 'none';
+
+
     const canvas = document.getElementById('outputCanvas');
     canvas.style.display = 'block';
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
@@ -231,7 +212,6 @@ async function initCombinedPlayer(profileData) {
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
     video = document.createElement('video');
     video.setAttribute('autoplay', ''); video.setAttribute('muted', ''); video.setAttribute('playsinline', '');
-    //const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: {ideal: 1280}, height: {ideal: 720} } });
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
     video.srcObject = stream;
     document.body.appendChild(video);
@@ -246,11 +226,11 @@ async function initCombinedPlayer(profileData) {
     const markerRoot = new THREE.Group();
     scene.add(markerRoot);
 
-    console.log("profileData", profileData);
+    console.log("Loading profile data from memory:", profileData);
     
+    // The profileData object is passed directly
     multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
-
-    // 💡 ADD THIS DIAGNOSTIC CODE
+    
     console.log("Inspecting controls object after creation:");
     console.log("Sub-marker controls found:", multiMarkerControls.subMarkersControls.length);
     console.log(multiMarkerControls);
@@ -261,7 +241,6 @@ async function initCombinedPlayer(profileData) {
     
     const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
     markerRoot.add(markerHelper.object3d);
-    //scene.add(markerHelper.object3d);
     
     console.log("currentMode:", currentMode);
     animateCombined();
@@ -269,15 +248,11 @@ async function initCombinedPlayer(profileData) {
 
 function animateCombined() {
     if (currentMode !== 'player') return;
-    console.log("Player mode");
     animationFrameId = requestAnimationFrame(animateCombined);
-    console.log("arToolkitSource:", arToolkitSource);
-
     
     if (arToolkitSource && arToolkitSource.ready) { 
         arToolkitContext.update(arToolkitSource.domElement); 
         if (multiMarkerControls) {
-            console.log("multiMarkerControls true");
             multiMarkerControls.update();
         }
     }
@@ -290,7 +265,6 @@ function animate() {
     renderMediaPipe();
 }
 
-// --- UPDATED LEARNER ANIMATION LOOP ---
 function animateAR() {
     if (currentMode !== 'learner') return;
     animationFrameId = requestAnimationFrame(animateAR);
@@ -299,8 +273,6 @@ function animateAR() {
     
     if (multiMarkerLearning) {
         multiMarkerLearning.computeResult();
-
-        // --- UPDATE STATUS UI ---
         const statusElement = document.getElementById('learningStatus');
         if (statusElement) {
             let nMarkersLearned = 0;
@@ -311,7 +283,7 @@ function animateAR() {
             });
 
             if (nMarkersLearned === multiMarkerLearning.subMarkersControls.length) {
-                statusElement.innerHTML = 'Ready to Download!';
+                statusElement.innerHTML = 'Ready to Start Player!';
                 statusElement.style.color = 'lightgreen';
             } else {
                 statusElement.innerHTML = `In Progress... (${nMarkersLearned}/${multiMarkerLearning.subMarkersControls.length})`;
@@ -319,7 +291,6 @@ function animateAR() {
             }
         }
     }
-
     renderer.render(scene, camera);
 }
 
@@ -352,4 +323,3 @@ function renderMediaPipe() {
 }
 
 main();
-//Test comment
