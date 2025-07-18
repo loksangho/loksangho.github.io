@@ -39,22 +39,61 @@ function loadLegacyScript(url) {
 
 async function main() {
     try {
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-artoolkitsource.js');
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-artoolkitprofile.js');
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-artoolkitcontext.js');
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-arsmoothedcontrols.js');
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-armarkerhelper.js');
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-armarkercontrols.js');
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-armarkercloak.js');
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-arbasecontrols.js');
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-arclickability.js');
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-arvideoinwebgl.js');
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-armultimarkercontrols.js');
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-armultimarkerslearning.js');
-        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-arprofile.js');
-        
-        
-        console.log("AR.js update function patched.");
+        await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
+
+       
+        // 2. Apply the necessary patch to the ArMultiMarkerControls update function.
+        // This is required to correctly calculate the combined marker's transformation.
+        THREEx.ArMultiMarkerControls.prototype.update = function() {
+            const markerRoot = this.object3d;
+            const arToolkitContext = this.arToolkitContext;
+            const subMarkerControls = this.parameters.subMarkersControls;
+
+            subMarkerControls.forEach(function(markerControls) {
+                markerControls.update(arToolkitContext);
+            });
+
+            const visibleSubMarkers = subMarkerControls.filter(function(markerControls) {
+                return markerControls.object3d.visible === true && markerControls.parameters.matrix;
+            });
+
+            if (visibleSubMarkers.length === 0) {
+                markerRoot.visible = false;
+                return;
+            }
+
+            markerRoot.visible = true;
+            const center = new THREE.Vector3();
+            const matrices = [];
+
+            for (let i = 0; i < visibleSubMarkers.length; i++) {
+                const subMatrix = new THREE.Matrix4().getInverse(visibleSubMarkers[i].object3d.matrix);
+                const learnedMatrix = new THREE.Matrix4();
+                learnedMatrix.elements = visibleSubMarkers[i].parameters.matrix.elements;
+                const resultMatrix = new THREE.Matrix4().multiplyMatrices(subMatrix, learnedMatrix);
+                center.applyMatrix4(resultMatrix);
+                const finalMatrix = new THREE.Matrix4().getInverse(resultMatrix);
+                matrices.push(finalMatrix);
+            }
+
+            center.divideScalar(visibleSubMarkers.length);
+            const averageMatrix = matrices[0].clone();
+            for (let i = 1; i < matrices.length; i++) {
+                averageMatrix.multiply(matrices[i]);
+            }
+
+            const position = new THREE.Vector3();
+            const quaternion = new THREE.Quaternion();
+            const scale = new THREE.Vector3();
+            averageMatrix.decompose(position, quaternion, scale);
+
+            markerRoot.position.copy(position);
+            markerRoot.quaternion.copy(quaternion);
+            markerRoot.scale.copy(scale);
+            markerRoot.matrix.compose(markerRoot.position, markerRoot.quaternion, markerRoot.scale);
+            markerRoot.matrixWorldNeedsUpdate = true;
+        };
+        console.log("🔧 AR.js update function patched successfully.");
         
         initMediaPipe();
     } catch (error) {
@@ -221,16 +260,23 @@ function initLearner() {
 async function initCombinedPlayer(profileData) {
     cleanup();
     currentMode = 'player';
+
     document.getElementById('uiContainer').style.display = 'none';
 
     const canvas = document.getElementById('outputCanvas');
+    canvas.style.display = 'block';
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const gl = renderer.getContext();
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
 
     scene = new THREE.Scene();
     camera = new THREE.Camera();
     scene.add(camera);
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
 
     arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
 
@@ -245,17 +291,44 @@ async function initCombinedPlayer(profileData) {
 
         arToolkitContext.init(() => {
             camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
-            
+
+            // 1. Create sub-marker controls from the profile data
+            const subMarkersControls = [];
+            if (profileData && profileData.subMarkersControls) {
+                profileData.subMarkersControls.forEach(function(markerParams) {
+                    const object3d = new THREE.Group();
+                    scene.add(object3d);
+                    const markerControls = new THREEx.ArMarkerControls(arToolkitContext, object3d, markerParams);
+
+                    if (markerParams.matrix && markerParams.matrix.elements) {
+                        const matrix = new THREE.Matrix4();
+                        matrix.fromArray(markerParams.matrix.elements);
+                        markerControls.parameters.matrix = matrix;
+                    }
+                    subMarkersControls.push(markerControls);
+                });
+            }
+
+            // 2. Create the main multi-marker controls object
             const markerRoot = new THREE.Group();
             scene.add(markerRoot);
-
-            // 💡 Now that the library is fixed, we can use fromJSON again.
-            multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
             
+            // 💡 Call the constructor the intended way, then add a safeguard
+            multiMarkerControls = new THREEx.ArMultiMarkerControls(arToolkitContext, markerRoot, subMarkersControls);
+
+            // Safeguard: If the buggy constructor failed, manually set the properties.
+            if (!multiMarkerControls.parameters || !multiMarkerControls.parameters.subMarkersControls) {
+                console.warn("ArMultiMarkerControls constructor failed. Manually setting parameters.");
+                multiMarkerControls.parameters = multiMarkerControls.parameters || {};
+                multiMarkerControls.parameters.subMarkersControls = subMarkersControls;
+            }
+            
+            // Add your 3D object to the markerRoot
             const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
             arjsObject.position.y = 0.5;
             markerRoot.add(arjsObject);
 
+            console.log("AR setup complete. Starting animation loop.");
             animateCombined();
         });
     });
