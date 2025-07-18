@@ -361,8 +361,18 @@ async function initCombinedPlayer(profileData) {
         arToolkitContext.init(() => {
             camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
 
+            // 2. Create the main multi-marker controls object
             const markerRoot = new THREE.Group();
             scene.add(markerRoot);
+
+            // 💡 FIX: Bypass the flawed constructor completely.
+            // We create a blank instance, then manually assign all the properties it needs.
+            multiMarkerControls = new THREEx.ArMultiMarkerControls();
+            multiMarkerControls.arToolkitContext = arToolkitContext;
+            multiMarkerControls.object3d = markerRoot;
+            multiMarkerControls.parameters.subMarkersControls = subMarkersControls;
+
+            console.log("Step 2: Manually constructed ArMultiMarkerControls object.");
 
             multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
 
