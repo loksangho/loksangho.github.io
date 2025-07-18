@@ -163,7 +163,7 @@ function initLearner() {
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
     
     // Initialize the learner object
-    multiMarkerLearner = new THREEx.ArMultiMakerLearning(arToolkitContext);
+    multiMarkerLearner = new THREEx.ArMultiMakersLearning(arToolkitContext);
 
     // --- EXPLICITLY DEFINE MARKERS TO LEARN ---
     // This makes the process more robust.
