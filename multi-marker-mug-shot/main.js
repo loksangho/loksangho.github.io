@@ -303,6 +303,9 @@ function animateAR() {
     animationFrameId = requestAnimationFrame(animateAR);
     if (!arToolkitSource || !arToolkitSource.ready) return;
     arToolkitContext.update(arToolkitSource.domElement);
+
+    if (multiMarkerLearning) multiMarkerLearning.computeResult();
+    
     renderer.render(scene, camera);
 }
 
