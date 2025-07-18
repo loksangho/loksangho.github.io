@@ -224,6 +224,7 @@ async function initCombinedPlayer(profileData) {
     cleanup();
     currentMode = 'player';
 
+    let videoElement = null;
     // Hide all UI phases
     document.getElementById('uiContainer').style.display = 'none';
     document.getElementById('phase1').style.display = 'none';
@@ -259,7 +260,7 @@ async function initCombinedPlayer(profileData) {
         console.log("AR source initialized.");
 
         onResize();
-
+        videoElement = arToolkitSource.domElement;
         // The library creates its own video element, which is accessed via .domElement
         // We just need to wait for it to be ready and then we can use it.
         // The onReady callback of init() is the right place to do this.
