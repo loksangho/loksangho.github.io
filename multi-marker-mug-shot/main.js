@@ -249,11 +249,31 @@ async function initCombinedPlayer(profileData) {
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
 
     // 💡 REMOVED all manual <video> element and getUserMedia code.
+    // 2. --- Shared Video Stream ---
+    // We create ONE video element and get the camera stream ONCE.
+    video = document.createElement('video');
+    video.setAttribute('autoplay', '');
+    video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: {ideal: 1280}, height: {ideal: 720} }
+    });
+    video.srcObject = stream;
+    document.body.appendChild(video);
+    video.style.position = 'absolute';
+    video.style.top = '0';
+    video.style.left = '0';
+    video.style.zIndex = '-1'; // Hide video behind canvas
+    await new Promise(resolve => { video.onloadedmetadata = resolve; });
+    video.play();
+
+
 
     // 💡 Initialize ArToolkitSource with sourceType 'webcam'.
     // The library will now create the video element and get the camera stream by itself.
     arToolkitSource = new THREEx.ArToolkitSource({
         sourceType: 'webcam',
+        sourceElement: video
     });
 
     arToolkitSource.init(() => {
