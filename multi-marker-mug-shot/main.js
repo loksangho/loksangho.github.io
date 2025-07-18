@@ -173,8 +173,7 @@ function initLearner() {
 
         setTimeout(() => {
             arToolkitSource.onResizeElement();
-            arToolkitSource.copyElementSizeTo(arToolkitSource.domElement);
-
+            arToolkitSource.copyElementSizeTo(renderer.domElement);
         }, 100);
     });
     arToolkitContext = new THREEx.ArToolkitContext({
@@ -242,8 +241,7 @@ function initLearner() {
 function onResize() {
     if (arToolkitSource) {
         arToolkitSource.onResizeElement();
-        arToolkitSource.copyElementSizeTo(arToolkitSource.domElement);
-
+        arToolkitSource.copyElementSizeTo(renderer.domElement);
         if (arToolkitContext && arToolkitContext.arController !== null) {
             arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
         }
@@ -304,8 +302,7 @@ async function initCombinedPlayer(profileData) {
         // We just need to wait for it to be ready and then we can use it.
         // The onReady callback of init() is the right place to do this.
         arToolkitSource.onResizeElement();
-        arToolkitSource.copyElementSizeTo(arToolkitSource.domElement);
-
+        arToolkitSource.copyElementSizeTo(renderer.domElement);
         
         // Note: The library automatically appends its video element to the body,
         // so we don't need to manually append arToolkitSource.domElement.
