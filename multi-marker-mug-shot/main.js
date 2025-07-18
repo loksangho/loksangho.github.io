@@ -307,8 +307,10 @@ async function initCombinedPlayer(profileData) {
                     }
                     
                     // Get the container for WebARRocks objects and add it to our main scene
-                    const webARrocksObjectsGroup = WebARRocksObjectThreeHelper.get_threeObject();
-                    scene.add(webARrocksObjectsGroup);
+                    if (WebARRocksObjectThreeHelper.object3D && !webARrocksGroupAdded) {
+                        scene.add(WebARRocksObjectThreeHelper.object3D);
+                        webARrocksGroupAdded = true;
+                    }
                 }
             });
 
