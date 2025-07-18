@@ -1,4 +1,4 @@
-// main.js - With corrected canvas handling
+// main.js - Patched for Matrix4.getInverse()
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -22,9 +22,23 @@ const _settings = { NNPath: './neuralNets/NN_COFFEE_0.json' };
 function loadLegacyScript(url) {
     return new Promise((resolve, reject) => {
         window.THREE = THREE;
+
+        // Patch for EventDispatcher
         if (!window.THREE.EventDispatcher) {
             window.THREE.EventDispatcher = THREE.Object3D;
         }
+
+        // --- NEW PATCH FOR getInverse ---
+        // ar-threex.js uses the old .getInverse() method on Matrix4,
+        // which was replaced by .invert(). We polyfill it here.
+        // The old function took a matrix as an argument and stored the result in 'this'.
+        if (!window.THREE.Matrix4.prototype.getInverse) {
+            window.THREE.Matrix4.prototype.getInverse = function(matrix) {
+                return this.copy(matrix).invert();
+            };
+        }
+        // --- END OF NEW PATCH ---
+
         const script = document.createElement('script');
         script.src = url;
         script.onload = resolve;
@@ -49,13 +63,10 @@ async function initMediaPipe() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 2.5;
-
-    // Use the existing canvas from the start
     const canvas = document.getElementById('outputCanvas');
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     canvas.style.display = 'block';
-
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
     dirLight.position.set(0, 1, 1);
@@ -113,46 +124,28 @@ function saveMesh() {
     }, (error) => console.error(error), { binary: true });
 }
 
-// --- UPDATED CLEANUP FUNCTION ---
 function cleanup() {
     cancelAnimationFrame(animationFrameId);
-    
-    // Stop any active video streams
-    if (video && video.srcObject) {
-        video.srcObject.getTracks().forEach(track => track.stop());
-        video.srcObject = null;
-    }
-
-    // Dispose of the renderer resources, but DO NOT remove the canvas element
+    if (video && video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); video.srcObject = null; }
     if (renderer) {
         renderer.dispose();
         renderer = null;
     }
-
-    if (currentMode === 'player') {
-        WebARRocksObjectThreeHelper.destroy();
-    }
-
-    // Clean up any UI elements created dynamically
+    if (currentMode === 'player') { WebARRocksObjectThreeHelper.destroy(); }
     const dynamicUI = document.getElementById('dynamicUI');
-    if (dynamicUI) dynamicUI.remove();
-    
-    // Hide UI
+    if(dynamicUI) dynamicUI.remove();
     document.getElementById('uiContainer').style.display = 'none';
 }
 
-// --- UPDATED LEARNER FUNCTION ---
 function initLearner() {
     cleanup();
     currentMode = 'learner';
 
-    // 1. Get the existing canvas and create the renderer with it
     const canvas = document.getElementById('outputCanvas');
     canvas.style.display = 'block';
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-    // 2. Init scene, camera, AR.js Source and Context
     scene = new THREE.Scene();
     camera = new THREE.Camera();
     scene.add(camera);
@@ -169,7 +162,6 @@ function initLearner() {
     });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
     
-    // 3. Create sub-marker controls
     const subMarkersControls = [];
     const markerNames = ['hiro', 'kanji'];
     markerNames.forEach(function(markerName){
@@ -184,11 +176,9 @@ function initLearner() {
         subMarkersControls.push(markerControls);
     });
     
-    // 4. Init the learner
     multiMarkerLearning = new THREEx.ArMultiMakersLearning(arToolkitContext, subMarkersControls);
     multiMarkerLearning.enabled = true;
 
-    // 5. Setup UI
     const controlsContainer = document.createElement('div');
     controlsContainer.id = 'dynamicUI';
     controlsContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px;';
@@ -224,7 +214,6 @@ async function initCombinedPlayer(profileData) {
     cleanup();
     currentMode = 'player';
     
-    // Also use the existing canvas here for consistency
     const canvas = document.getElementById('outputCanvas');
     canvas.style.display = 'block';
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
