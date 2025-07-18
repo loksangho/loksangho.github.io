@@ -139,7 +139,7 @@ function initLearner() {
 
     document.getElementById('outputCanvas').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'none';
-    
+
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
@@ -163,7 +163,7 @@ function initLearner() {
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
     
     // Initialize the learner object
-    multiMarkerLearner = new THREEx.ArMultiMarkerLearner(arToolkitContext);
+    multiMarkerLearner = new THREEx.ArMultiMakerLearning(arToolkitContext);
 
     // --- EXPLICITLY DEFINE MARKERS TO LEARN ---
     // This makes the process more robust.
