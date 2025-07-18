@@ -77,7 +77,6 @@ async function main() {
         //await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
         
         // 💡 Add the resize event listener globally
-        window.addEventListener('resize', onResize, false);
 
         initMediaPipe();
     } catch (error) {
@@ -284,7 +283,38 @@ async function initCombinedPlayer(profileData) {
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
 
-    // 💡 REMOVED all manual <video> element and getUserMedia code.
+    ////////////////////////////////////////////////////////////
+    // setup arToolkitSource
+    ////////////////////////////////////////////////////////////
+
+    arToolkitSource = new THREEx.ArToolkitSource({
+        sourceType: 'webcam',
+    });
+
+    function onResize() {
+        arToolkitSource.onResize()
+        arToolkitSource.copySizeTo(renderer.domElement)
+        if (arToolkitContext.arController !== null) {
+            arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)
+        }
+    }
+
+    arToolkitSource.init(function onReady() {
+        onResize()
+
+        arToolkitContext = new THREEx.ArToolkitContext({
+            cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
+            detectionMode: 'mono'
+        });
+
+
+    });
+
+    // handle resize event
+    window.addEventListener('resize', function() {
+        onResize()
+    });
+
 
     // 💡 Initialize ArToolkitSource with sourceType 'webcam'.
     // The library will now create the video element and get the camera stream by itself.
@@ -309,13 +339,15 @@ async function initCombinedPlayer(profileData) {
 
         arToolkitContext = new THREEx.ArToolkitContext({
             cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
-            detectionMode: 'mono'
+            detectionMode: 'mono',
+            maxDetectionRate: 30, // Adjust as needed
         });
+        
 
         arToolkitContext.init(() => {
             camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
 
-            const markerRoot = new THREE.Group();
+            /*const markerRoot = new THREE.Group();
             scene.add(markerRoot);
 
             multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
@@ -343,8 +375,61 @@ async function initCombinedPlayer(profileData) {
             markerRoot.add(markerHelper.object3d);
 
             console.log("AR setup complete. Starting animation loop.");
-            animateCombined();
+            animateCombined();*/
+            _DOMVideo = document.getElementById('webcamVideo'); 
+            WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
+                throw new Error('Cannot get video feed ' + err);
+                }, {
+                video: {
+                    width:  {min: 640, max: 1920, ideal: 1280},
+                    height: {min: 640, max: 1920, ideal: 720},
+                    facingMode: {ideal: 'environment'}
+                },
+                audio: false
+            });
         });
+
+        markerNames = ["hiro", "kanji", "letterA"];
+
+            markerArray = [];
+
+            for (let i = 0; i < markerNames.length; i++) {
+                let marker = new THREE.Group();
+                scene.add(marker);
+                markerArray.push(marker);
+
+                let markerControls = new THREEx.ArMarkerControls(arToolkitContext, marker, {
+                    type: 'pattern',
+                    patternUrl: "patt/" + markerNames[i] + ".patt",
+                });
+
+                let markerGroup = new THREE.Group();
+                marker.add(markerGroup);
+            }
+
+            ////////////////////////////////////////////////////////////
+            // setup scene
+            ////////////////////////////////////////////////////////////
+
+            sceneGroup = new THREE.Group();
+
+            let loader = new THREE.TextureLoader();
+
+            let geometry1 = new THREE.SphereGeometry(1, 32, 32);
+            let texture = loader.load('images/earth-sphere.jpg');
+            let material1 = new THREE.MeshLambertMaterial({
+                map: texture,
+                opacity: 0.75
+            });
+            globe = new THREE.Mesh(geometry1, material1);
+            globe.position.y = 1;
+            sceneGroup.add(globe);
+
+            markerArray[0].children[0].add(sceneGroup);
+            currentMarkerName = markerNames[0];
+
+            let pointLight = new THREE.PointLight(0xffffff, 1, 50);
+            camera.add(pointLight);
     });
 }
 
@@ -416,10 +501,67 @@ function startWebARRocks(err, three) {
     animateCombined();
 }
 
+function update() {
+
+    globe.rotation.y += 0.01;
+
+    let anyMarkerVisible = false;
+    for (let i = 0; i < markerArray.length; i++) {
+        if (markerArray[i].visible) {
+            anyMarkerVisible = true;
+            markerArray[i].children[0].add(sceneGroup);
+            if (currentMarkerName != markerNames[i]) {
+                currentMarkerName = markerNames[i];
+                // console.log("Switching to " + currentMarkerName);
+            }
+
+            let p = markerArray[i].children[0].getWorldPosition();
+            let q = markerArray[i].children[0].getWorldQuaternion();
+            let s = markerArray[i].children[0].getWorldScale();
+            let lerpAmount = 0.5;
+
+            scene.add(sceneGroup);
+            sceneGroup.position.lerp(p, lerpAmount);
+            sceneGroup.quaternion.slerp(q, lerpAmount);
+            sceneGroup.scale.lerp(s, lerpAmount);
+
+            break;
+        }
+    }
+
+    if (!anyMarkerVisible) {
+        // console.log("No marker currently visible.");
+    }
+
+    let baseMarker = markerArray[0];
+
+    // update relative positions of markers
+    for (let i = 1; i < markerArray.length; i++) {
+        let currentMarker = markerArray[i];
+        let currentGroup = currentMarker.children[0];
+        if (baseMarker.visible && currentMarker.visible) {
+            // console.log("updating marker " + i " -> base offset");
+
+            let relativePosition = currentMarker.worldToLocal(baseMarker.position.clone());
+            currentGroup.position.copy(relativePosition);
+
+            let relativeRotation = currentMarker.quaternion.clone().inverse().multiply(baseMarker.quaternion.clone());
+            currentGroup.quaternion.copy(relativeRotation);
+        }
+    }
+
+    // update artoolkit on every frame
+    if (arToolkitSource.ready !== false)
+        arToolkitContext.update(arToolkitSource.domElement);
+
+}
+
 function animateCombined() {
     if (currentMode !== 'player') return;
     animationFrameId = requestAnimationFrame(animateCombined);
     
+    update();
+
     if (arToolkitSource && arToolkitSource.ready) { 
         arToolkitContext.update(arToolkitSource.domElement); 
         if (multiMarkerControls) {
