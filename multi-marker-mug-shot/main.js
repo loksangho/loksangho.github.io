@@ -26,6 +26,15 @@ function loadLegacyScript(url) {
         // Make THREE globally available for the legacy script
         window.THREE = THREE;
 
+        // --- PATCH FOR INCOMPATIBILITY ---
+        // The ar-threex.js script is old and expects THREE.EventDispatcher.
+        // This was removed in Three.js r125. We can polyfill it by pointing
+        // to THREE.Object3D, which has the required event handling methods.
+        if (!window.THREE.EventDispatcher) {
+            window.THREE.EventDispatcher = THREE.Object3D;
+        }
+        // --- END OF PATCH ---
+
         const script = document.createElement('script');
         script.src = url;
         script.onload = resolve; // The script can now find window.THREE when it executes
