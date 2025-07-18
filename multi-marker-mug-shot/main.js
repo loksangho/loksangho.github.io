@@ -163,6 +163,23 @@ function initLearner() {
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
 
 
+    // --- EXPLICITLY DEFINE MARKERS TO LEARN ---
+    // This makes the process more robust.
+    let markers = []
+    const markerNames = ['hiro', 'kanji']; // Add other marker names here if you use more
+    const markerRoot = new THREE.Group(); // A dummy group for the controls
+    scene.add(markerRoot);
+
+    markerNames.forEach(name => {
+        const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+            type: 'pattern',
+            patternUrl: `https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.${name}`,
+        });
+        // Add the marker control to the learner
+        markers.push(markerControls);
+    });
+    // --- END OF CHANGE ---
+    
     var urlOptions = {
         backURL: null,
         trackingBackend: "artoolkit",
@@ -221,22 +238,6 @@ function initLearner() {
     })
 
     var multiMarkerLearning = new THREEx.ArMultiMakersLearning(arToolkitContext, subMarkersControls)
-
-    // --- EXPLICITLY DEFINE MARKERS TO LEARN ---
-    // This makes the process more robust.
-    const markerNames = ['hiro', 'kanji']; // Add other marker names here if you use more
-    const markerRoot = new THREE.Group(); // A dummy group for the controls
-    scene.add(markerRoot);
-
-    markerNames.forEach(name => {
-        const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
-            type: 'pattern',
-            patternUrl: `https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.${name}`,
-        });
-        // Add the marker control to the learner
-        multiMarkerLearning.push(markerControls);
-    });
-    // --- END OF CHANGE ---
 
     const controlsContainer = document.createElement('div');
     controlsContainer.id = 'dynamicUI';
