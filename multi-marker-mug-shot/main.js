@@ -1,4 +1,4 @@
-// main.js - Reverted to correct learner implementation
+// main.js - Corrected with ArMultiMakersLearning implementation
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -16,7 +16,7 @@ let animationFrameId;
 let currentMode = null;
 
 // AR specific variables
-let arToolkitSource, arToolkitContext, multiMarkerControls, multiMarkerLearner;
+let arToolkitSource, arToolkitContext, multiMarkerControls, multiMarkerLearning; // Renamed to match example
 const _settings = { NNPath: './neuralNets/NN_COFFEE_0.json' };
 
 function loadLegacyScript(url) {
@@ -127,19 +127,20 @@ function cleanup() {
     if (existingVideo) existingVideo.remove();
 }
 
-// --- CORRECT LEARNER FUNCTION ---
+// --- REWRITTEN LEARNER FUNCTION ---
 function initLearner() {
     cleanup();
     currentMode = 'learner';
 
+    // 1. Init renderer, scene, camera
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
-
     scene = new THREE.Scene();
     camera = new THREE.Camera();
     scene.add(camera);
     
+    // 2. Init AR.js Source and Context
     arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
     arToolkitSource.init(() => {
         setTimeout(() => {
@@ -154,55 +155,56 @@ function initLearner() {
     });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
     
-    // Initialize the learner object. This is the correct object to manage the process.
-    multiMarkerLearner = new THREEx.ArMultiMakersLearning(arToolkitContext);
-
-    // Define the markers we want to learn
+    // 3. Create the sub-marker controls FIRST
+    const subMarkersControls = [];
     const markerNames = ['hiro', 'kanji'];
-    const markerRoot = new THREE.Group();
-    scene.add(markerRoot);
-
-    // Create controls for each marker and add them to the learner
-    markerNames.forEach(name => {
+    markerNames.forEach(function(markerName){
+        const markerRoot = new THREE.Group();
+        scene.add(markerRoot);
         const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
             type: 'pattern',
-            patternUrl: `https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.${name}`,
+            patternUrl: `https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.${markerName}`,
         });
-        // Use the .trackMarker() method to add controls. DO NOT use JSON.stringify here.
-        multiMarkerLearner.trackMarker(markerControls);
-    });
+        // Add a helper to make the marker visible
+        const markerHelper = new THREEx.ArMarkerHelper(markerControls);
+        markerControls.object3d.add(markerHelper.object3d);
 
-    // Set up the UI for this phase
+        subMarkersControls.push(markerControls);
+    });
+    
+    // 4. Init the learner with the context AND the pre-built controls array
+    multiMarkerLearning = new THREEx.ArMultiMakersLearning(arToolkitContext, subMarkersControls);
+    multiMarkerLearning.enabled = true; // Start learning immediately
+
+    // 5. Setup UI
     const controlsContainer = document.createElement('div');
     controlsContainer.id = 'dynamicUI';
     controlsContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px;';
-    controlsContainer.innerHTML = `<button id="restartBtn">Restart Learning</button><button id="downloadBtn">Download and Continue</button>`;
+    controlsContainer.innerHTML = `<button id="resetBtn">Reset Learning</button><button id="downloadBtn">Download and Continue</button>`;
     document.body.appendChild(controlsContainer);
-    document.getElementById('restartBtn').onclick = () => { multiMarkerLearner.reset(); alert('Learning restarted!'); };
-    
-    // The download button uses the learner's special .toJSON() method
+    document.getElementById('resetBtn').onclick = () => multiMarkerLearning.resetStats();
     document.getElementById('downloadBtn').onclick = () => {
-        multiMarkerLearner.toJSON(profileData => {
-            if (profileData.subMarkersControls.length < markerNames.length) {
-                alert(`Not all markers were learned! Found ${profileData.subMarkersControls.length}/${markerNames.length}. Please show all markers to the camera.`);
-                return;
-            }
-            // This profileData is now a clean JSON object, safe to stringify
-            const jsonString = JSON.stringify(profileData, null, 2);
-            const blob = new Blob([jsonString], { type: 'application/json' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'multiMarkerProfile.json';
-            a.click();
-            URL.revokeObjectURL(a.href);
-            alert("Profile downloaded. Now please load it to start the combined AR.");
-            
-            cleanup();
-            document.getElementById('uiContainer').style.display = 'flex';
-            document.getElementById('phase1').style.display = 'none';
-            document.getElementById('phase2').style.display = 'none';
-            document.getElementById('phase3').style.display = 'block';
-        });
+        const jsonString = multiMarkerLearning.toJSON(); // This is a synchronous call
+        const profileData = JSON.parse(jsonString);
+
+        if (profileData.subMarkersControls.length < markerNames.length) {
+            alert(`Not all markers were learned! Found ${profileData.subMarkersControls.length}/${markerNames.length}. Please show all markers to the camera.`);
+            return;
+        }
+
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'multiMarkerProfile.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+        alert("Profile downloaded. Now please load it to start the combined AR.");
+        
+        cleanup();
+        document.getElementById('uiContainer').style.display = 'flex';
+        document.getElementById('phase1').style.display = 'none';
+        document.getElementById('phase2').style.display = 'none';
+        document.getElementById('phase3').style.display = 'block';
     };
     
     animateAR();
@@ -270,7 +272,10 @@ function animateAR() {
     animationFrameId = requestAnimationFrame(animateAR);
     if (!arToolkitSource || !arToolkitSource.ready) return;
     arToolkitContext.update(arToolkitSource.domElement);
-    multiMarkerLearner.update();
+
+    // In this learner version, there's no specific update function for the learner object itself.
+    // The learning happens automatically when the context is updated.
+
     renderer.render(scene, camera);
 }
 
