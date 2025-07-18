@@ -308,10 +308,10 @@ function animateCombined() {
     animationFrameId = requestAnimationFrame(animateCombined);
     
     if (arToolkitSource && arToolkitSource.ready) { 
-        //arToolkitContext.update(arToolkitSource.domElement); 
-        if (multiMarkerControls) {
-            multiMarkerControls.update();
-        }
+        arToolkitContext.update(arToolkitSource.domElement); 
+        //if (multiMarkerControls) {
+            //multiMarkerControls.update();
+        //}
     }
     renderer.render(scene, camera);
 }
