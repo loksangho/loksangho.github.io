@@ -249,7 +249,11 @@ async function initCombinedPlayer(profileData) {
     
     multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
 
-
+    // 💡 ADD THIS DIAGNOSTIC CODE
+    console.log("Inspecting controls object after creation:");
+    console.log("Sub-marker controls found:", multiMarkerControls.subMarkersControls.length);
+    console.log(multiMarkerControls);
+    
     const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
     arjsObject.position.y = 0.5;
     markerRoot.add(arjsObject);
