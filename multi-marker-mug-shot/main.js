@@ -177,6 +177,8 @@ function initLearner() {
     // --- CORRECTED SYNCHRONOUS DOWNLOAD LOGIC ---
     document.getElementById('downloadBtn').onclick = () => {
         const profileData = multiMarkerLearning.toJSON();
+
+        console.log(JSON.parse(profileData).subMarkersControls);
         
         if (!profileData || !profileData.subMarkersControls || profileData.subMarkersControls.length < markerNames.length) {
             alert(`Learning not complete! Please show all markers to the camera until the status is 'Ready'.`);
