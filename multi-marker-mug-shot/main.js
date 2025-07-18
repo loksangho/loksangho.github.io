@@ -303,7 +303,7 @@ async function initCombinedPlayer(profileData) {
         // The onReady callback of init() is the right place to do this.
         arToolkitSource.onResizeElement();
         arToolkitSource.copyElementSizeTo(renderer.domElement);
-        
+        arToolkitSource.copyElementSizeTo(arToolkitSource.domElement);
         // Note: The library automatically appends its video element to the body,
         // so we don't need to manually append arToolkitSource.domElement.
 
