@@ -306,16 +306,13 @@ function initLearner() {
     animateAR();
 }
 
+// Make sure this is in the global scope so animateCombined can see it
+
 async function initCombinedPlayer(profileData) {
     cleanup();
     currentMode = 'player';
 
-    // Hide all UI phases
     document.getElementById('uiContainer').style.display = 'none';
-    document.getElementById('phase1').style.display = 'none';
-    document.getElementById('phase2').style.display = 'none';
-    const phase3 = document.getElementById('phase3');
-    if (phase3) phase3.style.display = 'none';
 
     const canvas = document.getElementById('outputCanvas');
     canvas.style.display = 'block';
@@ -332,26 +329,11 @@ async function initCombinedPlayer(profileData) {
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
 
-    // 💡 REMOVED all manual <video> element and getUserMedia code.
-
-    // 💡 Initialize ArToolkitSource with sourceType 'webcam'.
-    // The library will now create the video element and get the camera stream by itself.
-    arToolkitSource = new THREEx.ArToolkitSource({
-        sourceType: 'webcam',
-    });
+    arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
 
     arToolkitSource.init(() => {
-        // This log should now appear correctly
-        console.log("AR source initialized.");
-
-        // The library creates its own video element, which is accessed via .domElement
-        // We just need to wait for it to be ready and then we can use it.
-        // The onReady callback of init() is the right place to do this.
         arToolkitSource.onResizeElement();
         arToolkitSource.copyElementSizeTo(renderer.domElement);
-        
-        // Note: The library automatically appends its video element to the body,
-        // so we don't need to manually append arToolkitSource.domElement.
 
         arToolkitContext = new THREEx.ArToolkitContext({
             cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
@@ -361,27 +343,41 @@ async function initCombinedPlayer(profileData) {
         arToolkitContext.init(() => {
             camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
 
+            // 1. Create sub-marker controls from the profile data
+            const subMarkersControls = [];
+            if (profileData && profileData.subMarkersControls) {
+                profileData.subMarkersControls.forEach(function(markerParams) {
+                    const object3d = new THREE.Group();
+                    scene.add(object3d);
+                    const markerControls = new THREEx.ArMarkerControls(arToolkitContext, object3d, markerParams);
+
+                    if (markerParams.matrix && markerParams.matrix.elements) {
+                        const matrix = new THREE.Matrix4();
+                        matrix.fromArray(markerParams.matrix.elements);
+                        markerControls.parameters.matrix = matrix;
+                    }
+                    subMarkersControls.push(markerControls);
+                });
+            }
+
             // 2. Create the main multi-marker controls object
             const markerRoot = new THREE.Group();
             scene.add(markerRoot);
+            
+            // 💡 Call the constructor the intended way, then add a safeguard
+            multiMarkerControls = new THREEx.ArMultiMarkerControls(arToolkitContext, markerRoot, subMarkersControls);
 
-            // 💡 FIX: Bypass the flawed constructor completely.
-            // We create a blank instance, then manually assign all the properties it needs.
-            multiMarkerControls = new THREEx.ArMultiMarkerControls();
-            multiMarkerControls.arToolkitContext = arToolkitContext;
-            multiMarkerControls.object3d = markerRoot;
-            multiMarkerControls.parameters.subMarkersControls = subMarkersControls;
-
-            console.log("Step 2: Manually constructed ArMultiMarkerControls object.");
-
-            multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
-
+            // Safeguard: If the buggy constructor failed, manually set the properties.
+            if (!multiMarkerControls.parameters || !multiMarkerControls.parameters.subMarkersControls) {
+                console.warn("ArMultiMarkerControls constructor failed. Manually setting parameters.");
+                multiMarkerControls.parameters = multiMarkerControls.parameters || {};
+                multiMarkerControls.parameters.subMarkersControls = subMarkersControls;
+            }
+            
+            // Add your 3D object to the markerRoot
             const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
             arjsObject.position.y = 0.5;
             markerRoot.add(arjsObject);
-
-            const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
-            markerRoot.add(markerHelper.object3d);
 
             console.log("AR setup complete. Starting animation loop.");
             animateCombined();
@@ -389,6 +385,7 @@ async function initCombinedPlayer(profileData) {
     });
 }
 
+// Ensure your animation loop uses multiMarkerControls
 function animateCombined() {
     if (currentMode !== 'player') return;
     animationFrameId = requestAnimationFrame(animateCombined);
