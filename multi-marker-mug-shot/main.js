@@ -173,6 +173,9 @@ function cleanup() {
 
 function initLearner() {
     //cleanup();
+    document.getElementById('outputCanvas').style.display = 'none';
+    document.getElementById('uiContainer').style.display = 'none';
+
     currentMode = 'learner';
 
     //renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
