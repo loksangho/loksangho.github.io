@@ -219,6 +219,7 @@ async function initCombinedPlayer(profileData) {
     await new Promise(resolve => { video.onloadedmetadata = resolve; });
     video.play();
     arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'video', sourceElement: video });
+    console.log("AR source created with video element:", arToolkitSource);
     arToolkitSource.init(() => { arToolkitSource.onResizeElement(); arToolkitSource.copyElementSizeTo(renderer.domElement); console.log("AR source initialized"); });
     arToolkitContext = new THREEx.ArToolkitContext({ cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat', detectionMode: 'mono' });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
