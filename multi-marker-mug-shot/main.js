@@ -39,7 +39,7 @@ function loadLegacyScript(url) {
 
 async function main() {
     try {
-        loadLegacyScript('https://raw.githack.com/jeromeetienne/AR.js/master/three.js/build/ar-threex.js'),
+        loadLegacyScript('https://raw.githubusercontent.com/jeromeetienne/AR.js/refs/heads/master/three.js/src/threex/threex-artoolkitsource.js'),
 
         //Fix for THREEx.ArMultiMarkerControls
         // 2. NOW, apply the monkey patch to the loaded THREEx object
