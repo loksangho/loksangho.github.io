@@ -19,41 +19,7 @@ let webARrocksGroupAdded = false;
 // AR specific variables
 let arToolkitSource, arToolkitContext, multiMarkerControls, multiMarkerLearning;
 let savedProfileData = null; // 💡 To store the marker profile in memory
-const _settings = {
-  nDetectsPerLoop: 0, // 0 -> adaptative
-
-  loadNNOptions: {
-    notHereFactor: 0.0,
-    paramsPerLabel: {
-      CUP: {
-        thresholdDetect: 0.92
-      }
-    }
-  },
-
-  detectOptions: {
-    isKeepTracking: true,
-    isSkipConfirmation: false,
-    thresholdDetectFactor: 1,
-    cutShader: 'median',
-    thresholdDetectFactorUnstitch: 0.2,
-    trackingFactors: [0.5, 0.4, 1.5]
-  },
-
-  NNPath: './neuralNets/NN_COFFEE_0.json',
-
-  cameraFov: 0, // In degrees, camera vertical FoV. 0 -> auto mode
-  scanSettings:{
-    nScaleLevels: 2,
-    scale0Factor: 0.8,
-    overlapFactors: [2, 2, 2], // between 0 (max overlap) and 1 (no overlap). Along X,Y,S
-    scanCenterFirst: true    
-  },
-
-  followZRot: true,
-
-  displayDebugCylinder: false
-};
+const _settings = { NNPath: './neuralNets/NN_COFFEE_0.json' };
 
 function loadLegacyScript(url) {
     return new Promise((resolve, reject) => {
@@ -282,12 +248,32 @@ async function initCombinedPlayer(profileData) {
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     scene.add(new THREE.DirectionalLight(0xffffff, 0.7));
 
+    // 💡 REMOVED all manual <video> element and getUserMedia code.
+    // 2. --- Shared Video Stream ---
+    // We create ONE video element and get the camera stream ONCE.
+    video = document.createElement('video');
+    video.setAttribute('autoplay', '');
+    video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: {ideal: 1280}, height: {ideal: 720} }
+    });
+    video.srcObject = stream;
+    document.body.appendChild(video);
+    video.style.position = 'absolute';
+    video.style.top = '0';
+    video.style.left = '0';
+    video.style.zIndex = '-1'; // Hide video behind canvas
+    await new Promise(resolve => { video.onloadedmetadata = resolve; });
+    video.play();
+
 
 
     // 💡 Initialize ArToolkitSource with sourceType 'webcam'.
     // The library will now create the video element and get the camera stream by itself.
     arToolkitSource = new THREEx.ArToolkitSource({
-        sourceType: 'webcam'
+        sourceType: 'webcam',
+        sourceElement: video
     });
 
     arToolkitSource.init(() => {
@@ -322,34 +308,25 @@ async function initCombinedPlayer(profileData) {
 
             // 4. --- Initialize WebARRocks (as slave) ---
             // It ALSO uses the shared video element, and we tell it to use our main scene.
-            // --- CORRECTED WEBARROCKS INIT ---
-            const arCanvas = document.getElementById('ARCanvas');
             WebARRocksObjectThreeHelper.init({
                 video: video,
+                // We DON'T provide a separate canvas, letting it know it won't be managing rendering.
                 NNPath: _settings.NNPath,
-                ARCanvas: arCanvas,
-                threeCanvas: canvas, // <-- This was the missing property
                 callbackReady: (err, three) => {
                     if (err) { console.error(err); return; }
+                    // Add the saved face mesh to the WebARRocks tracker
                     if (exportedMeshData) {
                         new GLTFLoader().parse(exportedMeshData, '', (gltf) => {
-                            if (gltf && gltf.scene) {
-                                gltf.scene.scale.set(0.4, 0.4, 0.4);
-                                WebARRocksObjectThreeHelper.add('CUP', gltf.scene);
-                            }
+                            WebARRocksObjectThreeHelper.add('CUP', gltf.scene); // Label must match your NN
                         });
-                    } else { 
-                        WebARRocksObjectThreeHelper.add('CUP', new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5), new THREE.MeshNormalMaterial())); 
+                    } else {
+                        WebARRocksObjectThreeHelper.add('CUP', new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5), new THREE.MeshNormalMaterial()));
                     }
-                },
-                loadNNOptions: _settings.loadNNOptions,
-                nDetectsPerLoop: _settings.nDetectsPerLoop,
-                detectOptions: _settings.detectOptions,
-                cameraFov: _settings.cameraFov,
-                followZRot: _settings.followZRot,
-                scanSettings: _settings.scanSettings,
-                isFullScreen: true,
-                stabilizerOptions: {}
+                    
+                    // Get the container for WebARRocks objects and add it to our main scene
+                    const webARrocksObjectsGroup = WebARRocksObjectThreeHelper.get_threeObject();
+                    scene.add(webARrocksObjectsGroup);
+                }
             });
 
             const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
@@ -367,12 +344,12 @@ function animateCombined() {
     
     if (arToolkitSource && arToolkitSource.ready) { 
         arToolkitContext.update(arToolkitSource.domElement); 
+        if (multiMarkerControls) {
+            multiMarkerControls.update();
+        }
     }
 
-    if (WebARRocksObjectThreeHelper.object3D && !webARrocksGroupAdded) {
-        scene.add(WebARRocksObjectThreeHelper.object3D);
-        webARrocksGroupAdded = true;
-    }
+    // Update WebARRocks - it processes the video and updates its internal object poses
     WebARRocksObjectThreeHelper.animate();
 
     renderer.render(scene, camera);
