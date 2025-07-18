@@ -219,14 +219,12 @@ async function initCombinedPlayer(profileData) {
     await new Promise(resolve => { video.onloadedmetadata = resolve; });
     video.play();
     arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'video', sourceElement: video });
-    arToolkitSource.init(() => { arToolkitSource.onResizeElement(); arToolkitSource.copyElementSizeTo(renderer.domElement); });
+    arToolkitSource.init(() => { arToolkitSource.onResizeElement(); arToolkitSource.copyElementSizeTo(renderer.domElement); console.log("AR source initialized"); });
     arToolkitContext = new THREEx.ArToolkitContext({ cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat', detectionMode: 'mono' });
     arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
     
     const markerRoot = new THREE.Group();
     scene.add(markerRoot);
-
-    console.log("Loading profile data from memory:", profileData);
     
     // The profileData object is passed directly
     multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
