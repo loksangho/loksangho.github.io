@@ -183,7 +183,7 @@ function initLearner() {
         // create a markerRoot
         var markerRoot = new THREE.Group()
         scene.add(markerRoot)
-
+        
         // create markerControls for our markerRoot
         var markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, markerControlsParameters)
 
