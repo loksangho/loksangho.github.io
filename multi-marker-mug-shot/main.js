@@ -467,7 +467,7 @@ function update() {
     for (let i = 0; i < markerArray.length; i++) {
         if (markerArray[i].visible) {
             anyMarkerVisible = true;
-            console.log("Marker " + markerNames[i] + " is visible.");
+            //console.log("Marker " + markerNames[i] + " is visible.");
             
 
             markerArray[i].children[0].add(sceneGroup);
@@ -476,7 +476,6 @@ function update() {
                 // console.log("Switching to " + currentMarkerName);
             }
 
-            console.log(markerArray[i].children);
             let p = markerArray[i].children[0].position;
             let q = markerArray[i].children[0].quaternion;
             let s = markerArray[i].children[0].scale;
@@ -504,11 +503,11 @@ function update() {
         let currentMarker = markerArray[i];
         let currentGroup = currentMarker.children[0];
         if (baseMarker.visible && currentMarker.visible) {
-            // console.log("updating marker " + i " -> base offset");
+            console.log("updating marker " + i +" -> base offset");
             let relativePosition = currentMarker.worldToLocal(baseMarker.position.clone());
             currentGroup.position.copy(relativePosition);
 
-            let relativeRotation = currentMarker.quaternion.clone().inverse().multiply(baseMarker.quaternion.clone());
+            let relativeRotation = currentMarker.quaternion.clone().invert().multiply(baseMarker.quaternion.clone());
             currentGroup.quaternion.copy(relativeRotation);
         }
     }
