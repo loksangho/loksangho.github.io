@@ -108,9 +108,9 @@ async function initMediaPipe() {
         baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task` },
         runningMode, numFaces: 1 });
     const geometry = new THREE.BufferGeometry();
-    geometry.position = new THREE.BufferAttribute(new Float32Array(478 * 3), 3);
-    geometry.uv = new THREE.BufferAttribute(new Float32Array(478 * 2));
-    geometry.index = FACEMESH_TESSELATION.flat();
+    geometry.attributes.position = new THREE.BufferAttribute(new Float32Array(478 * 3), 3);
+    geometry.attributes.uv = new THREE.BufferAttribute(new Float32Array(478 * 2));
+    geometry.attributes.index = FACEMESH_TESSELATION.flat();
     //geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(478 * 3), 3));
     //geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(478 * 2), 2));
     //geometry.setIndex(FACEMESH_TESSELATION.flat());
@@ -480,8 +480,8 @@ function renderMediaPipe() {
         if (results.faceLandmarks.length > 0) {
             faceMesh.visible = true;
             const landmarks = results.faceLandmarks[0];
-            const positions = faceMesh.geometry.position.array;
-            const uvs = faceMesh.geometry.uv.array;
+            const positions = faceMesh.geometry.attributes.position.array;
+            const uvs = faceMesh.geometry.attributes.uv.array;
             for (let i = 0; i < landmarks.length; i++) {
                 positions[i * 3]     = (landmarks[i].x - 0.5) * 2;
                 positions[i * 3 + 1] = -(landmarks[i].y - 0.5) * 2;
@@ -489,8 +489,8 @@ function renderMediaPipe() {
                 uvs[i * 2]           = landmarks[i].x;
                 uvs[i * 2 + 1]       = 1.0 - landmarks[i].y;
             }
-            faceMesh.geometry.position.needsUpdate = true;
-            faceMesh.geometry.uv.needsUpdate = true;
+            faceMesh.geometry.attributes.position.needsUpdate = true;
+            faceMesh.geometry.attributes.uv.needsUpdate = true;
             faceMesh.geometry.computeVertexNormals();
             textureCanvasCtx.clearRect(0, 0, 512, 512);
             textureCanvasCtx.drawImage(video, 0, 0, 512, 512);
