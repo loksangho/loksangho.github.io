@@ -278,6 +278,8 @@ async function initCombinedPlayer() {
             patternUrl: "./patt/" + markerNames[i] + ".patt",
         });
 
+        console.log("Added marker ", markerNames[i]);
+
         let markerGroup = new THREE.Group();
         marker.add(markerGroup);
     }
