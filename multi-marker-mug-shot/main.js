@@ -82,7 +82,7 @@ async function main() {
         
         // 💡 Add the resize event listener globally
 
-        initMediaPipe();
+        initCombinedPlayer();
     } catch (error) {
         console.error("Error loading ar-threex.js:", error);
     }
@@ -262,9 +262,8 @@ async function initCombinedPlayer() {
 
         camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
 
-       isWebARRocksReady = false;
-        animateCombined();
-        /*_DOMVideo = arToolkitSource.domElement; 
+       
+        _DOMVideo = arToolkitSource.domElement; 
         WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
             throw new Error('Cannot get video feed ' + err);
             }, {
@@ -274,7 +273,7 @@ async function initCombinedPlayer() {
                 facingMode: {ideal: 'environment'}
             },
             audio: false
-        });*/
+        });
 
         console.log("AR context initialized.");
 
