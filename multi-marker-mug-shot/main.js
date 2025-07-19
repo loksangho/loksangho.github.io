@@ -456,30 +456,36 @@ function update() {
     for (let i = 0; i < markerArray.length; i++) {
         if (markerArray[i].visible) {
             anyMarkerVisible = true;
-            console.log("Marker " + markerNames[i] + " is visible.");
+            //console.log("Marker " + markerNames[i] + " is visible.");
             
 
             markerArray[i].children[0].add(sceneGroup);
             if (currentMarkerName != markerNames[i]) {
                 currentMarkerName = markerNames[i];
-                console.log("Switching to " + currentMarkerName);
+                //console.log("Switching to " + currentMarkerName);
             }
 
-            const p = new THREE.Vector3();
-            const q = new THREE.Quaternion();
-            const s = new THREE.Vector3(1,1,1);
+            let p = new THREE.Vector3();
+            let q = new THREE.Quaternion();
+            let s = new THREE.Vector3();
 
             // 2. Then, you pass them as arguments
             markerArray[i].children[0].getWorldPosition(p);
             markerArray[i].children[0].getWorldQuaternion(q);
-            //markerArray[i].children[0].getWorldScale(s);
+            markerArray[i].children[0].getWorldScale(s);
             let lerpAmount = 0.5;
 
+            console.log(p);
+
             scene.add(sceneGroup);
+
             sceneGroup.position.lerp(p, lerpAmount);
             sceneGroup.quaternion.slerp(q, lerpAmount);
             sceneGroup.scale.lerp(s, lerpAmount);
 
+            sceneGroup.position.set(p);
+            sceneGroup.quaternion.set(q);
+            sceneGroup.scale.set(s);
             break;
         }
     }
