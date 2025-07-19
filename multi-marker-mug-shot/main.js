@@ -241,9 +241,10 @@ async function initCombinedPlayer() {
         detectionMode: 'mono',
         maxDetectionRate: 30, // Adjust as needed
     });
-    
+    console.log("AR context created.");
+    console.log("dispatchEvent:", arToolkitContext.dispatchEvent);
 
-   arToolkitContext.init(function onCompleted() {
+    arToolkitContext.init(function onCompleted() {
         
 
         camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
