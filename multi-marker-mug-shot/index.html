@@ -73,12 +73,7 @@
       
       import * as THREE from 'three';
       window.THREE = THREE;
-      var Module = {
-        logReadFiles: true
-        
-        // You can add other properties if needed.
-      };
-      console.log("$$$", Module["logReadFiles"]);
+      
       // Step 2: Load legacy scripts only after window.THREE is ready
       const legacyScripts = [
         "https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker-mug-shot/jsartoolkit/artoolkit.min.js",
@@ -90,6 +85,13 @@
       ];
 
       function loadNextScript() {
+        var Module = {
+          logReadFiles: function () {
+            console.log("logReadFiles called");
+          },
+          // You can add other properties if needed.
+        };
+      console.log("$$$", Module["logReadFiles"]);
         if (legacyScripts.length === 0) {
           // All legacy scripts are loaded, now load our main application logic
           console.log("All AR.js libraries loaded successfully from local files.");
