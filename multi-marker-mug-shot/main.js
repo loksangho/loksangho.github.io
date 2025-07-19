@@ -238,21 +238,10 @@ function initLearner() {
 
 // 💡 NEW: A robust resize handler for all modes
 function onResize() {
-    if (arToolkitSource) {
-        arToolkitSource.onResizeElement();
-        arToolkitSource.copyElementSizeTo(renderer.domElement);
-        if (arToolkitContext && arToolkitContext.arController !== null) {
-            arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
-        }
-    }
-
-    if (renderer) {
-        const canvas = renderer.domElement;
-        console.log(`Resizing renderer to ${canvas.clientWidth}x${canvas.clientHeight}`);
-        console.log(`Window size: ${window.innerWidth}, ${window.innerHeight}`);
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+    arToolkitSource.onResize()
+    arToolkitSource.copySizeTo(renderer.domElement)
+    if (arToolkitContext.arController !== null) {
+        arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)
     }
 }
 
