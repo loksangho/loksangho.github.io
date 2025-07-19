@@ -146,7 +146,9 @@ let _DOMVideo;
 async function initCombinedPlayer(profileData) {
     currentMode = 'player';
 
+
     // Hide all UI phases
+    document.getElementById('outputCanvas').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'none';
     document.getElementById('phase1').style.display = 'none';
     const phase2 = document.getElementById('phase2');
