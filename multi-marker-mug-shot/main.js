@@ -404,6 +404,8 @@ function update() {
         }
     }
 
+
+    
     if (!anyMarkerVisible) {
         console.log("No marker currently visible."); 
     }
