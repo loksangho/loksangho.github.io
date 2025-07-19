@@ -400,7 +400,7 @@ async function initCombinedPlayer() {
     markerArray[0].children[0].add(sceneGroup);
     currentMarkerName = markerNames[0];
 
-    let pointLight = new THREE.PointLight(0xffffff, 1, 50);
+    let pointLight = new THREE.PointLight(0xffffff, 1, 500);
     camera.add(pointLight);
 
     console.log("ARContext initialized, waiting for WebAR.rocks and markers...");
@@ -473,7 +473,7 @@ function update() {
             markerArray[i].children[0].getWorldPosition(p);
             markerArray[i].children[0].getWorldQuaternion(q);
             markerArray[i].children[0].getWorldScale(s);
-            let lerpAmount = 0.1;
+            let lerpAmount = 0.9;
 
 
             scene.add(sceneGroup);
