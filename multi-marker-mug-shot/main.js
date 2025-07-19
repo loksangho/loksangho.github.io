@@ -241,8 +241,7 @@ async function initCombinedPlayer() {
         detectionMode: 'mono',
         maxDetectionRate: 30, // Adjust as needed
     });
-    console.log("AR context created.");
-    console.log("dispatchEvent:", arToolkitContext.dispatchEvent);
+
 
     arToolkitContext.init(function onCompleted() {
         
@@ -262,10 +261,6 @@ async function initCombinedPlayer() {
             audio: false
         });
 
-        
-
-        console.log("AR context initialized.");
-        console.log("dispatchEvent:", arToolkitContext.dispatchEvent);
         
     });
     markerNames = ["hiro", "kanji", "letterA"];
@@ -430,7 +425,6 @@ function update() {
 
     // update artoolkit on every frame
     if (arToolkitSource.ready !== false)
-        console.log(arToolkitContext.dispatchEvent);
         arToolkitContext.update(arToolkitSource.domElement);
 
 }

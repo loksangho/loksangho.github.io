@@ -9,7 +9,6 @@ ARjs.Context = THREEx.ArToolkitContext = function(parameters){
 	this.dispatchEvent = this._dispatcher.dispatchEvent.bind(this._dispatcher);
 
 	var _this = this
-	console.log("1- dispatchEvent:", this.dispatchEvent);
 	_this._updatedAt = null
 
 	// handle default parameters
@@ -75,7 +74,6 @@ ARjs.Context = THREEx.ArToolkitContext = function(parameters){
 			_this.parameters[ key ] = newValue
 		}
 	}
-	console.log("2- dispatchEvent:", this.dispatchEvent);
 }
 
 Object.assign( ARjs.Context.prototype, THREE.EventDispatcher.prototype );
@@ -110,16 +108,13 @@ ARjs.Context.createDefaultCamera = function( trackingBackend ){
 //		init functions
 //////////////////////////////////////////////////////////////////////////////
 ARjs.Context.prototype.init = function(onCompleted){
-	console.log("3- dispatchEvent:", this.dispatchEvent);
 	var _this = this
 	if( this.parameters.trackingBackend === 'artoolkit' ){
-		console.log("4- dispatchEvent:", this.dispatchEvent);
 		this._initArtoolkit(done)
-		console.log("5- dispatchEvent:", this.dispatchEvent);
 	}else if( this.parameters.trackingBackend === 'aruco' ){
 		this._initAruco(done)
 	}else if( this.parameters.trackingBackend === 'tango' ){
-		this._initTango(done)
+		this._initTango-(done)
 	}else console.assert(false)
 	return
 
