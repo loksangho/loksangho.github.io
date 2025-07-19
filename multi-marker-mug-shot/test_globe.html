@@ -38,13 +38,7 @@
 <body>
     <div id="loading">Loading Libraries...</div>
 
-    <!-- Import map for Three.js -->
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://threejs.org/build/three.module.js"
-        }
-    }</script>
+
 
     <!-- 
       This single script block handles everything:
@@ -58,6 +52,7 @@
 
         // --- SCRIPT LOADING ---
         const legacyScripts = [
+            "./three.js",
             "https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker-mug-shot/jsartoolkit/artoolkit.min.js",
             "https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker-mug-shot/jsartoolkit/artoolkit.api.js",
             //"https://arprojectsdemo.netlify.app/jsartoolkit5/artoolkit.api.js",
