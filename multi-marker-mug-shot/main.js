@@ -110,7 +110,7 @@ async function initMediaPipe() {
     const geometry = new THREE.BufferGeometry();
     geometry.attributes.position = new THREE.BufferAttribute(new Float32Array(478 * 3), 3);
     geometry.attributes.uv = new THREE.BufferAttribute(new Float32Array(478 * 2));
-    geometry.index = new THREE.BufferAttribute(new Uint16Array(FACEMESH_TESSELATION.flat()), 1);
+    geometry.index = new Uint16Array(FACEMESH_TESSELATION.flat());
     //geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(478 * 3), 3));
     //geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(478 * 2), 2));
     //geometry.setIndex(FACEMESH_TESSELATION.flat());
