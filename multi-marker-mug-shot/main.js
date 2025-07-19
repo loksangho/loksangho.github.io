@@ -82,7 +82,7 @@ async function main() {
         
         // 💡 Add the resize event listener globally
 
-        initCombinedPlayer();
+        initMediaPipe();
     } catch (error) {
         console.error("Error loading ar-threex.js:", error);
     }
