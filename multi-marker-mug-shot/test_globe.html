@@ -1,269 +1,250 @@
 <!DOCTYPE html>
-
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>Hello, multi marker globe!</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Monospace;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #loading { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: 10; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            color: white; 
+            font-family: sans-serif; 
+            text-align: center;
+            background-color: rgba(0,0,0,0.7);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loading">Loading Libraries...</div>
+
+    <!-- Import map for Three.js -->
     <script type="importmap">
     {
         "imports": {
-            "three": "https://threejs.org/build/three.module.js",
-            "three/addons/": "https://threejs.org/examples/jsm/",
-            "@mediapipe/tasks-vision": "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/vision_bundle.mjs"
+            "three": "https://threejs.org/build/three.module.js"
         }
-
     }</script>
-    <!-- include jsartookit -->
+
+    <!-- 
+      This single script block handles everything:
+      1. Imports Three.js and makes it global for legacy scripts.
+      2. Sequentially loads all required AR.js libraries from a reliable CDN.
+      3. Once loading is complete, it runs the main application logic.
+    -->
     <script type="module">
-      import * as THREE from 'three';
-      window.THREE = THREE;
-
-      // Step 2: Load legacy scripts only after window.THREE is ready
-      const legacyScripts = [
-        //"https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker-mug-shot/jsartoolkit/artoolkit.min.js",
-        //"https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker-mug-shot/jsartoolkit/artoolkit.api.js",
-        "https://arprojectsdemo.netlify.app/jsartoolkit5/artoolkit.api.js",
-        "https://arprojectsdemo.netlify.app/jsartoolkit5/artoolkit.min.js",
-        "threex/threex-artoolkitsource.js",
-        "threex/threex-artoolkitcontext.js",
-        "threex/threex-arbasecontrols.js",
-        "threex/threex-armarkercontrols.js"
-      ];
-
-      function loadNextScript() {
-        if (legacyScripts.length === 0) {
-          // All legacy scripts are loaded, now load our main application logic
-          console.log("All AR.js libraries loaded successfully from local files.");
-          document.getElementById('loading').innerHTML = "Loading Application...";
-          const mainScript = document.createElement('script');
-          mainScript.type = 'module';
-          mainScript.src = 'main.js';
-          document.body.appendChild(mainScript);
-          return;
-        }
-
-        const nextScriptSrc = legacyScripts.shift();
-        console.log(`Loading: ${nextScriptSrc}`);
-        const script = document.createElement('script');
-        script.src = nextScriptSrc;
-        script.onload = loadNextScript; // When this script finishes, load the next one
-        script.onerror = () => console.error(`Failed to load script: ${nextScriptSrc}. Make sure it's in the correct folder.`);
-        document.head.appendChild(script);
-      }
-
-      window.Module = {
-        logReadFiles: function(filePath) {
-          console.log("Reading file:", filePath);
-        }
-      };
-
-      // Start loading the scripts
-      loadNextScript();
-    </script>
-
-<body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
-
-   
-
-    <script type="module">
-
         import * as THREE from 'three';
-        window.THREE = THREE;
-        var scene, camera, renderer, clock, deltaTime, totalTime;
+        window.THREE = THREE; // Make THREE global for legacy AR.js scripts
 
-        var arToolkitSource, arToolkitContext;
+        // --- SCRIPT LOADING ---
+        const legacyScripts = [
+            "https://raw.githack.com/jeromeetienne/AR.js/master/three.js/vendor/jsartoolkit5/build/artoolkit.min.js",
+            "https://raw.githack.com/jeromeetienne/AR.js/master/three.js/vendor/jsartoolkit5/js/artoolkit.api.js",
+            "https://raw.githack.com/jeromeetienne/AR.js/master/three.js/build/threex-artoolkitsource.js",
+            "https://raw.githack.com/jeromeetienne/AR.js/master/three.js/build/threex-artoolkitcontext.js",
+            "https://raw.githack.com/jeromeetienne/AR.js/master/three.js/build/threex-arbasecontrols.js",
+            "https://raw.githack.com/jeromeetienne/AR.js/master/three.js/build/threex-armarkercontrols.js"
+        ];
 
-        var markerNames, markerArray, currentMarkerName;
-
-        var sceneGroup;
-
-        var globe;
-
-        initialize();
-        animate();
-
-        function initialize() {
-            scene = new THREE.Scene();
-
-            let ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
-            scene.add(ambientLight);
-
-            camera = new THREE.Camera();
-            scene.add(camera);
-
-            renderer = new THREE.WebGLRenderer({
-                antialias: true,
-                alpha: true
-            });
-            renderer.setClearColor(new THREE.Color('lightgrey'), 0)
-            renderer.setSize(800, 600);
-            renderer.domElement.style.position = 'absolute'
-            renderer.domElement.style.top = '0px'
-            renderer.domElement.style.left = '0px'
-            document.body.appendChild(renderer.domElement);
-
-            clock = new THREE.Clock();
-            deltaTime = 0;
-            totalTime = 0;
-
-            ////////////////////////////////////////////////////////////
-            // setup arToolkitSource
-            ////////////////////////////////////////////////////////////
-
-            arToolkitSource = new THREEx.ArToolkitSource({
-                sourceType: 'webcam',
-            });
-
-            function onResize() {
-                arToolkitSource.onResize()
-                arToolkitSource.copySizeTo(renderer.domElement)
-                if (arToolkitContext.arController !== null) {
-                    arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)
-                }
+        function loadNextScript() {
+            if (legacyScripts.length === 0) {
+                console.log("All AR.js libraries loaded successfully.");
+                document.getElementById('loading').style.display = 'none';
+                // **FIXED**: Run the main application logic ONLY after all scripts are loaded.
+                main();
+                return;
             }
 
-            arToolkitSource.init(function onReady() {
-                onResize()
-            });
+            const nextScriptSrc = legacyScripts.shift();
+            console.log(`Loading: ${nextScriptSrc}`);
+            const script = document.createElement('script');
+            script.src = nextScriptSrc;
+            script.onload = loadNextScript;
+            script.onerror = () => console.error(`Failed to load script: ${nextScriptSrc}`);
+            document.head.appendChild(script);
+        }
 
-            // handle resize event
-            window.addEventListener('resize', function() {
-                onResize()
-            });
+        // Start the loading process
+        loadNextScript();
 
-            ////////////////////////////////////////////////////////////
-            // setup arToolkitContext
-            ////////////////////////////////////////////////////////////	
 
-            // create atToolkitContext
-            arToolkitContext = new THREEx.ArToolkitContext({
-                cameraParametersUrl: 'data/camera_para.dat',
-                detectionMode: 'mono',
-                maxDetectionRate: 30,
-            });
+        // --- MAIN APPLICATION LOGIC ---
+        function main() {
+            var scene, camera, renderer, clock, deltaTime, totalTime;
+            var arToolkitSource, arToolkitContext;
+            var markerNames, markerArray, currentMarkerName;
+            var sceneGroup;
+            var globe;
 
-            // copy projection matrix to camera when initialization complete
-            arToolkitContext.init(function onCompleted() {
-                camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
-            });
+            initialize();
+            animate();
 
-            ////////////////////////////////////////////////////////////
-            // setup markerRoots
-            ////////////////////////////////////////////////////////////
+            function initialize() {
+                scene = new THREE.Scene();
 
-            markerNames = ["kanji", "letterA", "letterB"];
+                let ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
+                scene.add(ambientLight);
 
-            markerArray = [];
+                camera = new THREE.Camera();
+                scene.add(camera);
 
-            for (let i = 0; i < markerNames.length; i++) {
-                let marker = new THREE.Group();
-                scene.add(marker);
-                markerArray.push(marker);
+                renderer = new THREE.WebGLRenderer({
+                    antialias: true,
+                    alpha: true
+                });
+                renderer.setClearColor(new THREE.Color('lightgrey'), 0);
+                // **FIXED**: Make renderer full screen
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.domElement.style.position = 'absolute';
+                renderer.domElement.style.top = '0px';
+                renderer.domElement.style.left = '0px';
+                document.body.appendChild(renderer.domElement);
 
-                let markerControls = new THREEx.ArMarkerControls(arToolkitContext, marker, {
-                    type: 'pattern',
-                    patternUrl: "data/" + markerNames[i] + ".patt",
+                clock = new THREE.Clock();
+                deltaTime = 0;
+                totalTime = 0;
+
+                // --- setup arToolkitSource ---
+                arToolkitSource = new THREEx.ArToolkitSource({
+                    sourceType: 'webcam',
                 });
 
-                let markerGroup = new THREE.Group();
-                marker.add(markerGroup);
+                arToolkitSource.init(function onReady() {
+                    onResize();
+                });
+
+                // handle resize event
+                window.addEventListener('resize', onResize);
+
+                // --- setup arToolkitContext ---
+                arToolkitContext = new THREEx.ArToolkitContext({
+                    // **FIXED**: Use full URL for camera parameters
+                    cameraParametersUrl: 'https://raw.githack.com/jeromeetienne/AR.js/master/data/data/camera_para.dat',
+                    detectionMode: 'mono',
+                });
+
+                arToolkitContext.init(function onCompleted() {
+                    camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+                });
+
+                // --- setup markerRoots ---
+                markerNames = ["hiro", "kanji", "letterA"];
+                markerArray = [];
+
+                for (let i = 0; i < markerNames.length; i++) {
+                    let marker = new THREE.Group();
+                    scene.add(marker);
+                    markerArray.push(marker);
+
+                    let markerControls = new THREEx.ArMarkerControls(arToolkitContext, marker, {
+                        type: 'pattern',
+                        // **FIXED**: Use full URL for marker patterns
+                        patternUrl: "https://raw.githack.com/jeromeetienne/AR.js/master/data/data/patt." + markerNames[i],
+                    });
+
+                    let markerGroup = new THREE.Group();
+                    marker.add(markerGroup);
+                }
+
+                // --- setup scene ---
+                sceneGroup = new THREE.Group();
+
+                let loader = new THREE.TextureLoader();
+                let texture = loader.load('https://stemkoski.github.io/Three.js/images/earth-sphere.jpg');
+                let geometry1 = new THREE.SphereGeometry(1, 32, 32);
+                let material1 = new THREE.MeshLambertMaterial({
+                    map: texture,
+                    opacity: 0.9
+                });
+                globe = new THREE.Mesh(geometry1, material1);
+                globe.position.y = 1;
+                sceneGroup.add(globe);
+
+                markerArray[0].children[0].add(sceneGroup);
+                currentMarkerName = markerNames[0];
+
+                let pointLight = new THREE.PointLight(0xffffff, 1, 50);
+                camera.add(pointLight);
             }
 
-            ////////////////////////////////////////////////////////////
-            // setup scene
-            ////////////////////////////////////////////////////////////
+            function onResize() {
+                arToolkitSource.onResizeElement();
+                arToolkitSource.copyElementSizeTo(renderer.domElement);
+                if (arToolkitContext.arController !== null) {
+                    arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
+                }
+                // **FIXED**: Update camera aspect ratio on resize
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
 
-            sceneGroup = new THREE.Group();
+            function update() {
+                if (arToolkitSource.ready !== false) {
+                    arToolkitContext.update(arToolkitSource.domElement);
+                }
 
-            let loader = new THREE.TextureLoader();
+                globe.rotation.y += 0.01;
 
-            let geometry1 = new THREE.SphereGeometry(1, 32, 32);
-            let texture = loader.load('images/earth-sphere.jpg');
-            let material1 = new THREE.MeshLambertMaterial({
-                map: texture,
-                opacity: 0.75
-            });
-            globe = new THREE.Mesh(geometry1, material1);
-            globe.position.y = 1;
-            sceneGroup.add(globe);
+                let anyMarkerVisible = false;
+                for (let i = 0; i < markerArray.length; i++) {
+                    if (markerArray[i].visible) {
+                        anyMarkerVisible = true;
+                        markerArray[i].children[0].add(sceneGroup);
+                        if (currentMarkerName != markerNames[i]) {
+                            currentMarkerName = markerNames[i];
+                        }
 
-            markerArray[0].children[0].add(sceneGroup);
-            currentMarkerName = markerNames[0];
+                        let p = new THREE.Vector3();
+                        let q = new THREE.Quaternion();
+                        let s = new THREE.Vector3();
+                        markerArray[i].children[0].getWorldPosition(p);
+                        markerArray[i].children[0].getWorldQuaternion(q);
+                        markerArray[i].children[0].getWorldScale(s);
+                        
+                        let lerpAmount = 0.5;
+                        scene.add(sceneGroup);
+                        sceneGroup.position.lerp(p, lerpAmount);
+                        sceneGroup.quaternion.slerp(q, lerpAmount);
+                        sceneGroup.scale.lerp(s, lerpAmount);
 
-            let pointLight = new THREE.PointLight(0xffffff, 1, 50);
-            camera.add(pointLight);
-        }
-
-
-        function update() {
-
-            globe.rotation.y += 0.01;
-
-            let anyMarkerVisible = false;
-            for (let i = 0; i < markerArray.length; i++) {
-                if (markerArray[i].visible) {
-                    anyMarkerVisible = true;
-                    markerArray[i].children[0].add(sceneGroup);
-                    if (currentMarkerName != markerNames[i]) {
-                        currentMarkerName = markerNames[i];
-                        // console.log("Switching to " + currentMarkerName);
+                        break;
                     }
-
-                    let p = markerArray[i].children[0].getWorldPosition();
-                    let q = markerArray[i].children[0].getWorldQuaternion();
-                    let s = markerArray[i].children[0].getWorldScale();
-                    let lerpAmount = 0.5;
-
-                    scene.add(sceneGroup);
-                    sceneGroup.position.lerp(p, lerpAmount);
-                    sceneGroup.quaternion.slerp(q, lerpAmount);
-                    sceneGroup.scale.lerp(s, lerpAmount);
-
-                    break;
                 }
             }
 
-            if (!anyMarkerVisible) {
-                // console.log("No marker currently visible.");
+            function render() {
+                renderer.render(scene, camera);
             }
 
-            let baseMarker = markerArray[0];
-
-            // update relative positions of markers
-            for (let i = 1; i < markerArray.length; i++) {
-                let currentMarker = markerArray[i];
-                let currentGroup = currentMarker.children[0];
-                if (baseMarker.visible && currentMarker.visible) {
-                    // console.log("updating marker " + i " -> base offset");
-
-                    let relativePosition = currentMarker.worldToLocal(baseMarker.position.clone());
-                    currentGroup.position.copy(relativePosition);
-
-                    let relativeRotation = currentMarker.quaternion.clone().inverse().multiply(baseMarker.quaternion.clone());
-                    currentGroup.quaternion.copy(relativeRotation);
-                }
+            function animate() {
+                requestAnimationFrame(animate);
+                deltaTime = clock.getDelta();
+                totalTime += deltaTime;
+                update();
+                render();
             }
-
-            // update artoolkit on every frame
-            if (arToolkitSource.ready !== false)
-                arToolkitContext.update(arToolkitSource.domElement);
-
-        }
-
-
-        function render() {
-            renderer.render(scene, camera);
-        }
-
-
-        function animate() {
-            requestAnimationFrame(animate);
-            deltaTime = clock.getDelta();
-            totalTime += deltaTime;
-            update();
-            render();
         }
     </script>
-
 </body>
-
 </html>
