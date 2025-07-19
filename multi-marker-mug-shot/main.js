@@ -260,7 +260,6 @@ async function initCombinedPlayer() {
           ];
 
         for(var script in legacyScripts) {
-            console.log(legacyScripts[script]);
             if (script === 0) continue;
             await loadLegacyScript(legacyScripts[script]);
         }
