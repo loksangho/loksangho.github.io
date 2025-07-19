@@ -376,7 +376,7 @@ async function initCombinedPlayer() {
 
     // 7. --- Marker and 3D Object Setup (Your existing logic) ---
     // This part remains the same.
-    markerNames = ["hiro", "kanji", "letterA"];
+    markerNames = ["hiro", "kanji", "letterA", "letterB"];
     markerArray = [];
     for (let i = 0; i < markerNames.length; i++) {
         let marker = new THREE.Group();
@@ -400,7 +400,7 @@ async function initCombinedPlayer() {
     markerArray[0].children[0].add(sceneGroup);
     currentMarkerName = markerNames[0];
 
-    let pointLight = new THREE.PointLight(0xffffff, 1, 500);
+    let pointLight = new THREE.PointLight(0xffffff, 1, 500000);
     camera.add(pointLight);
 
     console.log("ARContext initialized, waiting for WebAR.rocks and markers...");
