@@ -1,8 +1,8 @@
 // main.js - Modified to save marker profiles in memory instead of file download/upload.
 
 //import * as THREE from 'three';
-import { GLTFLoader } from 'addons/loaders/GLTFLoader.js';
-import { GLTFExporter } from 'addons/exporters/GLTFExporter.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { FACEMESH_TESSELATION } from './face_mesh_data.js';
 import { WebARRocksObjectThreeHelper } from './helpers/WebARRocksObjectThreeHelper.js';
