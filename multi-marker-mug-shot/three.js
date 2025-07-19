@@ -13458,7 +13458,7 @@
 
 		},
 
-		addAttribute: function ( name, attribute ) {
+		setAttribute: function ( name, attribute ) {
 
 			if ( ! ( attribute && attribute.isBufferAttribute ) && ! ( attribute && attribute.isInterleavedBufferAttribute ) ) {
 
