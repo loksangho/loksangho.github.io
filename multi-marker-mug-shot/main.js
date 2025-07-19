@@ -273,7 +273,7 @@ async function initCombinedPlayer() {
 
         let markerControls = new THREEx.ArMarkerControls(arToolkitContext, marker, {
             type: 'pattern',
-            patternUrl: "patt/" + markerNames[i] + ".patt",
+            patternUrl: "./patt/" + markerNames[i] + ".patt",
         });
 
         let markerGroup = new THREE.Group();
@@ -381,6 +381,7 @@ function update() {
     for (let i = 0; i < markerArray.length; i++) {
         if (markerArray[i].visible) {
             anyMarkerVisible = true;
+            console.log("Marker " + markerNames[i] + " is visible.");
             markerArray[i].children[0].add(sceneGroup);
             if (currentMarkerName != markerNames[i]) {
                 currentMarkerName = markerNames[i];
