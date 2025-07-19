@@ -161,7 +161,7 @@
                     let markerControls = new THREEx.ArMarkerControls(arToolkitContext, marker, {
                         type: 'pattern',
                         // **FIXED**: Use full URL for marker patterns
-                        patternUrl: "https://raw.githack.com/jeromeetienne/AR.js/master/data/data/patt." + markerNames[i],
+                        patternUrl: "./patt/" + markerNames[i] + ".patt",
                     });
 
                     let markerGroup = new THREE.Group();
