@@ -18,6 +18,7 @@ let currentMode = null;
 let webARrocksGroupAdded = false;
 let isWebARRocksReady = false;
 let markerArray, markerNames, sceneGroup, globe, currentMarkerName;
+let arVideo;
 
 // AR specific variables
 let arToolkitSource, arToolkitContext;
@@ -226,26 +227,53 @@ function cleanup() {
 }
 
 let _DOMVideo;
-async function initCombinedPlayer() {
+// main.js
 
+// This function will be called by the resize event listener
+let onResize = null;
+
+async function initCombinedPlayer() {
+    // 1. --- Full Cleanup of MediaPipe Phase ---
     cleanup();
     currentMode = 'player';
+    console.log("🚀 Initializing Combined AR Player...");
 
-    // Hide all UI phases
+    // 2. --- UI and DOM Setup ---
     document.getElementById('uiContainer').style.display = 'none';
-    document.getElementById('phase1').style.display = 'none';
-    const phase2 = document.getElementById('phase2');
-    if (phase2) phase2.style.display = 'none';
+    const outputCanvas = document.getElementById('outputCanvas');
+    if (outputCanvas) outputCanvas.style.display = 'none'; // Hide MediaPipe canvas
 
-    const canvas = document.getElementById('outputCanvas');
-    canvas.style.display = 'none';
+    // 3. --- Get Rear Camera Stream (The Core Change) ---
+    // We get the stream ONCE and share it with both AR libraries.
+    arVideo = document.createElement('video');
+    arVideo.setAttribute('autoplay', '');
+    arVideo.setAttribute('muted', '');
+    arVideo.setAttribute('playsinline', '');
+    document.body.appendChild(arVideo);
 
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {
+                // Request rear camera
+                facingMode: { ideal: 'environment' },
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            }
+        });
+        arVideo.srcObject = stream;
+        console.log("✅ Rear camera stream acquired.");
+    } catch (err) {
+        console.error("Could not access rear camera, falling back to default.", err);
+        alert("Could not access the rear camera. Using default camera instead.");
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        arVideo.srcObject = stream;
+    }
+    await new Promise(resolve => arVideo.onloadedmetadata = resolve);
+    arVideo.style.display = 'none'; // Keep the video element hidden
 
+    // 4. --- THREE.js Scene Setup ---
     scene = new THREE.Scene();
-
-    let ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
-    scene.add(ambientLight);
-
     camera = new THREE.PerspectiveCamera();
     scene.add(camera);
 
@@ -253,134 +281,52 @@ async function initCombinedPlayer() {
         antialias: true,
         alpha: true
     });
-    renderer.setClearColor(new THREE.Color('lightgrey'), 0)
-    renderer.setSize(800, 600);
-    renderer.domElement.style.position = 'absolute'
-    renderer.domElement.style.top = '0px'
-    renderer.domElement.style.left = '0px'
+    renderer.setClearColor(0x000000, 0); // Transparent background
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.domElement.style.position = 'absolute';
+    renderer.domElement.style.top = '0px';
+    renderer.domElement.style.left = '0px';
     document.body.appendChild(renderer.domElement);
 
-    ////////////////////////////////////////////////////////////
-    // setup arToolkitSource
-    ////////////////////////////////////////////////////////////
-
-
-    function onResize() {
-        arToolkitSource.onResize()
-        arToolkitSource.copySizeTo(renderer.domElement)
-        if (arToolkitContext.arController !== null) {
-            arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)
-        }
-    }
-
-
-    // 💡 Initialize ArToolkitSource with sourceType 'webcam'.
-    // The library will now create the video element and get the camera stream by itself.
+    // 5. --- AR.js Initialization (using the shared video) ---
     arToolkitSource = new THREEx.ArToolkitSource({
-        sourceType: 'webcam',
+        sourceType: 'video',
+        sourceElement: arVideo,
     });
 
-    arToolkitSource.init(() => {
-        // This log should now appear correctly
-        console.log("AR source initialized.");
-
-        onResize();
-
-        // The library creates its own video element, which is accessed via .domElement
-        // We just need to wait for it to be ready and then we can use it.
-        // The onReady callback of init() is the right place to do this.
-        arToolkitSource.onResizeElement();
-        arToolkitSource.copyElementSizeTo(renderer.domElement);
-        
-        // Note: The library automatically appends its video element to the body,
-        // so we don't need to manually append arToolkitSource.domElement.
-
-    });
     arToolkitContext = new THREEx.ArToolkitContext({
         cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
         detectionMode: 'mono',
-        maxDetectionRate: 30, // Adjust as needed
     });
 
+    // Define resize handler
+    onResize = () => {
+        arToolkitSource.onResizeElement();
+        arToolkitSource.copyElementSizeTo(renderer.domElement);
+        if (arToolkitContext && arToolkitContext.arController !== null) {
+            arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
+        }
+        camera.aspect = renderer.domElement.width / renderer.domElement.height;
+        camera.updateProjectionMatrix();
+    };
 
-    arToolkitContext.init(function onCompleted() {
-        
+    // Initialize AR.js source and context
+    arToolkitSource.init(() => {
+        arVideo.play();
+        onResize(); // Call once to set initial size
+        window.addEventListener('resize', onResize);
+    });
 
+    arToolkitContext.init(() => {
         camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
-
-       
-        _DOMVideo = arToolkitSource.domElement; 
-        WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
-            throw new Error('Cannot get video feed ' + err);
-            }, {
-            video: {
-                width:  {min: 640, max: 1920, ideal: 1280},
-                height: {min: 640, max: 1920, ideal: 720},
-                facingMode: {ideal: 'environment'}
-            },
-            audio: false
-        });
-
-        console.log("AR context initialized.");
-
-        
     });
-    markerNames = ["hiro", "kanji", "letterA"];
 
-    markerArray = [];
-
-    for (let i = 0; i < markerNames.length; i++) {
-        let marker = new THREE.Group();
-        scene.add(marker);
-        markerArray.push(marker);
-
-        let markerControls = new THREEx.ArMarkerControls(arToolkitContext, marker, {
-            type: 'pattern',
-            patternUrl: "./patt/" + markerNames[i] + ".patt",
-        });
-
-        console.log("Added marker ", markerControls.parameters.patternUrl);
-
-        let markerGroup = new THREE.Group();
-        marker.add(markerGroup);
-    }
-
-    ////////////////////////////////////////////////////////////
-    // setup scene
-    ////////////////////////////////////////////////////////////
-
-    sceneGroup = new THREE.Group();
-
-    let loader = new THREE.TextureLoader();
-
-    let geometry1 = new THREE.SphereGeometry(1, 32, 32);
-    let texture = loader.load('images/earth-sphere.jpg');
-    let material1 = new THREE.MeshLambertMaterial({
-        map: texture,
-        opacity: 0.75
-    });
-    globe = new THREE.Mesh(geometry1, material1);
-    globe.position.y = 1;
-    sceneGroup.add(globe);
-
-    markerArray[0].children[0].add(sceneGroup);
-    currentMarkerName = markerNames[0];
-
-    let pointLight = new THREE.PointLight(0xffffff, 1, 50);
-    camera.add(pointLight);
-
-    console.log("ARContext initialised");
-}
-
-function initWebARRocks(){
-    const ARCanvas = document.getElementById('ARCanvas');
-    const threeCanvas = document.getElementById('threeCanvas');
-    
-    
-
+    // 6. --- WebAR.rocks Initialization (also using the shared video) ---
     WebARRocksObjectThreeHelper.init({
-        video: _DOMVideo,
-        ARCanvas: ARCanvas,
+        video: arVideo,
+        threeCanvas: renderer.domElement, // Use the main renderer's canvas
+        NNPath: _settings.NNPath,
+        callbackReady: startWebARRocks, // Your existing function to load the model
         threeCanvas: threeCanvas,
         NNPath: _settings.NNPath,
         callbackReady: startWebARRocks,
@@ -391,15 +337,44 @@ function initWebARRocks(){
         followZRot: _settings.followZRot,
         scanSettings: _settings.scanSettings,
         isFullScreen: true,
-        stabilizerOptions: {}
+        stabilizerOptions: {},
+        isFullScreen: true,
     });
 
-  console.log("init config", {
-    video: renderer.domElement,
-    threeCanvas: renderer.domElement,
-    NNPath: _settings.NNPath
-    });
+    // 7. --- Marker and 3D Object Setup (Your existing logic) ---
+    // This part remains the same.
+    markerNames = ["hiro", "kanji", "letterA"];
+    markerArray = [];
+    for (let i = 0; i < markerNames.length; i++) {
+        let marker = new THREE.Group();
+        scene.add(marker);
+        markerArray.push(marker);
+        let markerControls = new THREEx.ArMarkerControls(arToolkitContext, marker, {
+            type: 'pattern',
+            patternUrl: "./patt/" + markerNames[i] + ".patt",
+        });
+        marker.add(new THREE.Group());
+    }
+
+    sceneGroup = new THREE.Group();
+    let loader = new THREE.TextureLoader();
+    let geometry1 = new THREE.SphereGeometry(1, 32, 32);
+    let texture = loader.load('images/earth-sphere.jpg');
+    let material1 = new THREE.MeshLambertMaterial({ map: texture, opacity: 0.75 });
+    globe = new THREE.Mesh(geometry1, material1);
+    globe.position.y = 1;
+    sceneGroup.add(globe);
+    markerArray[0].children[0].add(sceneGroup);
+    currentMarkerName = markerNames[0];
+
+    let pointLight = new THREE.PointLight(0xffffff, 1, 50);
+    camera.add(pointLight);
+
+    console.log("ARContext initialized, waiting for WebAR.rocks and markers...");
 }
+        
+    
+
 
 function startWebARRocks(err, three) {
     if (err) {
