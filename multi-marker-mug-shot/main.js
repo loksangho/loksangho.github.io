@@ -58,6 +58,11 @@ const _settings = {
   displayDebugCylinder: false
 };
 
+console.log("beginning of main.js");
+console.log("window.Module:", window.Module);
+console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
+
+
 function loadLegacyScript(url) {
     return new Promise((resolve, reject) => {
         window.THREE = THREE;
@@ -75,6 +80,9 @@ function loadLegacyScript(url) {
 
 async function main() {
     try {
+        console.log("main");
+        console.log("window.Module:", window.Module);
+        console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
         //await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
         
         // 💡 Add the resize event listener globally
@@ -508,5 +516,7 @@ function renderMediaPipe() {
     }
     if (renderer) renderer.render(scene, camera);
 }
-
+console.log("beforeMain");
+console.log("window.Module:", window.Module);
+console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
 main();
