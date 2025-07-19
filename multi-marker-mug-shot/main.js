@@ -17,6 +17,7 @@ let animationFrameId;
 let currentMode = null;
 let webARrocksGroupAdded = false;
 let isWebARRocksReady = false;
+let markerArray, markerNames;
 
 // AR specific variables
 let arToolkitSource, arToolkitContext, multiMarkerControls, multiMarkerLearning;
@@ -266,9 +267,9 @@ async function initCombinedPlayer(profileData) {
         });
     });
 
-    let markerNames = ["hiro", "kanji", "letterA"];
+    markerNames = ["hiro", "kanji", "letterA"];
 
-    let markerArray = [];
+    markerArray = [];
 
     for (let i = 0; i < markerNames.length; i++) {
         let marker = new THREE.Group();
