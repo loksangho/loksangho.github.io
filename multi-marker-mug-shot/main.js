@@ -435,12 +435,12 @@ function animateCombined() {
     
     update();
 
-    if (arToolkitSource && arToolkitSource.ready) { 
+    /*if (arToolkitSource && arToolkitSource.ready) { 
         arToolkitContext.update(arToolkitSource.domElement); 
         if (multiMarkerControls) {
             multiMarkerControls.update();
         }
-    }
+    }*/
 
     // Update WebARRocks - it processes the video and updates its internal object poses
     if (isWebARRocksReady) {
