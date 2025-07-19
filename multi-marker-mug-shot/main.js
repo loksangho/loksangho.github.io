@@ -108,11 +108,11 @@ async function initMediaPipe() {
         baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task` },
         runningMode, numFaces: 1 });
     const geometry = new THREE.BufferGeometry();
-    geometry.attributes.position = new THREE.BufferAttribute(new Float32Array(478 * 3), 3);
-    geometry.attributes.uv = new THREE.BufferAttribute(new Float32Array(478 * 2));
+    //geometry.attributes.position = new THREE.BufferAttribute(new Float32Array(478 * 3), 3);
+    //geometry.attributes.uv = new THREE.BufferAttribute(new Float32Array(478 * 2));
     //geometry.index = new THREE.BufferAttribute(new Uint16Array(FACEMESH_TESSELATION.flat()));
-    //geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(478 * 3), 3));
-    //geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(478 * 2), 2));
+    geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(478 * 3), 3));
+    geometry.addAttribute('uv', new THREE.BufferAttribute(new Float32Array(478 * 2), 2));
     geometry.setIndex(FACEMESH_TESSELATION.flat());
     textureCanvas = document.createElement('canvas');
     textureCanvas.width = 512; textureCanvas.height = 512;
