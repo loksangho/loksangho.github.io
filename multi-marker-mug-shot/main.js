@@ -184,7 +184,7 @@ async function initCombinedPlayer() {
     let ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
     scene.add(ambientLight);
 
-    camera = new THREE.Camera();
+    camera = new THREE.PerspectiveCamera();
     scene.add(camera);
 
     renderer = new THREE.WebGLRenderer({
@@ -247,7 +247,7 @@ async function initCombinedPlayer() {
         camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
 
        
-        _DOMVideo = document.getElementById('webcamVideo'); 
+        _DOMVideo = arToolkitSource.domElement; 
         WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
             throw new Error('Cannot get video feed ' + err);
             }, {
