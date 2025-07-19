@@ -152,6 +152,7 @@ async function initMediaPipe() {
 }
 
 function saveMesh() {
+    document.getElementById('phase2').style.display = 'block';
     if (currentMode !== 'mediapipe' || !faceLandmarker) return;
     const results = faceLandmarker.detectForVideo(video, performance.now());
     if (results.faceLandmarks.length === 0) { alert("No face detected. Please look at the camera."); return; }
