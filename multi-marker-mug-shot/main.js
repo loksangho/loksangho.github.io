@@ -43,7 +43,7 @@ const _settings = {
     trackingFactors: [0.5, 0.4, 1.5]
   },
 
-  NNPath: './neuralNets/NN_COFFEE_0.json',
+  NNPath: './neuralNets/NN_COFFEE_1.json',
 
   cameraFov: 0, // In degrees, camera vertical FoV. 0 -> auto mode
   scanSettings:{
