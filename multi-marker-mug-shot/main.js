@@ -113,9 +113,7 @@ async function initMediaPipe() {
     await new Promise(resolve => video.onloadedmetadata = () => { video.play(); resolve(); });
     video.style.display = 'none';
 
-    console.log("middleMediaPipe");
-    console.log("window.Module:", window.Module);
-    console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
+    
 
     const visionResolver = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/wasm");
     faceLandmarker = await FaceLandmarker.createFromOptions(visionResolver, {
@@ -128,6 +126,10 @@ async function initMediaPipe() {
     geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(478 * 3), 3));
     geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(478 * 2), 2));
     geometry.setIndex(FACEMESH_TESSELATION.flat());
+
+    console.log("middleMediaPipe");
+    console.log("window.Module:", window.Module);
+    console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
     textureCanvas = document.createElement('canvas');
     textureCanvas.width = 512; textureCanvas.height = 512;
     textureCanvasCtx = textureCanvas.getContext('2d');
