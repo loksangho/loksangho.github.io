@@ -172,7 +172,7 @@
                 sceneGroup = new THREE.Group();
 
                 let loader = new THREE.TextureLoader();
-                let texture = loader.load('https://stemkoski.github.io/Three.js/images/earth-sphere.jpg');
+                let texture = loader.load('./images/earth-sphere.jpg');
                 let geometry1 = new THREE.SphereGeometry(1, 32, 32);
                 let material1 = new THREE.MeshLambertMaterial({
                     map: texture,
