@@ -46,6 +46,19 @@
       2. Sequentially loads all required AR.js libraries from a reliable CDN.
       3. Once loading is complete, it runs the main application logic.
     -->
+
+    <script>
+      
+    window.Module = {
+      logReadFiles: function (file) {
+        console.log("File read:", file);
+      },
+      onRuntimeInitialized: function () {
+        console.log("ARToolKit ready");
+      }
+    };
+
+    </script>
     <script type="module">
         //import * as THREE from 'three';
         //window.THREE = THREE; // Make THREE global for legacy AR.js scripts
