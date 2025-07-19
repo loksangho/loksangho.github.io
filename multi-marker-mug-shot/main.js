@@ -141,25 +141,9 @@ function saveMesh() {
     }, (error) => console.error(error), { binary: true });
 }
 
-function cleanup() {
-    cancelAnimationFrame(animationFrameId);
-    if (video && video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); video.srcObject = null; }
-    if (renderer) {
-        renderer.dispose();
-        renderer = null;
-    }
-    if (currentMode === 'player') { 
-        WebARRocksObjectThreeHelper.destroy();
-        webARrocksGroupAdded = false;
-    }
-    const dynamicUI = document.getElementById('dynamicUI');
-    if(dynamicUI) dynamicUI.remove();
-}
-
 
 let _DOMVideo;
 async function initCombinedPlayer(profileData) {
-    cleanup();
     currentMode = 'player';
 
     // Hide all UI phases
