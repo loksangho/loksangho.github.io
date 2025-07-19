@@ -109,8 +109,8 @@ async function initMediaPipe() {
         runningMode, numFaces: 1 });
     const geometry = new THREE.BufferGeometry();
     geometry.attributes.position = new THREE.BufferAttribute(new Float32Array(478 * 3), 3);
-    geometry.attributes.uv = new THREE.BufferAttribute(new Float32Array(478 * 2));
-    geometry.attributes.index = FACEMESH_TESSELATION.flat();
+    geometry.attributes.uv = new THREE.BufferAttribute(new Float32Array(478 * 2);
+    geometry.index = FACEMESH_TESSELATION.flat();
     //geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(478 * 3), 3));
     //geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(478 * 2), 2));
     //geometry.setIndex(FACEMESH_TESSELATION.flat());
