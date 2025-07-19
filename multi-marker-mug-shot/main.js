@@ -268,7 +268,7 @@ async function initCombinedPlayer(profileData) {
 
     let markerNames = ["hiro", "kanji", "letterA"];
 
-    markerArray = [];
+    let markerArray = [];
 
     for (let i = 0; i < markerNames.length; i++) {
         let marker = new THREE.Group();
