@@ -67,22 +67,12 @@
 
     }</script>
     <script src="./helpers/DeviceOrientationHelper.js"></script>
-
+    
     <!-- include jsartookit -->
     <script type="module">
       
       import * as THREE from 'three';
       window.THREE = THREE;
-
-      var Module = {
-        onRuntimeInitialized: function () {
-          console.log("ARToolKit is ready");
-          // Safe to call functions now
-        },
-        logReadFiles: function(file) {
-          console.log("File read:", file);
-        }
-      };
       
       // Step 2: Load legacy scripts only after window.THREE is ready
       const legacyScripts = [
