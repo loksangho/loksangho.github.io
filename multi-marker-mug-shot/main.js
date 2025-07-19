@@ -297,8 +297,7 @@ async function initCombinedPlayer() {
 
     // 5. --- AR.js Initialization (using the shared video) ---
     arToolkitSource = new THREEx.ArToolkitSource({
-        sourceType: 'video',
-        sourceElement: arVideo,
+        sourceType: 'webcam'
     });
 
     arToolkitContext = new THREEx.ArToolkitContext({
@@ -322,10 +321,12 @@ async function initCombinedPlayer() {
         arVideo.play();
         onResize(); // Call once to set initial size
         window.addEventListener('resize', onResize);
+        console.log("source initialised");
     });
 
     arToolkitContext.init(() => {
         camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+        console.log("context initialised");
     });
 
     // 6. --- WebAR.rocks Initialization (also using the shared video) ---
@@ -358,7 +359,7 @@ async function initCombinedPlayer() {
         markerArray.push(marker);
         let markerControls = new THREEx.ArMarkerControls(arToolkitContext, marker, {
             type: 'pattern',
-            patternUrl: "./patt/" + markerNames[i] + ".patt",
+            patternUrl: "patt/" + markerNames[i] + ".patt",
         });
         marker.add(new THREE.Group());
     }
@@ -423,24 +424,29 @@ function startWebARRocks(err, three) {
     isWebARRocksReady = true;
     animateCombined();
 }
-
+let flag = false;
 function update() {
+
     globe.rotation.y += 0.01;
 
+    if (!flag) {
     let anyMarkerVisible = false;
     for (let i = 0; i < markerArray.length; i++) {
         if (markerArray[i].visible) {
             anyMarkerVisible = true;
             console.log("Marker " + markerNames[i] + " is visible.");
+            flag = true;
+
             markerArray[i].children[0].add(sceneGroup);
             if (currentMarkerName != markerNames[i]) {
                 currentMarkerName = markerNames[i];
                 // console.log("Switching to " + currentMarkerName);
             }
 
-            let p = markerArray[i].children[0].getWorldPosition();
-            let q = markerArray[i].children[0].getWorldQuaternion();
-            let s = markerArray[i].children[0].getWorldScale();
+            console.log(markerArray[i].children);
+            let p = markerArray[i].children[0].position;
+            let q = markerArray[i].children[0].quaternion;
+            let s = markerArray[i].children[0].scale;
             let lerpAmount = 0.5;
 
             scene.add(sceneGroup);
@@ -466,7 +472,6 @@ function update() {
         let currentGroup = currentMarker.children[0];
         if (baseMarker.visible && currentMarker.visible) {
             // console.log("updating marker " + i " -> base offset");
-
             let relativePosition = currentMarker.worldToLocal(baseMarker.position.clone());
             currentGroup.position.copy(relativePosition);
 
@@ -475,11 +480,15 @@ function update() {
         }
     }
 
+    
+
 
     //console.log("arToolkitSource.ready: ", arToolkitSource.ready);
     // update artoolkit on every frame
     if (arToolkitSource && arToolkitSource.ready) { 
         arToolkitContext.update(arToolkitSource.domElement);
+    }
+
     }
 
 }
