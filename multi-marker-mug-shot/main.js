@@ -260,7 +260,9 @@ async function initCombinedPlayer() {
           ];
 
         for(var script in legacyScripts) {
-            await loadLegacyScript(script);
+            console.log(legacyScripts[script]);
+            if (script === 0) continue;
+            await loadLegacyScript(legacyScripts[script]);
         }
         
         console.log("✅ AR.js script loaded successfully.");
@@ -457,18 +459,16 @@ function startWebARRocks(err, three) {
     isWebARRocksReady = true;
     animateCombined();
 }
-let flag = false;
 function update() {
 
     globe.rotation.y += 0.01;
 
-    if (!flag) {
     let anyMarkerVisible = false;
     for (let i = 0; i < markerArray.length; i++) {
         if (markerArray[i].visible) {
             anyMarkerVisible = true;
             console.log("Marker " + markerNames[i] + " is visible.");
-            flag = true;
+            
 
             markerArray[i].children[0].add(sceneGroup);
             if (currentMarkerName != markerNames[i]) {
@@ -522,7 +522,7 @@ function update() {
         arToolkitContext.update(arToolkitSource.domElement);
     }
 
-    }
+    
 
 }
 
