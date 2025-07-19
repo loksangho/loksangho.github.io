@@ -422,7 +422,7 @@ function startWebARRocks(err, three) {
         return;
     }
 
-ß
+
     // Add lighting to the AR Scene
     three.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     const arDirLight = new THREE.DirectionalLight(0xffffff, 0.7);
