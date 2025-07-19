@@ -179,9 +179,6 @@ async function initCombinedPlayer(profileData) {
     // setup arToolkitSource
     ////////////////////////////////////////////////////////////
 
-    arToolkitSource = new THREEx.ArToolkitSource({
-        sourceType: 'webcam',
-    });
 
     function onResize() {
         arToolkitSource.onResize()
@@ -190,15 +187,6 @@ async function initCombinedPlayer(profileData) {
             arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)
         }
     }
-
-    arToolkitSource.init(function onReady() {
-        onResize();
-    });
-
-    // handle resize event
-    window.addEventListener('resize', function() {
-        onResize()
-    });
 
 
     // 💡 Initialize ArToolkitSource with sourceType 'webcam'.
