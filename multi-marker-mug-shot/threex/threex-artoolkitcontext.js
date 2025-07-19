@@ -3,8 +3,11 @@ var THREEx = THREEx || {}
 
 ARjs.Context = THREEx.ArToolkitContext = function(parameters){
 
-	THREE.EventDispatcher.call(this);
-	
+	this._dispatcher = new THREE.EventDispatcher();	
+	this.addEventListener = this._dispatcher.addEventListener.bind(this._dispatcher);
+	this.removeEventListener = this._dispatcher.removeEventListener.bind(this._dispatcher);
+	this.dispatchEvent = this._dispatcher.dispatchEvent.bind(this._dispatcher);
+
 	var _this = this
 	console.log("1- dispatchEvent:", this.dispatchEvent);
 	_this._updatedAt = null
