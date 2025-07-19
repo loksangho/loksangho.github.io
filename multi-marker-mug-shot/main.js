@@ -116,9 +116,9 @@ async function initMediaPipe() {
 
     var tempModule = window.Module || {};
 
-    //faceLandmarker = await FaceLandmarker.createFromOptions(visionResolver, {
-        //baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task` },
-        //runningMode, numFaces: 1 });
+    faceLandmarker = await FaceLandmarker.createFromOptions(visionResolver, {
+        baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task` },
+        runningMode, numFaces: 1 });
 
     window.Module = tempModule; // Restore the original Module if it was set
 
@@ -152,7 +152,6 @@ async function initMediaPipe() {
 }
 
 function saveMesh() {
-    document.getElementById('phase2').style.display = 'block';
     if (currentMode !== 'mediapipe' || !faceLandmarker) return;
     const results = faceLandmarker.detectForVideo(video, performance.now());
     if (results.faceLandmarks.length === 0) { alert("No face detected. Please look at the camera."); return; }

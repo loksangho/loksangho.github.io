@@ -3,7 +3,7 @@ var THREEx = THREEx || {}
 
 ARjs.Context = THREEx.ArToolkitContext = function(parameters){
 	var _this = this
-
+	console.log("1- dispatchEvent:", arToolkitContext.dispatchEvent);
 	_this._updatedAt = null
 
 	// handle default parameters
@@ -69,6 +69,7 @@ ARjs.Context = THREEx.ArToolkitContext = function(parameters){
 			_this.parameters[ key ] = newValue
 		}
 	}
+	console.log("2- dispatchEvent:", arToolkitContext.dispatchEvent);
 }
 
 Object.assign( ARjs.Context.prototype, THREE.EventDispatcher.prototype );
