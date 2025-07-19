@@ -270,7 +270,13 @@ async function initCombinedPlayer() {
         arVideo.srcObject = stream;
     }
     await new Promise(resolve => arVideo.onloadedmetadata = resolve);
-    arVideo.style.display = 'none'; // Keep the video element hidden
+    arVideo.style.position = 'absolute';
+    arVideo.style.top = '0px';
+    arVideo.style.left = '0px';
+    arVideo.style.width = '100%';
+    arVideo.style.height = '100%';
+    arVideo.style.objectFit = 'cover'; // Ensures the video covers the screen without distortion
+    arVideo.style.zIndex = '-1';       // Places the video BEHIND the three.js canvas
 
     // 4. --- THREE.js Scene Setup ---
     scene = new THREE.Scene();
