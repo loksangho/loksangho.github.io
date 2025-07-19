@@ -20,7 +20,7 @@ let isWebARRocksReady = false;
 let markerArray, markerNames, sceneGroup, globe, currentMarkerName;
 
 // AR specific variables
-let arToolkitSource, arToolkitContext, multiMarkerControls;
+let arToolkitSource, arToolkitContext;
 let savedProfileData = null; // 💡 To store the marker profile in memory
 const _settings = {
   nDetectsPerLoop: 0, // 0 -> adaptative
