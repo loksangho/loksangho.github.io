@@ -110,10 +110,10 @@ async function initMediaPipe() {
     const geometry = new THREE.BufferGeometry();
     geometry.attributes.position = new THREE.BufferAttribute(new Float32Array(478 * 3), 3);
     geometry.attributes.uv = new THREE.BufferAttribute(new Float32Array(478 * 2));
-    geometry.index = new THREE.BufferAttribute(new Uint16Array(FACEMESH_TESSELATION.flat()));
+    //geometry.index = new THREE.BufferAttribute(new Uint16Array(FACEMESH_TESSELATION.flat()));
     //geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(478 * 3), 3));
     //geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(478 * 2), 2));
-    //geometry.setIndex(FACEMESH_TESSELATION.flat());
+    geometry.setIndex(FACEMESH_TESSELATION.flat());
     textureCanvas = document.createElement('canvas');
     textureCanvas.width = 512; textureCanvas.height = 512;
     textureCanvasCtx = textureCanvas.getContext('2d');
