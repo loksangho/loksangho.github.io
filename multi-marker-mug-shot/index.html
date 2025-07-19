@@ -103,6 +103,12 @@
         document.head.appendChild(script);
       }
 
+      window.Module = {
+        logReadFiles: function(filePath) {
+          console.log("Reading file:", filePath);
+        }
+      };
+
       // Start loading the scripts
       loadNextScript();
     </script>
