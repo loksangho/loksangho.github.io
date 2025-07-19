@@ -103,6 +103,8 @@ async function initMediaPipe() {
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
     dirLight.position.set(0, 1, 1);
     scene.add(dirLight);
+
+
     video = document.getElementById('webcamVideo');
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
     video.srcObject = stream;
@@ -260,8 +262,9 @@ async function initCombinedPlayer() {
 
         camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
 
-       
-        _DOMVideo = arToolkitSource.domElement; 
+       isWebARRocksReady = false;
+        animateCombined();
+        /*_DOMVideo = arToolkitSource.domElement; 
         WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
             throw new Error('Cannot get video feed ' + err);
             }, {
@@ -271,7 +274,7 @@ async function initCombinedPlayer() {
                 facingMode: {ideal: 'environment'}
             },
             audio: false
-        });
+        });*/
 
         console.log("AR context initialized.");
 
