@@ -277,61 +277,65 @@ async function initCombinedPlayer() {
 
         console.log("AR setup complete. Starting animation loop.");
         animateCombined();*/
-        
-    });
-    _DOMVideo = document.getElementById('webcamVideo'); 
-    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
-        throw new Error('Cannot get video feed ' + err);
-        }, {
-        video: {
-            width:  {min: 640, max: 1920, ideal: 1280},
-            height: {min: 640, max: 1920, ideal: 720},
-            facingMode: {ideal: 'environment'}
-        },
-        audio: false
-    });
-
-    markerNames = ["hiro", "kanji", "letterA"];
-
-    markerArray = [];
-
-    for (let i = 0; i < markerNames.length; i++) {
-        let marker = new THREE.Group();
-        scene.add(marker);
-        markerArray.push(marker);
-
-        let markerControls = new THREEx.ArMarkerControls(arToolkitContext, marker, {
-            type: 'pattern',
-            patternUrl: "patt/" + markerNames[i] + ".patt",
+        _DOMVideo = document.getElementById('webcamVideo'); 
+        WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
+            throw new Error('Cannot get video feed ' + err);
+            }, {
+            video: {
+                width:  {min: 640, max: 1920, ideal: 1280},
+                height: {min: 640, max: 1920, ideal: 720},
+                facingMode: {ideal: 'environment'}
+            },
+            audio: false
         });
 
-        let markerGroup = new THREE.Group();
-        marker.add(markerGroup);
-    }
+        markerNames = ["hiro", "kanji", "letterA"];
 
-    ////////////////////////////////////////////////////////////
-    // setup scene
-    ////////////////////////////////////////////////////////////
+        markerArray = [];
 
-    sceneGroup = new THREE.Group();
+        for (let i = 0; i < markerNames.length; i++) {
+            let marker = new THREE.Group();
+            scene.add(marker);
+            markerArray.push(marker);
 
-    let loader = new THREE.TextureLoader();
+            let markerControls = new THREEx.ArMarkerControls(arToolkitContext, marker, {
+                type: 'pattern',
+                patternUrl: "patt/" + markerNames[i] + ".patt",
+            });
 
-    let geometry1 = new THREE.SphereGeometry(1, 32, 32);
-    let texture = loader.load('images/earth-sphere.jpg');
-    let material1 = new THREE.MeshLambertMaterial({
-        map: texture,
-        opacity: 0.75
+            let markerGroup = new THREE.Group();
+            marker.add(markerGroup);
+        }
+
+        ////////////////////////////////////////////////////////////
+        // setup scene
+        ////////////////////////////////////////////////////////////
+
+        sceneGroup = new THREE.Group();
+
+        let loader = new THREE.TextureLoader();
+
+        let geometry1 = new THREE.SphereGeometry(1, 32, 32);
+        let texture = loader.load('images/earth-sphere.jpg');
+        let material1 = new THREE.MeshLambertMaterial({
+            map: texture,
+            opacity: 0.75
+        });
+        globe = new THREE.Mesh(geometry1, material1);
+        globe.position.y = 1;
+        sceneGroup.add(globe);
+
+        markerArray[0].children[0].add(sceneGroup);
+        currentMarkerName = markerNames[0];
+
+        let pointLight = new THREE.PointLight(0xffffff, 1, 50);
+        camera.add(pointLight);
+
+        console.log("AR context initialized.");
+        console.log("dispatchEvent:", arToolkitContext.dispatchEvent);
+        
     });
-    globe = new THREE.Mesh(geometry1, material1);
-    globe.position.y = 1;
-    sceneGroup.add(globe);
-
-    markerArray[0].children[0].add(sceneGroup);
-    currentMarkerName = markerNames[0];
-
-    let pointLight = new THREE.PointLight(0xffffff, 1, 50);
-    camera.add(pointLight);
+    
 }
 
 function initWebARRocks(){
