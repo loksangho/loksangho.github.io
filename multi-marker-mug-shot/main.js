@@ -119,21 +119,13 @@ async function initMediaPipe() {
 
     var tempModule = window.Module || {};
 
-    console.log(tempModule);
 
     faceLandmarker = await FaceLandmarker.createFromOptions(visionResolver, {
         baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task` },
         runningMode, numFaces: 1 });
 
-    /*if (!window.Module) {
-        window.Module = {};
-    }
-
-    for (var key in tempModule) {
-       window.Module[key] = tempModule[key];
-    }*/
+    
     window.Module = tempModule;
-    console.log(window.Module);
 
     
     const geometry = new THREE.BufferGeometry();
@@ -337,6 +329,7 @@ async function initCombinedPlayer() {
     arToolkitContext = new THREEx.ArToolkitContext({
         cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
         detectionMode: 'mono',
+        maxDetectionRate: 30,
     });
 
     // Define resize handler
