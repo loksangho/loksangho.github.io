@@ -77,9 +77,7 @@ function loadLegacyScript(url) {
 
 async function main() {
     try {
-        console.log("main");
-        console.log("window.Module:", window.Module);
-        console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
+
         //await loadLegacyScript('https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js');
         
         // 💡 Add the resize event listener globally
@@ -93,9 +91,7 @@ async function main() {
 async function initMediaPipe() {
     currentMode = 'mediapipe';
 
-    console.log("initMediaPipeStart");
-    console.log("window.Module:", window.Module);
-    console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
+    
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 2.5;
@@ -115,23 +111,18 @@ async function initMediaPipe() {
 
     
 
-    console.log("middleMediaPipe1");
-    console.log("window.Module:", window.Module);
-    console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
+
     const visionResolver = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/wasm");
 
-    console.log("middleMediaPipe2");
-    console.log("window.Module:", window.Module);
-    console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
+    var tempModule = window.Module || {};
 
     faceLandmarker = await FaceLandmarker.createFromOptions(visionResolver, {
         baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task` },
         runningMode, numFaces: 1 });
 
+    window.Module = tempModule; // Restore the original Module if it was set
 
-    console.log("middleMediaPipe3");
-    console.log("window.Module:", window.Module);
-    console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
+    
     const geometry = new THREE.BufferGeometry();
     //geometry.attributes.position = new THREE.BufferAttribute(new Float32Array(478 * 3), 3);
     //geometry.attributes.uv = new THREE.BufferAttribute(new Float32Array(478 * 2));
@@ -156,9 +147,7 @@ async function initMediaPipe() {
 
     // 💡 REMOVED playerButton and profileInput logic, as player is now started from the learner.
 
-    console.log("initMediaPipe");
-    console.log("window.Module:", window.Module);
-    console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
+
     animate();
 }
 
@@ -179,10 +168,6 @@ function saveMesh() {
 let _DOMVideo;
 async function initCombinedPlayer() {
     currentMode = 'player';
-
-    console.log("initCombinedPlayer");
-    console.log("window.Module:", window.Module);
-    console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
 
     // Hide all UI phases
     document.getElementById('outputCanvas').style.display = 'none';
@@ -535,7 +520,5 @@ function renderMediaPipe() {
     }
     if (renderer) renderer.render(scene, camera);
 }
-console.log("beforeMain");
-console.log("window.Module:", window.Module);
-console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
+
 main();

@@ -105,16 +105,7 @@
 
         const nextScriptSrc = legacyScripts.shift();
 
-        if (nextScriptSrc == "https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker-mug-shot/jsartoolkit/artoolkit.api.js") { // We want to lock the Module object after artoolkit.min.js is loaded
-          Object.defineProperty(window, "Module", {
-          configurable: false,
-          writable: false,
-          value: {
-            logReadFiles: (f) => console.log("File read:", f),
-            onRuntimeInitialized: () => console.log("ARToolKit ready")
-          }
-        });
-        }
+     
         console.log(`Loading: ${nextScriptSrc}`);
         const script = document.createElement('script');
         script.src = nextScriptSrc;
