@@ -356,12 +356,10 @@ async function initCombinedPlayer() {
         arVideo.play();
         onResize(); // Call once to set initial size
         window.addEventListener('resize', onResize);
-        console.log("source initialised");
     });
 
     arToolkitContext.init(() => {
         camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
-        console.log("context initialised");
     });
 
     // 6. --- WebAR.rocks Initialization (also using the shared video) ---
@@ -425,8 +423,7 @@ function startWebARRocks(err, three) {
         return;
     }
 
-    console.log("startWebARRocks here");
-
+ß
     // Add lighting to the AR Scene
     three.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     const arDirLight = new THREE.DirectionalLight(0xffffff, 0.7);
