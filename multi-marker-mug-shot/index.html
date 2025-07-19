@@ -68,7 +68,7 @@
     }</script>
     <script src="./helpers/DeviceOrientationHelper.js"></script>
     <script>
-      window.Module = {
+      Module = {
         logReadFiles: function (file) {
           console.log("File read:", file);
         },
@@ -95,7 +95,6 @@
 
       function loadNextScript() {
         
-      console.log("$$$", Module["logReadFiles"]);
         if (legacyScripts.length === 0) {
           // All legacy scripts are loaded, now load our main application logic
           console.log("All AR.js libraries loaded successfully from local files.");
