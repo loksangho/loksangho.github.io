@@ -156,14 +156,6 @@ function cleanup() {
     if(dynamicUI) dynamicUI.remove();
 }
 
-// 💡 NEW: A robust resize handler for all modes
-function onResize() {
-    arToolkitSource.onResize()
-    arToolkitSource.copySizeTo(renderer.domElement)
-    if (arToolkitContext.arController !== null) {
-        arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)
-    }
-}
 
 let _DOMVideo;
 async function initCombinedPlayer(profileData) {
@@ -173,9 +165,8 @@ async function initCombinedPlayer(profileData) {
     // Hide all UI phases
     document.getElementById('uiContainer').style.display = 'none';
     document.getElementById('phase1').style.display = 'none';
-    document.getElementById('phase2').style.display = 'none';
-    const phase3 = document.getElementById('phase3');
-    if (phase3) phase3.style.display = 'none';
+    const phase2 = document.getElementById('phase2');
+    if (phase2) phase2.style.display = 'none';
 
     const canvas = document.getElementById('outputCanvas');
     canvas.style.display = 'block';
@@ -217,7 +208,7 @@ async function initCombinedPlayer(profileData) {
     }
 
     arToolkitSource.init(function onReady() {
-        onResize()
+        onResize();
 
         arToolkitContext = new THREEx.ArToolkitContext({
             cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
