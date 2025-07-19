@@ -259,17 +259,18 @@ async function initCombinedPlayer() {
 
         console.log("AR setup complete. Starting animation loop.");
         animateCombined();*/
-        _DOMVideo = document.getElementById('webcamVideo'); 
-        WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
-            throw new Error('Cannot get video feed ' + err);
-            }, {
-            video: {
-                width:  {min: 640, max: 1920, ideal: 1280},
-                height: {min: 640, max: 1920, ideal: 720},
-                facingMode: {ideal: 'environment'}
-            },
-            audio: false
-        });
+        
+    });
+    _DOMVideo = document.getElementById('webcamVideo'); 
+    WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
+        throw new Error('Cannot get video feed ' + err);
+        }, {
+        video: {
+            width:  {min: 640, max: 1920, ideal: 1280},
+            height: {min: 640, max: 1920, ideal: 720},
+            facingMode: {ideal: 'environment'}
+        },
+        audio: false
     });
 
     markerNames = ["hiro", "kanji", "letterA"];
