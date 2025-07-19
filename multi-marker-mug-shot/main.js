@@ -83,7 +83,7 @@ async function main() {
         
         // 💡 Add the resize event listener globally
 
-        initCombinedPlayer();
+        initMediaPipe();
     } catch (error) {
         console.error("Error loading ar-threex.js:", error);
     }
@@ -119,11 +119,21 @@ async function initMediaPipe() {
 
     var tempModule = window.Module || {};
 
+    console.log(tempModule);
+
     faceLandmarker = await FaceLandmarker.createFromOptions(visionResolver, {
         baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task` },
         runningMode, numFaces: 1 });
 
-    window.Module = tempModule; // Restore the original Module if it was set
+    /*if (!window.Module) {
+        window.Module = {};
+    }
+
+    for (var key in tempModule) {
+       window.Module[key] = tempModule[key];
+    }*/
+    window.Module = tempModule;
+    console.log(window.Module);
 
     
     const geometry = new THREE.BufferGeometry();
@@ -237,6 +247,29 @@ async function initCombinedPlayer() {
     cleanup();
     currentMode = 'player';
     console.log("🚀 Initializing Combined AR Player...");
+
+
+    try {
+        const legacyScripts = [
+            "https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker-mug-shot/jsartoolkit/artoolkit.min.js",
+            "https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker-mug-shot/jsartoolkit/artoolkit.api.js",
+            "./threex/threex-artoolkitsource.js",
+            "./threex/threex-artoolkitcontext.js",
+            "./threex/threex-arbasecontrols.js",
+            "./threex/threex-armarkercontrols.js"
+          ];
+
+        for(var script in legacyScripts) {
+            await loadLegacyScript(script);
+        }
+        
+        console.log("✅ AR.js script loaded successfully.");
+    } catch (error) {
+        console.error("Fatal: Could not load AR.js script.", error);
+        alert("Error: Could not load the AR library. The application cannot continue.");
+        return;
+    }
+
 
     // 2. --- UI and DOM Setup ---
     document.getElementById('uiContainer').style.display = 'none';
