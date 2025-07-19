@@ -164,9 +164,25 @@ function saveMesh() {
     }, (error) => console.error(error), { binary: true });
 }
 
+function cleanup() {
+    cancelAnimationFrame(animationFrameId);
+    if (video && video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); video.srcObject = null; }
+    if (renderer) {
+        renderer.dispose();
+        renderer = null;
+    }
+    if (currentMode === 'player') { 
+        WebARRocksObjectThreeHelper.destroy();
+        webARrocksGroupAdded = false;
+    }
+    const dynamicUI = document.getElementById('dynamicUI');
+    if(dynamicUI) dynamicUI.remove();
+}
 
 let _DOMVideo;
 async function initCombinedPlayer() {
+
+    cleanup();
     currentMode = 'player';
 
     // Hide all UI phases
@@ -431,7 +447,7 @@ function update() {
     }
 
 
-    console.log("arToolkitSource.ready: ", arToolkitSource.ready);
+    //console.log("arToolkitSource.ready: ", arToolkitSource.ready);
     // update artoolkit on every frame
     if (arToolkitSource.ready !== false)
         arToolkitContext.update(arToolkitSource.domElement);
