@@ -2,6 +2,12 @@ var ARjs = ARjs || {}
 var THREEx = THREEx || {}
 
 ARjs.MarkerControls = THREEx.ArMarkerControls = function(context, object3d, parameters){
+
+	this._dispatcher = new THREE.EventDispatcher();	
+	this.addEventListener = this._dispatcher.addEventListener.bind(this._dispatcher);
+	this.removeEventListener = this._dispatcher.removeEventListener.bind(this._dispatcher);
+	this.dispatchEvent = this._dispatcher.dispatchEvent.bind(this._dispatcher);
+	 
 	var _this = this
 
 	THREEx.ArBaseControls.call(this, object3d)
