@@ -277,6 +277,7 @@ async function initCombinedPlayer() {
     arVideo.style.height = '100%';
     arVideo.style.objectFit = 'cover'; // Ensures the video covers the screen without distortion
     arVideo.style.zIndex = '-1';       // Places the video BEHIND the three.js canvas
+    arVideo.style.display = 'block';
 
     // 4. --- THREE.js Scene Setup ---
     scene = new THREE.Scene();
@@ -388,6 +389,8 @@ function startWebARRocks(err, three) {
         return;
     }
 
+    console.log("startWebARRocks here");
+
     // Add lighting to the AR Scene
     three.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     const arDirLight = new THREE.DirectionalLight(0xffffff, 0.7);
@@ -422,7 +425,7 @@ function startWebARRocks(err, three) {
 }
 
 function update() {
-
+    console.log("here");
     globe.rotation.y += 0.01;
 
     let anyMarkerVisible = false;
