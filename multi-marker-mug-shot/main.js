@@ -265,7 +265,7 @@ async function initCombinedPlayer() {
         
 
         console.log("AR context initialized.");
-        console.log("dispatchEvent:", this.dispatchEvent);
+        console.log("dispatchEvent:", arToolkitContext.dispatchEvent);
         
     });
     markerNames = ["hiro", "kanji", "letterA"];
