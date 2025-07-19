@@ -453,6 +453,7 @@ function update() {
 
     // update artoolkit on every frame
     if (arToolkitSource.ready !== false)
+        console.log(arToolkitContext.dispatchEvent);
         arToolkitContext.update(arToolkitSource.domElement);
 
 }
