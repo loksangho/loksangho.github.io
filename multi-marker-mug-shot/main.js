@@ -473,9 +473,8 @@ function update() {
             markerArray[i].children[0].getWorldPosition(p);
             markerArray[i].children[0].getWorldQuaternion(q);
             markerArray[i].children[0].getWorldScale(s);
-            let lerpAmount = 0.5;
+            let lerpAmount = 0.1;
 
-            console.log(p);
 
             scene.add(sceneGroup);
 
@@ -483,9 +482,6 @@ function update() {
             sceneGroup.quaternion.slerp(q, lerpAmount);
             sceneGroup.scale.lerp(s, lerpAmount);
 
-            sceneGroup.position.set(p);
-            sceneGroup.quaternion.set(q);
-            sceneGroup.scale.set(s);
             break;
         }
     }
