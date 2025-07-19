@@ -225,7 +225,9 @@ async function initCombinedPlayer() {
     });
     
 
-    arToolkitContext.init(() => {
+   arToolkitContext.init(function onCompleted() {
+        
+
         camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
 
         /*const markerRoot = new THREE.Group();
