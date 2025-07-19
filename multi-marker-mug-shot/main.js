@@ -447,8 +447,9 @@ function update() {
 
     //console.log("arToolkitSource.ready: ", arToolkitSource.ready);
     // update artoolkit on every frame
-    if (arToolkitSource.ready !== false)
+    if (arToolkitSource && arToolkitSource.ready) { 
         arToolkitContext.update(arToolkitSource.domElement);
+    }
 
 }
 
@@ -466,7 +467,7 @@ function animateCombined() {
     }*/
 
     // Update WebARRocks - it processes the video and updates its internal object poses
-    /*if (isWebARRocksReady) {
+    if (isWebARRocksReady) {
         try {
         if (WebARRocksObjectThreeHelper.object3D && !webARrocksGroupAdded) {
             scene.add(WebARRocksObjectThreeHelper.object3D);
@@ -477,7 +478,7 @@ function animateCombined() {
         } catch (e) {
         console.warn("WebARRocks animate error:", e);
         }
-    }*/
+    }
 
     renderer.render(scene, camera);
 }
