@@ -170,14 +170,13 @@ async function initCombinedPlayer() {
     currentMode = 'player';
 
     // Hide all UI phases
-    document.getElementById('outputCanvas').style.display = 'none';
     document.getElementById('uiContainer').style.display = 'none';
     document.getElementById('phase1').style.display = 'none';
     const phase2 = document.getElementById('phase2');
     if (phase2) phase2.style.display = 'none';
 
     const canvas = document.getElementById('outputCanvas');
-    canvas.style.display = 'block';
+    canvas.style.display = 'none';
 
 
     scene = new THREE.Scene();
