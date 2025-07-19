@@ -7,7 +7,7 @@ ARjs.MarkerControls = THREEx.ArMarkerControls = function(context, object3d, para
 	this.addEventListener = this._dispatcher.addEventListener.bind(this._dispatcher);
 	this.removeEventListener = this._dispatcher.removeEventListener.bind(this._dispatcher);
 	this.dispatchEvent = this._dispatcher.dispatchEvent.bind(this._dispatcher);
-	
+	 
 	var _this = this
 
 	THREEx.ArBaseControls.call(this, object3d)
