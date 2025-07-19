@@ -466,7 +466,7 @@ function animateCombined() {
     }*/
 
     // Update WebARRocks - it processes the video and updates its internal object poses
-    if (isWebARRocksReady) {
+    /*if (isWebARRocksReady) {
         try {
         if (WebARRocksObjectThreeHelper.object3D && !webARrocksGroupAdded) {
             scene.add(WebARRocksObjectThreeHelper.object3D);
@@ -477,7 +477,7 @@ function animateCombined() {
         } catch (e) {
         console.warn("WebARRocks animate error:", e);
         }
-    }
+    }*/
 
     renderer.render(scene, camera);
 }
