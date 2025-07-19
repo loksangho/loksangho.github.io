@@ -210,100 +210,101 @@ async function initCombinedPlayer(profileData) {
         // Note: The library automatically appends its video element to the body,
         // so we don't need to manually append arToolkitSource.domElement.
 
-        arToolkitContext = new THREEx.ArToolkitContext({
-            cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
-            detectionMode: 'mono',
-            maxDetectionRate: 30, // Adjust as needed
+
+    });
+    arToolkitContext = new THREEx.ArToolkitContext({
+        cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
+        detectionMode: 'mono',
+        maxDetectionRate: 30, // Adjust as needed
+    });
+    
+
+    arToolkitContext.init(() => {
+        camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+
+        /*const markerRoot = new THREE.Group();
+        scene.add(markerRoot);
+
+        multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
+
+        const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
+        arjsObject.position.y = 0.5;
+        markerRoot.add(arjsObject);
+
+        _DOMVideo = document.getElementById('webcamVideo'); 
+        WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
+            throw new Error('Cannot get video feed ' + err);
+            }, {
+            video: {
+                width:  {min: 640, max: 1920, ideal: 1280},
+                height: {min: 640, max: 1920, ideal: 720},
+                facingMode: {ideal: 'environment'}
+            },
+            audio: false
         });
+        // 4. --- Initialize WebARRocks (as slave) ---
+        // It ALSO uses the shared video element, and we tell it to use our main scene.
         
 
-        arToolkitContext.init(() => {
-            camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+        const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
+        markerRoot.add(markerHelper.object3d);
 
-            /*const markerRoot = new THREE.Group();
-            scene.add(markerRoot);
+        console.log("AR setup complete. Starting animation loop.");
+        animateCombined();*/
+        _DOMVideo = document.getElementById('webcamVideo'); 
+        WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
+            throw new Error('Cannot get video feed ' + err);
+            }, {
+            video: {
+                width:  {min: 640, max: 1920, ideal: 1280},
+                height: {min: 640, max: 1920, ideal: 720},
+                facingMode: {ideal: 'environment'}
+            },
+            audio: false
+        });
+    });
 
-            multiMarkerControls = THREEx.ArMultiMarkerControls.fromJSON(arToolkitContext, scene, markerRoot, JSON.stringify(profileData));
+    markerNames = ["hiro", "kanji", "letterA"];
 
-            const arjsObject = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 'red' }));
-            arjsObject.position.y = 0.5;
-            markerRoot.add(arjsObject);
+    markerArray = [];
 
-            _DOMVideo = document.getElementById('webcamVideo'); 
-            WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
-                throw new Error('Cannot get video feed ' + err);
-                }, {
-                video: {
-                    width:  {min: 640, max: 1920, ideal: 1280},
-                    height: {min: 640, max: 1920, ideal: 720},
-                    facingMode: {ideal: 'environment'}
-                },
-                audio: false
-            });
-            // 4. --- Initialize WebARRocks (as slave) ---
-            // It ALSO uses the shared video element, and we tell it to use our main scene.
-            
+    for (let i = 0; i < markerNames.length; i++) {
+        let marker = new THREE.Group();
+        scene.add(marker);
+        markerArray.push(marker);
 
-            const markerHelper = new THREEx.ArMarkerHelper(multiMarkerControls);
-            markerRoot.add(markerHelper.object3d);
-
-            console.log("AR setup complete. Starting animation loop.");
-            animateCombined();*/
-            _DOMVideo = document.getElementById('webcamVideo'); 
-            WebARRocksMediaStreamAPIHelper.get(_DOMVideo, initWebARRocks, function(err){
-                throw new Error('Cannot get video feed ' + err);
-                }, {
-                video: {
-                    width:  {min: 640, max: 1920, ideal: 1280},
-                    height: {min: 640, max: 1920, ideal: 720},
-                    facingMode: {ideal: 'environment'}
-                },
-                audio: false
-            });
+        let markerControls = new THREEx.ArMarkerControls(arToolkitContext, marker, {
+            type: 'pattern',
+            patternUrl: "patt/" + markerNames[i] + ".patt",
         });
 
-        markerNames = ["hiro", "kanji", "letterA"];
+        let markerGroup = new THREE.Group();
+        marker.add(markerGroup);
+    }
 
-            markerArray = [];
+    ////////////////////////////////////////////////////////////
+    // setup scene
+    ////////////////////////////////////////////////////////////
 
-            for (let i = 0; i < markerNames.length; i++) {
-                let marker = new THREE.Group();
-                scene.add(marker);
-                markerArray.push(marker);
+    sceneGroup = new THREE.Group();
 
-                let markerControls = new THREEx.ArMarkerControls(arToolkitContext, marker, {
-                    type: 'pattern',
-                    patternUrl: "patt/" + markerNames[i] + ".patt",
-                });
+    let loader = new THREE.TextureLoader();
 
-                let markerGroup = new THREE.Group();
-                marker.add(markerGroup);
-            }
-
-            ////////////////////////////////////////////////////////////
-            // setup scene
-            ////////////////////////////////////////////////////////////
-
-            sceneGroup = new THREE.Group();
-
-            let loader = new THREE.TextureLoader();
-
-            let geometry1 = new THREE.SphereGeometry(1, 32, 32);
-            let texture = loader.load('images/earth-sphere.jpg');
-            let material1 = new THREE.MeshLambertMaterial({
-                map: texture,
-                opacity: 0.75
-            });
-            globe = new THREE.Mesh(geometry1, material1);
-            globe.position.y = 1;
-            sceneGroup.add(globe);
-
-            markerArray[0].children[0].add(sceneGroup);
-            currentMarkerName = markerNames[0];
-
-            let pointLight = new THREE.PointLight(0xffffff, 1, 50);
-            camera.add(pointLight);
+    let geometry1 = new THREE.SphereGeometry(1, 32, 32);
+    let texture = loader.load('images/earth-sphere.jpg');
+    let material1 = new THREE.MeshLambertMaterial({
+        map: texture,
+        opacity: 0.75
     });
+    globe = new THREE.Mesh(geometry1, material1);
+    globe.position.y = 1;
+    sceneGroup.add(globe);
+
+    markerArray[0].children[0].add(sceneGroup);
+    currentMarkerName = markerNames[0];
+
+    let pointLight = new THREE.PointLight(0xffffff, 1, 50);
+    camera.add(pointLight);
 }
 
 function initWebARRocks(){
