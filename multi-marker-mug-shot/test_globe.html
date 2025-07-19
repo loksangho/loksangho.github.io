@@ -13,14 +13,50 @@
 
     }</script>
     <!-- include jsartookit -->
-    <script src="https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker-mug-shot/jsartoolkit/artoolkit.min.js"></script>
-    <script src="https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker-mug-shot/jsartoolkit/artoolkit.api.js"></script>
-    <!-- include threex.artoolkit -->
-    <script src="threex/threex-artoolkitsource.js"></script>
-    <script src="threex/threex-artoolkitcontext.js"></script>
-    <script src="threex/threex-arbasecontrols.js"></script>
-    <script src="threex/threex-armarkercontrols.js"></script>
-</head>
+    <script type="module">
+      import * as THREE from 'three';
+      window.THREE = THREE;
+
+      // Step 2: Load legacy scripts only after window.THREE is ready
+      const legacyScripts = [
+        "https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker-mug-shot/jsartoolkit/artoolkit.min.js",
+        "https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker-mug-shot/jsartoolkit/artoolkit.api.js",
+        "threex/threex-artoolkitsource.js",
+        "threex/threex-artoolkitcontext.js",
+        "threex/threex-arbasecontrols.js",
+        "threex/threex-armarkercontrols.js"
+      ];
+
+      function loadNextScript() {
+        if (legacyScripts.length === 0) {
+          // All legacy scripts are loaded, now load our main application logic
+          console.log("All AR.js libraries loaded successfully from local files.");
+          document.getElementById('loading').innerHTML = "Loading Application...";
+          const mainScript = document.createElement('script');
+          mainScript.type = 'module';
+          mainScript.src = 'main.js';
+          document.body.appendChild(mainScript);
+          return;
+        }
+
+        const nextScriptSrc = legacyScripts.shift();
+        console.log(`Loading: ${nextScriptSrc}`);
+        const script = document.createElement('script');
+        script.src = nextScriptSrc;
+        script.onload = loadNextScript; // When this script finishes, load the next one
+        script.onerror = () => console.error(`Failed to load script: ${nextScriptSrc}. Make sure it's in the correct folder.`);
+        document.head.appendChild(script);
+      }
+
+      window.Module = {
+        logReadFiles: function(filePath) {
+          console.log("Reading file:", filePath);
+        }
+      };
+
+      // Start loading the scripts
+      loadNextScript();
+    </script>
 
 <body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
 
