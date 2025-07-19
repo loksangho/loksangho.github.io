@@ -94,9 +94,11 @@
         "threex/threex-arbasecontrols.js",
         "threex/threex-armarkercontrols.js"
       ];
+        
 
       function loadNextScript() {
-        
+          console.log("Global Module available?", window.Module);
+
         if (legacyScripts.length === 0) {
           // All legacy scripts are loaded, now load our main application logic
           console.log("All AR.js libraries loaded successfully from local files.");
