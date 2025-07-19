@@ -233,7 +233,6 @@ async function initCombinedPlayer() {
         // Note: The library automatically appends its video element to the body,
         // so we don't need to manually append arToolkitSource.domElement.
 
-
     });
     arToolkitContext = new THREEx.ArToolkitContext({
         cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
