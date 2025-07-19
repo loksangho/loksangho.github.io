@@ -260,6 +260,8 @@ async function initCombinedPlayer() {
             audio: false
         });
 
+        console.log("AR context initialized.");
+
         
     });
     markerNames = ["hiro", "kanji", "letterA"];
