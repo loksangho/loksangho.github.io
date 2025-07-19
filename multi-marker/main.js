@@ -243,8 +243,8 @@ async function initCombinedPlayer() {
 
     try {
         const legacyScripts = [
-            "https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker-mug-shot/jsartoolkit/artoolkit.min.js",
-            "https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker-mug-shot/jsartoolkit/artoolkit.api.js",
+            "https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker/jsartoolkit/artoolkit.min.js",
+            "https://raw.githack.com/loksangho/loksangho.github.io/gh-pages/multi-marker/jsartoolkit/artoolkit.api.js",
             "./threex/threex-artoolkitsource.js",
             "./threex/threex-artoolkitcontext.js",
             "./threex/threex-arbasecontrols.js",
