@@ -248,7 +248,7 @@ async function initCombinedPlayer() {
             "./threex/threex-artoolkitsource.js",
             "./threex/threex-artoolkitcontext.js",
             "./threex/threex-arbasecontrols.js",
-            "./threex/threex-armarkercontrols.js"
+            "./threex/threex-armarkercontrols.js?ver=1"
           ];
 
         for(var script in legacyScripts) {
