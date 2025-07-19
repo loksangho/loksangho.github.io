@@ -67,16 +67,15 @@
 
     }</script>
     <script src="./helpers/DeviceOrientationHelper.js"></script>
-    <script>
+
+    <!-- include jsartookit -->
+    <script type="module">
       var Module = {
         logReadFiles: function () {
           console.log("logReadFiles called");
         },
         // You can add other properties if needed.
       };
-    </script>
-    <!-- include jsartookit -->
-    <script type="module">
       import * as THREE from 'three';
       window.THREE = THREE;
 
