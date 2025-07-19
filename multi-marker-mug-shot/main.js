@@ -405,7 +405,7 @@ function update() {
     }
 
     if (!anyMarkerVisible) {
-        console.log("No marker currently visible.");
+        console.log("No marker currently visible."); 
     }
 
     let baseMarker = markerArray[0];
