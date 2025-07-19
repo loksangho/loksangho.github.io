@@ -83,7 +83,7 @@ async function main() {
         
         // 💡 Add the resize event listener globally
 
-        initMediaPipe();
+        initCombinedPlayer();
     } catch (error) {
         console.error("Error loading ar-threex.js:", error);
     }
@@ -425,7 +425,6 @@ function startWebARRocks(err, three) {
 }
 
 function update() {
-    console.log("here");
     globe.rotation.y += 0.01;
 
     let anyMarkerVisible = false;
