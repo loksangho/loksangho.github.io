@@ -234,7 +234,7 @@ async function initCombinedPlayer() {
         // so we don't need to manually append arToolkitSource.domElement.
 
 
-    });
+    });ß
     arToolkitContext = new THREEx.ArToolkitContext({
         cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
         detectionMode: 'mono',
@@ -305,6 +305,8 @@ async function initCombinedPlayer() {
 
     let pointLight = new THREE.PointLight(0xffffff, 1, 50);
     camera.add(pointLight);
+
+    console.log("ARContext initialised");
 }
 
 function initWebARRocks(){
