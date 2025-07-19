@@ -234,7 +234,7 @@ async function initCombinedPlayer() {
         // so we don't need to manually append arToolkitSource.domElement.
 
 
-    });ß
+    });
     arToolkitContext = new THREEx.ArToolkitContext({
         cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
         detectionMode: 'mono',
