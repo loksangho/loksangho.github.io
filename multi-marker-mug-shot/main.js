@@ -175,8 +175,6 @@ function cleanup() {
         WebARRocksObjectThreeHelper.destroy();
         webARrocksGroupAdded = false;
     }
-    const dynamicUI = document.getElementById('dynamicUI');
-    if(dynamicUI) dynamicUI.remove();
 }
 
 let _DOMVideo;
@@ -293,7 +291,7 @@ async function initCombinedPlayer() {
             patternUrl: "./patt/" + markerNames[i] + ".patt",
         });
 
-        console.log("Added marker ", markerNames[i]);
+        console.log("Added marker ", markerControls.parameters.patternUrl);
 
         let markerGroup = new THREE.Group();
         marker.add(markerGroup);
