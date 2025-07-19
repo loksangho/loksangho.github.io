@@ -166,17 +166,63 @@ function saveMesh() {
     }, (error) => console.error(error), { binary: true });
 }
 
+// main.js
+
 function cleanup() {
-    cancelAnimationFrame(animationFrameId);
-    if (video && video.srcObject) { video.srcObject.getTracks().forEach(track => track.stop()); video.srcObject = null; }
+    console.log("Cleaning up previous scene...");
+    // Stop any active animation loop
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+    }
+
+    // Stop and remove the MediaPipe video element (front camera)
+    if (video && video.srcObject) {
+        video.srcObject.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+    }
+
+    // Stop and remove the AR video element (rear camera)
+    if (arVideo && arVideo.srcObject) {
+        arVideo.srcObject.getTracks().forEach(track => track.stop());
+        arVideo.srcObject = null;
+        if (arVideo.parentNode) {
+            arVideo.parentNode.removeChild(arVideo);
+        }
+        arVideo = null;
+    }
+
+    // Clean up WebAR.rocks if it was initialized
+    if (isWebARRocksReady) {
+        WebARRocksObjectThreeHelper.destroy();
+        webARrocksGroupAdded = false;
+        isWebARRocksReady = false;
+    }
+
+    // Clean up AR.js context if it exists
+    // Note: The old ar-threex helper does not have a clean public dispose method,
+    // so we rely on garbage collection after nulling references.
+    if (arToolkitContext) {
+        arToolkitContext = null;
+        arToolkitSource = null;
+    }
+
+    // Dispose of the renderer and remove its canvas from the DOM
     if (renderer) {
+        if (renderer.domElement && renderer.domElement.parentNode) {
+            renderer.domElement.parentNode.removeChild(renderer.domElement);
+        }
         renderer.dispose();
         renderer = null;
     }
-    if (currentMode === 'player') { 
-        WebARRocksObjectThreeHelper.destroy();
-        webARrocksGroupAdded = false;
-    }
+
+    // Remove event listeners to prevent memory leaks
+    window.removeEventListener('resize', onResize);
+
+    // Reset scene objects
+    scene = null;
+    camera = null;
+    faceMesh = null;
 }
 
 let _DOMVideo;
