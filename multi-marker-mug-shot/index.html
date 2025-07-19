@@ -82,11 +82,29 @@
         "threex/threex-armarkercontrols.js"
       ];
 
-      for (const src of legacyScripts) {
+      function loadNextScript() {
+        if (legacyScripts.length === 0) {
+          // All legacy scripts are loaded, now load our main application logic
+          console.log("All AR.js libraries loaded successfully from local files.");
+          document.getElementById('loading').innerHTML = "Loading Application...";
+          const mainScript = document.createElement('script');
+          mainScript.type = 'module';
+          mainScript.src = 'main.js';
+          document.body.appendChild(mainScript);
+          return;
+        }
+
+        const nextScriptSrc = legacyScripts.shift();
+        console.log(`Loading: ${nextScriptSrc}`);
         const script = document.createElement('script');
-        script.src = src;
-        document.body.appendChild(script);
+        script.src = nextScriptSrc;
+        script.onload = loadNextScript; // When this script finishes, load the next one
+        script.onerror = () => console.error(`Failed to load script: ${nextScriptSrc}. Make sure it's in the correct folder.`);
+        document.head.appendChild(script);
       }
+
+      // Start loading the scripts
+      loadNextScript();
     </script>
     <script type="module" src="main.js" defer></script>
     <script src="./dist/WebARRocksObject.js"></script>
