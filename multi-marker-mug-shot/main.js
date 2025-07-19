@@ -186,7 +186,7 @@ async function initCombinedPlayer(profileData) {
     function onResize() {
         arToolkitSource.onResize()
         arToolkitSource.copySizeTo(renderer.domElement)
-        if (arToolkitContext.arController !== null) {
+        if (arToolkitContext && arToolkitContext.arController !== null) {
             arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)
         }
     }
