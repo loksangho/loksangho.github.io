@@ -456,18 +456,23 @@ function update() {
     for (let i = 0; i < markerArray.length; i++) {
         if (markerArray[i].visible) {
             anyMarkerVisible = true;
-            //console.log("Marker " + markerNames[i] + " is visible.");
+            console.log("Marker " + markerNames[i] + " is visible.");
             
 
             markerArray[i].children[0].add(sceneGroup);
             if (currentMarkerName != markerNames[i]) {
                 currentMarkerName = markerNames[i];
-                // console.log("Switching to " + currentMarkerName);
+                console.log("Switching to " + currentMarkerName);
             }
 
-            let p = markerArray[i].children[0].position;
-            let q = markerArray[i].children[0].quaternion;
-            let s = markerArray[i].children[0].scale;
+            const p = new THREE.Vector3();
+            const q = new THREE.Quaternion();
+            const s = new THREE.Vector3(1,1,1);
+
+            // 2. Then, you pass them as arguments
+            markerArray[i].children[0].getWorldPosition(p);
+            markerArray[i].children[0].getWorldQuaternion(q);
+            //markerArray[i].children[0].getWorldScale(s);
             let lerpAmount = 0.5;
 
             scene.add(sceneGroup);
