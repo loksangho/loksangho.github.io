@@ -503,7 +503,7 @@ function update() {
         let currentMarker = markerArray[i];
         let currentGroup = currentMarker.children[0];
         if (baseMarker.visible && currentMarker.visible) {
-            console.log("updating marker " + i +" -> base offset");
+            //console.log("updating marker " + i +" -> base offset");
             let relativePosition = currentMarker.worldToLocal(baseMarker.position.clone());
             currentGroup.position.copy(relativePosition);
 
