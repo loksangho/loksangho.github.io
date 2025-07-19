@@ -410,7 +410,7 @@ function update() {
 
 
     if (!anyMarkerVisible) {
-        console.log("No marker currently visible."); 
+        //console.log("No marker currently visible."); 
     }
 
     let baseMarker = markerArray[0];
@@ -430,6 +430,8 @@ function update() {
         }
     }
 
+
+    console.log("arToolkitSource.ready: ", arToolkitSource.ready);
     // update artoolkit on every frame
     if (arToolkitSource.ready !== false)
         arToolkitContext.update(arToolkitSource.domElement);
