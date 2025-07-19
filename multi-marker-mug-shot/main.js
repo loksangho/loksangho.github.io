@@ -58,9 +58,6 @@ const _settings = {
   displayDebugCylinder: false
 };
 
-console.log("beginning of main.js");
-console.log("window.Module:", window.Module);
-console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
 
 
 function loadLegacyScript(url) {
@@ -95,6 +92,10 @@ async function main() {
 
 async function initMediaPipe() {
     currentMode = 'mediapipe';
+
+    console.log("initMediaPipeStart");
+    console.log("window.Module:", window.Module);
+    console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 2.5;
@@ -111,6 +112,11 @@ async function initMediaPipe() {
     video.srcObject = stream;
     await new Promise(resolve => video.onloadedmetadata = () => { video.play(); resolve(); });
     video.style.display = 'none';
+
+    console.log("middleMediaPipe");
+    console.log("window.Module:", window.Module);
+    console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
+
     const visionResolver = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/wasm");
     faceLandmarker = await FaceLandmarker.createFromOptions(visionResolver, {
         baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task` },
