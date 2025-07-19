@@ -17,7 +17,7 @@ let animationFrameId;
 let currentMode = null;
 let webARrocksGroupAdded = false;
 let isWebARRocksReady = false;
-let markerArray, markerNames;
+let markerArray, markerNames, sceneGroup, globe, currentMarkerName;
 
 // AR specific variables
 let arToolkitSource, arToolkitContext, multiMarkerControls, multiMarkerLearning;
