@@ -68,14 +68,16 @@
     }</script>
     <script src="./helpers/DeviceOrientationHelper.js"></script>
     <script>
-      Module = {
-        logReadFiles: function (file) {
-          console.log("File read:", file);
-        },
-        onRuntimeInitialized: function () {
-          console.log("ARToolKit ready");
-        }
-      };
+      
+    window.Module = {
+      logReadFiles: function (file) {
+        console.log("File read:", file);
+      },
+      onRuntimeInitialized: function () {
+        console.log("ARToolKit ready");
+      }
+    };
+
     </script>
     <!-- include jsartookit -->
     <script type="module">
