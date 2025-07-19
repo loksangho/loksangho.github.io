@@ -62,7 +62,10 @@
 
    
 
-    <script>
+    <script type="module">
+
+        import * as THREE from 'three';
+        window.THREE = THREE;
         var scene, camera, renderer, clock, deltaTime, totalTime;
 
         var arToolkitSource, arToolkitContext;
