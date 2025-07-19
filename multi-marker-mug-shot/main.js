@@ -156,86 +156,6 @@ function cleanup() {
     if(dynamicUI) dynamicUI.remove();
 }
 
-function initLearner() {
-    cleanup();
-    currentMode = 'learner';
-    const canvas = document.getElementById('outputCanvas');
-    canvas.style.display = 'block';
-    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera();
-    scene.add(camera);
-    arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
-    arToolkitSource.init(() => {
-        onResize();
-
-        setTimeout(() => {
-            arToolkitSource.onResizeElement();
-            arToolkitSource.copyElementSizeTo(renderer.domElement);
-        }, 100);
-    });
-    arToolkitContext = new THREEx.ArToolkitContext({
-        cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
-        detectionMode: 'mono',
-    });
-    arToolkitContext.init(() => camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix()));
-    const subMarkersControls = [];
-    const markerNames = ['hiro', 'kanji', 'letterA'];
-
-    markerNames.forEach(function(markerName){
-        const markerRoot = new THREE.Group();
-        scene.add(markerRoot);
-        const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
-            type: 'pattern',
-            patternUrl: `./patt/patt.${markerName}`,
-        });
-        const markerHelper = new THREEx.ArMarkerHelper(markerControls);
-        markerControls.object3d.add(markerHelper.object3d);
-        subMarkersControls.push(markerControls);
-    });
-    multiMarkerLearning = new THREEx.ArMultiMakersLearning(arToolkitContext, subMarkersControls);
-    multiMarkerLearning.enabled = true;
-
-    // --- MODIFIED UI FOR LEARNING STATUS ---
-    const controlsContainer = document.createElement('div');
-    controlsContainer.id = 'dynamicUI';
-    controlsContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; color: white;';
-    // 💡 Changed button to "Save Profile & Start Player"
-    controlsContainer.innerHTML = `
-        <button id="resetBtn">Reset Learning</button>
-        <button id="saveAndPlayBtn">Save Profile & Start Player</button>
-        <div style="margin-top: 10px;">Status: <span id="learningStatus" style="font-weight: bold; color: red;">In Progress...</span></div>
-    `;
-    document.body.appendChild(controlsContainer);
-    document.getElementById('resetBtn').onclick = () => multiMarkerLearning.resetStats();
-    
-    // --- MODIFIED BUTTON LOGIC TO SAVE TO MEMORY AND START PLAYER ---
-    document.getElementById('saveAndPlayBtn').onclick = () => {
-        const profileData = JSON.parse(multiMarkerLearning.toJSON());
-        
-        if (!profileData || !profileData.subMarkersControls || profileData.subMarkersControls.length < markerNames.length) {
-            alert(`Learning not complete! Please show all markers to the camera until the status is 'Ready'.`);
-            return;
-        }
-
-        profileData.parameters = {
-            type: 'area'
-        };
-        
-        // 💡 Save data to memory variable instead of downloading a file
-        savedProfileData = profileData;
-        alert("Profile saved to memory. Starting the player...");
-        
-        
-
-        // 💡 Directly initialize the player with the saved data
-        initCombinedPlayer(savedProfileData);
-    };
-    
-    animateAR();
-}
-
 // 💡 NEW: A robust resize handler for all modes
 function onResize() {
     arToolkitSource.onResize()
@@ -579,8 +499,6 @@ function animateCombined() {
         console.warn("WebARRocks animate error:", e);
         }
     }
-        
-
 
     renderer.render(scene, camera);
 }
@@ -589,35 +507,6 @@ function animate() {
     if (currentMode !== 'mediapipe') return;
     animationFrameId = requestAnimationFrame(animate);
     renderMediaPipe();
-}
-
-function animateAR() {
-    if (currentMode !== 'learner') return;
-    animationFrameId = requestAnimationFrame(animateAR);
-    if (!arToolkitSource || !arToolkitSource.ready) return;
-    arToolkitContext.update(arToolkitSource.domElement);
-    
-    if (multiMarkerLearning) {
-        multiMarkerLearning.computeResult();
-        const statusElement = document.getElementById('learningStatus');
-        if (statusElement) {
-            let nMarkersLearned = 0;
-            multiMarkerLearning.subMarkersControls.forEach(function(markerControls) {
-                if (markerControls.object3d.userData.result === undefined) return;
-                if (markerControls.object3d.userData.result.confidenceFactor < 1) return;
-                nMarkersLearned++;
-            });
-
-            if (nMarkersLearned === multiMarkerLearning.subMarkersControls.length) {
-                statusElement.innerHTML = 'Ready to Start Player!';
-                statusElement.style.color = 'lightgreen';
-            } else {
-                statusElement.innerHTML = `In Progress... (${nMarkersLearned}/${multiMarkerLearning.subMarkersControls.length})`;
-                statusElement.style.color = 'red';
-            }
-        }
-    }
-    renderer.render(scene, camera);
 }
 
 let lastVideoTime = -1;
