@@ -128,7 +128,10 @@ async function initMediaPipe() {
     document.getElementById('playerButton').addEventListener('click', initCombinedPlayer);
 
     // 💡 REMOVED playerButton and profileInput logic, as player is now started from the learner.
-    
+
+    console.log("initMediaPipe");
+    console.log("window.Module:", window.Module);
+    console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
     animate();
 }
 
@@ -150,6 +153,9 @@ let _DOMVideo;
 async function initCombinedPlayer() {
     currentMode = 'player';
 
+    console.log("initCombinedPlayer");
+    console.log("window.Module:", window.Module);
+    console.log("Module === window.Module:", typeof Module !== 'undefined' && Module === window.Module);
 
     // Hide all UI phases
     document.getElementById('outputCanvas').style.display = 'none';
