@@ -186,20 +186,13 @@ async function initCombinedPlayer(profileData) {
     function onResize() {
         arToolkitSource.onResize()
         arToolkitSource.copySizeTo(renderer.domElement)
-        if (arToolkitContext && arToolkitContext.arController !== null) {
+        if (arToolkitContext.arController !== null) {
             arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)
         }
     }
 
     arToolkitSource.init(function onReady() {
         onResize();
-
-        arToolkitContext = new THREEx.ArToolkitContext({
-            cameraParametersUrl: 'https://raw.githack.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
-            detectionMode: 'mono'
-        });
-
-
     });
 
     // handle resize event
