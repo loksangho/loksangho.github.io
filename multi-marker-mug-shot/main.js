@@ -266,7 +266,7 @@ async function initCombinedPlayer(profileData) {
         });
     });
 
-    markerNames = ["hiro", "kanji", "letterA"];
+    let markerNames = ["hiro", "kanji", "letterA"];
 
     markerArray = [];
 
