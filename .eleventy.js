@@ -1,4 +1,5 @@
 require('dotenv').config();
+const { BLOCKS } = require('@contentful/rich-text-types')
 const { documentToHtmlString } = require("@contentful/rich-text-html-renderer");
 const { documentToPlainTextString } = require("@contentful/rich-text-plain-text-renderer");
 const trimWords = require('trim-words').default;
